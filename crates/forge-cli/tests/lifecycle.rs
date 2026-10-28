@@ -133,6 +133,28 @@ fn success_and_artifact_change_invalidates_status() {
     assert!(!f.call(&["resume"]).0);
 }
 #[test]
+fn ignored_artifact_change_blocks_resume() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    std::fs::write(f.repo.join(".gitignore"), "output.txt\n").unwrap();
+    let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    m["tasks"][0]["acceptance"] = json!([{
+        "kind":"artifact", "path":"output.txt", "sha256":forge_domain::digest(b"verified")
+    }]);
+    std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+    assert!(f.call(&["release", "run"]).0);
+    std::fs::write(f.repo.join("output.txt"), "tampered").unwrap();
+    assert_eq!(f.call(&["status"]).1["evidence_current"], false);
+    let (ok, result) = f.call(&["resume"]);
+    assert!(!ok);
+    assert!(
+        result["error"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("reconcile"),
+        "{result}"
+    );
+}
+#[test]
 fn mandatory_memory_fails_closed() {
     let f = Fixture::new("printf verified > output.txt", false);
     let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();

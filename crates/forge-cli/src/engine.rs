@@ -167,7 +167,9 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                 .tasks
                 .values()
                 .any(|t| t.status == "running" || t.pid.is_some());
-            let changed = old.manifest_hash != c.hash || old.revisions != current;
+            let changed = old.manifest_hash != c.hash
+                || old.revisions != current
+                || !artifacts_current(&c, &old);
             if let Some(reason) = reconcile {
                 ensure!(!reason.trim().is_empty(), "reconciliation reason required");
                 for t in old.tasks.values() {
@@ -188,7 +190,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
             } else {
                 ensure!(
                     !changed && !orphan,
-                    "manifest/worktree changed or orphan detected; resume --reconcile REASON is required"
+                    "manifest/worktree/artifact changed or orphan detected; resume --reconcile REASON is required"
                 );
                 ensure!(
                     old.status != "cancelled",
