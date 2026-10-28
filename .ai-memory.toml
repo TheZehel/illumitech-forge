@@ -1,4 +1,5 @@
 workspace = "illumitech"
+project = "illumitech-forge"
 project_strategy = "repo-root"
 
 [auto_improve]

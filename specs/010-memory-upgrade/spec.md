@@ -1,6 +1,6 @@
 # FORGE-010 — Atualização ai-memory
 
-Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
+Status: verified for the approved Codex v0.1.0 scope (ADR 0001).
 
 ## Dependências
 FORGE-006

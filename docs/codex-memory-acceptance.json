@@ -7,7 +7,7 @@
   "server_version": "3.2.9",
   "scope": {
     "workspace": "illumitech",
-    "project": "forge-eval-codex-baseline",
+    "project": "illumitech-forge",
     "resolved_by": "explicit"
   },
   "native_mcp_calls": [
@@ -22,15 +22,14 @@
       "is_error": false
     }
   ],
-  "earlier_sessions_visible": 5,
-  "current_session_records": 0,
+  "earlier_sessions_visible": 2,
+  "current_session_records": 1,
   "read_only_preserved": true,
   "external_behavior_gate": "passed",
   "limitations": [
-    "Claude acceptance remains deferred.",
-    "No durable memory page was explicitly written for this test.",
-    "Session record count does not by itself prove lifecycle observation deduplication.",
-    "Native hook trust and verification of new lifecycle capture were explicitly deferred by the user."
+    "Claude is experimental under the approved v0.1.0 scope.",
+    "Forge called read-only MCP tools; native hooks captured session continuity.",
+    "Initial backfill overlap was corrected and retested; see lifecycle-acceptance.json."
   ],
-  "lifecycle_capture": "deferred_by_user"
+  "lifecycle_capture": "passed"
 }

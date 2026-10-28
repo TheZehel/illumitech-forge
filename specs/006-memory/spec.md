@@ -1,6 +1,6 @@
 # FORGE-006 — Memória integrada
 
-Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
+Status: verified for the approved Codex v0.1.0 scope; see docs/lifecycle-acceptance.json.
 
 ## Dependências
 FORGE-004, FORGE-005

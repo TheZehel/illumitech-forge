@@ -5,7 +5,7 @@ evidências vinculadas ao manifest e fingerprint do worktree. Falhas de contrato
 obrigatória ou permissão bloqueiam sem retry. Migrações usam cópia ensaiada e rollback separado.
 
 ## Verificação
-- Codex e Claude reais.
+- Codex real; Claude experimental nesta entrega (ADR 0001).
 - atualização aceita e revisão humana.
 
 Registrar evidência em docs/verification.md; manter limitações explícitas.

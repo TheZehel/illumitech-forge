@@ -23,14 +23,13 @@
   ],
   "release_published": false,
   "release_blockers": [
-    "Claude native acceptance deferred by user",
-    "Native hook trust and lifecycle capture deferred by user",
-    "Final integrated release review not completed"
+    "Final human release review and explicit publication"
   ],
   "smoke_tests": {
     "macos_arm64": "passed --version",
     "linux_x86_64_ubuntu_24_04": "passed --version",
     "linux_debian_12": "unsupported: requires GLIBC_2.39"
   },
-  "linux_minimum_glibc": "2.39"
+  "linux_minimum_glibc": "2.39",
+  "scope_decision": "v0.1.0 focused on Codex; Claude experimental (ADR 0001)"
 }

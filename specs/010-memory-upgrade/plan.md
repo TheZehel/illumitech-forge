@@ -6,6 +6,6 @@ obrigatória ou permissão bloqueiam sem retry. Migrações usam cópia ensaiada
 
 ## Verificação
 - integridade IDs páginas buscas escopos.
-- continuidade nos dois clientes.
+- continuidade no Codex; Claude experimental conforme ADR 0001.
 
 Registrar evidência em docs/verification.md; manter limitações explícitas.

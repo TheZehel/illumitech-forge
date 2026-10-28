@@ -4,6 +4,7 @@
 
 **From contract to evidence.** A Rust CLI for coordinating releases with Codex and Claude Code.
 An agent saying “done” never proves that a task passed.
+**v0.1.0: Codex validated; Claude experimental.** [Approved scope](docs/adr/0001-first-delivery-scope.md).
 
 [Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification.md)
 
@@ -13,6 +14,10 @@ Initially private, MIT-licensed from the first version. Public visibility is a l
 Version 0.1.0 publication requires integrated acceptance, a validated memory upgrade and human review.
 
 ## Install and try
+
+Download the platform archive from the private release; the binary needs no Rust toolchain.
+The [first-run guide](docs/quickstart.md) covers checksums and bundled examples with and without
+Codex. Examples require Git and Python 3.
 
 Supports macOS ARM64 and Linux x86_64. Rust 1.94.0 and Git are required for source builds.
 The CI Linux binary requires glibc 2.39 or newer (Ubuntu 24.04); other distributions can build from source.

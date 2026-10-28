@@ -9,7 +9,8 @@ out=root/'dist';out.mkdir(exist_ok=True)
 archive=out/f'illumitech-forge-v0.1.0-{target}.tar.gz'
 with tarfile.open(archive,'w:gz') as tar:
  tar.add(binary,arcname='illumitech-forge')
- for name in ['LICENSE','THIRD_PARTY_NOTICES','THIRD_PARTY_LICENSES','docs/dependencies.json']:
+ for name in ['LICENSE','THIRD_PARTY_NOTICES','THIRD_PARTY_LICENSES','docs/dependencies.json',
+              'docs/quickstart.md','scripts/demo.py','scripts/agent-fixtures.py']:
   tar.add(root/name,arcname=name)
 hash=hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()
 (out/(archive.name+'.sha256')).write_text(f'{hash}  {archive.name}\n')

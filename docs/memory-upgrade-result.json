@@ -57,7 +57,9 @@
       "unrelated_configuration_preserved": true,
       "idempotent_reapply": true,
       "max_memory_handlers_per_event": 1,
-      "native_session_acceptance": "MCP recovery passed; lifecycle capture deferred by user"
+      "native_session_acceptance": "passed: fresh scoped recovery, lifecycle capture and project isolation",
+      "hook_trust": "7 enabled and trusted",
+      "backfill_on_start": false
     },
     "claude-code": {
       "unrelated_configuration_preserved": true,
@@ -67,16 +69,14 @@
     }
   },
   "limitations": [
-    "Native Codex MCP recovery passed; lifecycle capture explicitly deferred by user.",
-    "Claude configuration is prepared, but real Claude session acceptance is deferred.",
+    "Claude configuration is prepared but experimental; no real Claude acceptance is claimed.",
     "Private backups, corpus and configuration inventories are excluded from the repository."
   ],
   "migration_note": "The OKF migration creates one deterministic index.md per project; the live wiki watcher indexed these 42 new bundle indexes. All 624 pre-existing page records remained unchanged.",
   "forge_repo_scope": {
     "workspace": "illumitech",
     "project": "illumitech-forge",
-    "status": "not_registered",
-    "doctor_result": "blocked",
-    "next_step": "Register through an authorized lifecycle session after native hook trust or an explicitly requested scoped bootstrap; no unscoped fallback."
+    "status": "registered_by_native_lifecycle",
+    "doctor_result": "passed"
   }
 }

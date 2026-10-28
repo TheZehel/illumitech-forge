@@ -18,7 +18,8 @@ runtime and must never be executed by an agent tasked with modifying a project.
 6. Only after the rehearsal passes, stop the active writer, obtain the final backup and migrate the
    updated corpus. Preserve the old container/volume for rollback; one writer per data directory.
 7. Update the pinned client and native integrations together. Preserve unrelated settings and model
-   selection. Review hook diffs for duplicate capture and run fresh Codex and Claude sessions.
+   selection. Review hook diffs for duplicate capture and run fresh client sessions. For the
+   approved v0.1.0 scope, Codex is required and Claude remains experimental (ADR 0001).
 8. On failure, stop the new writer and restore the final old-version backup using the old image.
    Do not point 1.17.3 at the migrated database.
 
@@ -28,3 +29,9 @@ Operational backup paths and private inventories are deliberately kept outside t
 Actual outcomes and remaining gates appear in verification.md.
 
 Validated result: [migration evidence](memory-upgrade-result.json). The current server is 3.2.9 on Docker/Colima. Native helper clients are used only for host hooks/bridges; no native server migration occurred.
+
+The first real capture exposed an overlap between automatic first-project transcript backfill
+and live hooks in 3.2.9. The native client's `config.toml` now has `backfill_on_start = false`.
+Hook definitions and trust hashes were preserved. A subsequent session and an entirely new
+disposable project each captured one start, prompt, stop and end, with no cross-project rows.
+Historical records from the failed test were retained. Manual history import remains explicit.

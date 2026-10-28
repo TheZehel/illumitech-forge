@@ -1,6 +1,6 @@
 # FORGE-004 — Execução nativa
 
-Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
+Status: verified for command and Codex; Claude experimental under ADR 0001.
 
 ## Dependências
 FORGE-002, FORGE-003

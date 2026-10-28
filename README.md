@@ -4,6 +4,7 @@
 
 **Do contrato à evidência.** CLI em Rust para coordenar releases com Codex e Claude Code,
 sem confundir a resposta de um agente com trabalho verificado.
+**v0.1.0: Codex validado; Claude experimental.** [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
 
 [English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências atuais](docs/verification.md) · [Specs](specs)
 
@@ -15,7 +16,11 @@ quando os gates de integração, memória e revisão humana estiverem comprovado
 
 ## Instalação
 
-Requer macOS ARM64 ou Linux x86_64, Git e a toolchain Rust 1.94.0.
+Use o arquivo da sua plataforma na release privada: o binário não exige Rust.
+O [guia de primeira execução](docs/quickstart.md) inclui verificação de checksums e exemplos
+com e sem Codex. Git e Python 3 são necessários para os exemplos.
+
+Para compilar do código-fonte, requer macOS ARM64 ou Linux x86_64, Git e Rust 1.94.0.
 O binário Linux da CI requer glibc 2.39 ou superior (Ubuntu 24.04); outras distribuições podem compilar do código-fonte. Windows ainda não tem
 suporte operacional. Codex e Claude Code são instalados e autenticados separadamente.
 
@@ -98,6 +103,8 @@ nunca valores no manifest. `memory doctor` verifica a capacidade e o escopo devo
 Modo opcional registra degradação. O Forge não acessa o banco do ai-memory, não escreve páginas
 permanentes e não instala hooks. As integrações nativas existentes continuam responsáveis pela
 captura; procedimentos compartilhados ficam em `skills/core/SKILL.md`.
+No ai-memory 3.2.9, desative o backfill automático no cliente nativo para que ele não
+importe a sessão em andamento junto com os hooks. Veja o [guia](docs/quickstart.md#memória-e-limites--memory-and-limits).
 
 Os adaptadores preservam autenticação, configuração e modelo padrão dos CLIs. Um modelo só
 é passado quando declarado no manifest. Codex usa sandbox explícito; Claude usa `dontAsk`

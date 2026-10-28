@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "status": "passed",
+  "codex_cli": "0.165.0",
+  "ai_memory": "3.2.9",
+  "trusted_enabled_hooks": 7,
+  "memory_handlers_per_event": 1,
+  "initial_attempt": "failed: automatic first-project backfill overlapped live capture",
+  "correction": "Native client backfill_on_start=false; trusted hook commands unchanged; failed records retained",
+  "scenarios": [
+    {
+      "schema_version": 1,
+      "status": "passed",
+      "scope": {
+        "workspace": "illumitech",
+        "project": "illumitech-forge"
+      },
+      "native_session_sha256": "02e41842323bc537d5270126837e946e787174358dafd55ba429d717243972a5",
+      "observations": 8,
+      "events": {
+        "session-start": 1,
+        "user-prompt": 1,
+        "pre-tool-use": 2,
+        "post-tool-use": 2,
+        "stop": 1,
+        "session-end": 1
+      },
+      "cross_project_observations": 0,
+      "files_preserved": true,
+      "scenario": "loop_native_capture"
+    },
+    {
+      "schema_version": 1,
+      "status": "passed",
+      "scope": {
+        "workspace": "illumitech",
+        "project": "illumitech-forge"
+      },
+      "native_session_sha256": "cd0683d3589d62e057386493e4ffc23cdcbe0486d4c3f35292e3b2cd28c57ba3",
+      "observations": 10,
+      "events": {
+        "session-start": 1,
+        "user-prompt": 1,
+        "pre-tool-use": 3,
+        "post-tool-use": 3,
+        "stop": 1,
+        "session-end": 1
+      },
+      "cross_project_observations": 0,
+      "files_preserved": true,
+      "scenario": "forge_required_memory_continuity"
+    },
+    {
+      "schema_version": 1,
+      "status": "passed",
+      "scope": {
+        "workspace": "illumitech",
+        "project": "forge-eval-isolation-20261028"
+      },
+      "native_session_sha256": "6dc07690c3fec355be54bb090f497d64db600b4c3ac49659529685eba4a85523",
+      "observations": 10,
+      "events": {
+        "session-start": 1,
+        "user-prompt": 1,
+        "pre-tool-use": 3,
+        "post-tool-use": 3,
+        "stop": 1,
+        "session-end": 1
+      },
+      "cross_project_observations": 0,
+      "files_preserved": true,
+      "scenario": "fresh_project_isolation"
+    }
+  ],
+  "scope_marker": "workspace illumitech; explicit project illumitech-forge; repo-root strategy",
+  "limitations": [
+    "Bounded real sessions establish these lifecycle scenarios, not all future workloads.",
+    "PreCompact was not triggered in the bounded acceptance runs.",
+    "Claude remains experimental and was not run."
+  ]
+}

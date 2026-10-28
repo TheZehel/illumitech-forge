@@ -12,17 +12,17 @@ Snapshot: 2026-10-28. Implementation evidence and integrated release acceptance 
 | Secret scan | passed | gitleaks, redacted output, no findings |
 | Legacy bootstrap/import | passed (planning and import only) | [12 read-only candidates](legacy-import.json), isolated Loop worktree, inspect/dry-run and 52 tests |
 | Codex baseline/toolkit | passed | [real native implementation and read-only review](codex-acceptance.json), external pinned behavioral evaluator |
-| Codex mandatory memory | passed for scoped recovery | [fresh native MCP calls](codex-memory-acceptance.json), previous sessions available in the correct fixture project |
-| New lifecycle capture | deferred by user | new hook trust not granted; capture must not be inferred from successful MCP reads |
-| Claude native | deferred by user | initial existing API-key auth returned insufficient credit; incompatible configured model; no further runs attempted |
+| Codex mandatory memory | passed | [fresh native MCP calls](codex-memory-acceptance.json), previous sessions recovered in illumitech/illumitech-forge |
+| New lifecycle capture | passed | [three bounded real scenarios](lifecycle-acceptance.json); trusted hooks, unique lifecycle events, preserved files and no cross-project rows |
+| Claude native | experimental, outside v0.1.0 acceptance | [explicit scope decision](adr/0001-first-delivery-scope.md); no further Claude runs attempted |
 | ai-memory rehearsal | passed | isolated old/new copies; integrity, IDs and content preserved; old-version restore validated |
-| ai-memory production upgrade | passed; integrated client acceptance partial | [3.2.9 active](memory-upgrade-result.json), final backups, separate volume, retained 1.17.3 image and volume |
+| ai-memory production upgrade | passed for Codex scope | [3.2.9 active](memory-upgrade-result.json), final backups, separate volume, retained 1.17.3 image and volume |
 | ai-memory client configuration | passed | idempotent install; unrelated settings preserved; one ai-memory handler per event |
-| Forge repository memory scope | pending | marker configured for illumitech/illumitech-forge; scope registration awaits authorized lifecycle capture or explicit bootstrap; doctor fails closed |
+| Forge repository memory scope | passed | explicit marker, registered by real SessionStart; memory doctor verified illumitech/illumitech-forge |
 | CI macOS/Linux | passed | [run 40730758972](https://github.com/TheZehel/illumitech-forge/actions/runs/40730758972), code commit 4e4942d |
 | Binary archives and checksums | passed | [distribution evidence](distribution-result.json); downloaded CI archives verified locally |
 | Private repository | published | [TheZehel/illumitech-forge](https://github.com/TheZehel/illumitech-forge), MIT, private visibility verified |
-| Private release v0.1.0 | blocked | Claude, native capture/scope continuity and final human release review remain pending; no tag or release published |
+| Private release v0.1.0 | awaiting final review | Codex scope approved; final candidate review and explicit publication remain; GitHub release is the publication receipt |
 
 The first Codex evaluator imported Python and created bytecode. Forge blocked acceptance because
 the evaluator changed the worktree, even though it exited 0. The corrected evaluator disables
@@ -43,11 +43,17 @@ harvesting and scheduled improvement are disabled; no durable knowledge note was
 [Tool pilots](tool-pilots.json) cover only disposable fixtures. RTK was not installed globally;
 Graphify ran code-only in an isolated environment. No LLM benchmark or savings claim follows.
 
-The user approved the Rust core for real acceptance, then explicitly deferred Claude execution and
-new lifecycle capture. These decisions do not waive the original integrated release gates. Daemon
+The user approved the Rust core, later authorized lifecycle capture, and explicitly selected a
+Codex-focused v0.1.0 with Claude experimental (ADR 0001). All other release gates remain mandatory.
+The first fresh-project capture exposed a 3.2.9 backfill/live-hook overlap and failed its external
+gate. Disabling automatic startup backfill in the native client preserved trusted hook definitions.
+The subsequent Loop run, Forge continuity run and entirely new disposable project all passed.
+No old observations were deleted or rewritten. Daemon
 mode remains a documented future extension; this version uses foreground supervision and persistent
 control commands. The Linux CI binary requires glibc 2.39 (Ubuntu 24.04); source builds remain available.
 
 Private operational artifacts, session identifiers, host paths, raw output and memory corpus remain
-outside this repository. Documentation-only reconciliation after code commit 4e4942d does not change
-the tested binary inputs. Build artifacts are staged locally and in the private Actions run, not released.
+outside this repository. Binary inputs remain unchanged from code commit 4e4942d; packaging now also
+includes the bilingual first-run guide and example generators. The distribution receipt identifies
+the build and archive checksums. This ledger is the pre-publication snapshot; the GitHub release
+records the final publication without modifying the approved source revision.

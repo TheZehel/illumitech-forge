@@ -6,6 +6,6 @@ obrigatória ou permissão bloqueiam sem retry. Migrações usam cópia ensaiada
 
 ## Verificação
 - processos órfãos e timeout.
-- ambos os CLIs reais.
+- Codex real e subprocessos; Claude experimental nesta entrega (ADR 0001).
 
 Registrar evidência em docs/verification.md; manter limitações explícitas.
