@@ -19,7 +19,7 @@ Snapshot: 2026-10-28. Implementation evidence and integrated release acceptance 
 | ai-memory production upgrade | passed; integrated client acceptance partial | [3.2.9 active](memory-upgrade-result.json), final backups, separate volume, retained 1.17.3 image and volume |
 | ai-memory client configuration | passed | idempotent install; unrelated settings preserved; one ai-memory handler per event |
 | Forge repository memory scope | pending | marker configured for illumitech/illumitech-forge; scope registration awaits authorized lifecycle capture or explicit bootstrap; doctor fails closed |
-| CI macOS/Linux | passed | [run 40728932643](https://github.com/TheZehel/illumitech-forge/actions/runs/40728932643), code commit 6c4bbea |
+| CI macOS/Linux | passed | [run 40730758972](https://github.com/TheZehel/illumitech-forge/actions/runs/40730758972), code commit 4e4942d |
 | Binary archives and checksums | passed | [distribution evidence](distribution-result.json); downloaded CI archives verified locally |
 | Private repository | published | [TheZehel/illumitech-forge](https://github.com/TheZehel/illumitech-forge), MIT, private visibility verified |
 | Private release v0.1.0 | blocked | Claude, native capture/scope continuity and final human release review remain pending; no tag or release published |
@@ -36,7 +36,7 @@ was reproduced before correction; the 27-test suite and native CI passed afterwa
 The first production migration rolled back automatically because the operator used an unavailable
 HTTP health route. The corrected MCP handshake passed after another final backup and migration to
 a fresh volume. No migrated database was opened with the old binary. The final snapshot preserves
-all old records and all 624 existing page bodies/metadata. The OKF migration also produced 42
+all old IDs and all 624 existing page bodies, paths and update timestamps. The OKF migration also produced 42
 deterministic project bundle indexes, which the live wiki watcher indexed. Automatic profile
 harvesting and scheduled improvement are disabled; no durable knowledge note was explicitly written.
 
@@ -49,5 +49,5 @@ mode remains a documented future extension; this version uses foreground supervi
 control commands. The Linux CI binary requires glibc 2.39 (Ubuntu 24.04); source builds remain available.
 
 Private operational artifacts, session identifiers, host paths, raw output and memory corpus remain
-outside this repository. Documentation-only reconciliation after code commit 6c4bbea does not change
+outside this repository. Documentation-only reconciliation after code commit 4e4942d does not change
 the tested binary inputs. Build artifacts are staged locally and in the private Actions run, not released.

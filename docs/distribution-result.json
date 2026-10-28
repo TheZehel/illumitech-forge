@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "source_commit": "6c4bbea7a189a9ee2459eb67e0807d8ed02337fa",
-  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40728932643",
+  "source_commit": "4e4942d455ee9ccc1450fbf520342f86af1274b9",
+  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40730758972",
   "ci_result": "success",
   "platforms": [
     "macos-14 / ARM64",
@@ -12,13 +12,13 @@
   "artifacts": [
     {
       "name": "illumitech-forge-v0.1.0-aarch64-apple-darwin.tar.gz",
-      "sha256": "b08e2bc1dee3a0601b4b5ce73f8e6b5d1121ecad3774a07788d1b42902f7edad",
-      "bytes": 4236095
+      "sha256": "980c2c8be357190e26fdde8efed02a1df1fe4e67c561d243cbed5e7f59bb249c",
+      "bytes": 4236060
     },
     {
       "name": "illumitech-forge-v0.1.0-x86_64-unknown-linux-gnu.tar.gz",
-      "sha256": "9c81a81940ea0c083487080758c38430268bdd45376b430056434df180ab816b",
-      "bytes": 4720995
+      "sha256": "5c20fe938d9aff795b80de12886d2896789b42a1da461e78a923745a4bf49d61",
+      "bytes": 4720999
     }
   ],
   "release_published": false,
