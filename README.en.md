@@ -1,0 +1,88 @@
+<p align="center"><img src="docs/assets/logo.webp" width="108" alt="Illumitech logo"></p>
+
+# Illumitech Forge
+
+**From contract to evidence.** A Rust CLI for coordinating releases with Codex and Claude Code.
+An agent saying “done” never proves that a task passed.
+
+[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification.md)
+
+![An orange engineered cube passes three checkpoints toward a petrol-green structure](docs/assets/cover.webp)
+
+Initially private, MIT-licensed from the first version. Public visibility is a later explicit decision.
+Version 0.1.0 publication requires integrated acceptance, a validated memory upgrade and human review.
+
+## Install and try
+
+Supports macOS ARM64 and Linux x86_64. Rust 1.94.0 and Git are required for source builds.
+Windows has no operational support yet. Install and authenticate agent CLIs separately.
+
+```sh
+cargo build --release --locked
+./target/release/illumitech-forge doctor
+python3 scripts/demo.py /tmp/forge-demo
+./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release inspect /tmp/forge-demo/release.yaml
+./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release run /tmp/forge-demo/release.yaml --dry-run
+./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release run /tmp/forge-demo/release.yaml
+```
+
+The demo uses a disposable Git repository and an external evaluator; it calls no LLM.
+Private release archives include both platform binaries, SHA-256 checksums and third-party notices.
+Nothing is published to crates.io in this phase.
+
+## Architecture and workflow
+
+Specs and ADRs own intent; YAML manifests own execution contracts; SQLite owns operational state;
+Git owns source; ai-memory owns contextual continuity. Four crates separate domain, adapters,
+catalog and CLI. State and evaluators live outside agent-writable repositories. OS locks enforce
+one Forge writer per worktree. This is a trusted local orchestrator, not an OS security boundary.
+
+Create specs with permanent IDs, inspect the manifest, review its dry-run, execute, evaluate and
+explicitly approve the evaluated revision. `pause`, `resume`, `cancel`, `status` and `report` control
+persistent runs. Publication is a separate `release publish` action. `--json` uses schema version 1;
+blocked outcomes return exit code 2. Read-only commands create no execution state.
+
+Default limits are 30 minutes per task, 10 minutes per gate and three total execution attempts.
+Permission, contract, human approval and mandatory-memory failures never retry automatically.
+Process groups receive TERM then KILL on cancellation or timeout; output is bounded and redacted.
+Changed manifests, worktrees or orphaned tasks require explicit reconciliation. Approval is bound
+to the evaluated fingerprint and cannot survive a material revision change.
+
+## Memory and native clients
+
+`memory doctor` verifies MCP capability and explicit workspace/project scope; `memory query` returns
+bounded sourced context. Configure `memory.required: true` to fail closed; optional mode records
+degradation. HTTPS is required except on loopback. Tokens are environment-variable references.
+Forge neither accesses the memory database nor writes durable pages or duplicates lifecycle hooks.
+Shared procedures live in `skills/core/SKILL.md`.
+
+Codex and Claude preserve native authentication, configuration and default model. A model is passed
+only when explicitly selected in the manifest. Codex uses a declared sandbox; Claude uses `dontAsk`
+and existing permissions. Grant project-scoped `Edit` rules before write tasks. There is no silent
+fallback to paid APIs. Structured client results are necessary but never sufficient acceptance.
+
+## Toolkit, quality and adoption
+
+`tools list/doctor/plan/apply` supports selective, idempotent local recipes. It never runs remote
+installers. Availability, installed recipe, executable discovery and functional validation remain
+separate. Rust, Node/TypeScript and generic profiles preserve existing conventions. RTK/Graphify
+pilots and optional workflow styles do not impose universal file-size or prose rules.
+
+```sh
+cargo fmt --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+cargo doc --workspace --no-deps --locked
+python3 scripts/licenses.py
+```
+
+`eval run` executes fixture manifests through the same engine. Tests cover false completion, stale
+approval, required memory, locks, timeout, output bounds, cancellation, pause/resume and repeated
+setup. Real clients and cross-platform CI remain separate acceptance evidence in the ledger.
+`release import-loop` produces a reviewable candidate; historical completion is never imported.
+The Python Loop remains operational while projects migrate gradually.
+
+The 12 specs cover the full delivery contract. A daemon, web dashboard, native memory runtime and
+public visibility are future extensions. No paid benchmarks or official Harness² framework are bundled.
+
+Illumitech · MIT. See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES). No unmeasured performance badges.

@@ -1,0 +1,5 @@
+workspace = "illumitech"
+project_strategy = "repo-root"
+
+[auto_improve]
+require_approval = true

@@ -1,0 +1,26 @@
+[package]
+name = "forge-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+sha2.workspace = true
+forge-domain = { path = "../forge-domain" }
+forge-adapters = { path = "../forge-adapters" }
+forge-catalog = { path = "../forge-catalog" }
+
+[[bin]]
+name = "illumitech-forge"
+path = "src/main.rs"
+
+[dev-dependencies]
+tempfile.workspace = true

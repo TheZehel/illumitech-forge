@@ -1,0 +1,8 @@
+/target/
+/.forge/
+/.local/
+/dist/
+.env*
+*.sqlite*
+*.log
+.DS_Store

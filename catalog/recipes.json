@@ -1,0 +1,197 @@
+[
+  {
+    "id": "rust",
+    "source": "https://doc.rust-lang.org/",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "rust"
+    ],
+    "executable": "cargo",
+    "content": "# rust\n\nRun cargo fmt --check, cargo clippy --all-targets -- -D warnings, cargo test and cargo doc. Keep Cargo.lock and toolchain pinned.\n\nSource: https://doc.rust-lang.org/\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "node-typescript",
+    "source": "https://www.typescriptlang.org/docs/",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "node"
+    ],
+    "executable": "node",
+    "content": "# node-typescript\n\nUse existing package manager and scripts. Strict types; preserve stack and framework. Run project typecheck and meaningful tests.\n\nSource: https://www.typescriptlang.org/docs/\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "generic",
+    "source": "https://github.com/TheZehel/illumitech-forge",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# generic\n\nInspect existing conventions. Separate intent, execution, state and evidence. Keep evaluators outside writable worktrees.\n\nSource: https://github.com/TheZehel/illumitech-forge\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "context7",
+    "source": "https://github.com/upstash/context7",
+    "revision": "eabe36965ec69b2f3487c4eb329c448dd60b817c",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# context7\n\nResolve exact library version and consult primary documentation. Select and pin a reviewed MCP distribution; no automatic install from main.\n\nSource: https://github.com/upstash/context7\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: eabe36965ec69b2f3487c4eb329c448dd60b817c. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "rtk",
+    "source": "https://github.com/rtk-ai/rtk",
+    "revision": "e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": "rtk",
+    "content": "# rtk\n\nOpt-in pilot: same fixture with and without output compression; measure output bytes, errors, elapsed time and evidence completeness. Never replace unredacted evidence with summaries.\n\nSource: https://github.com/rtk-ai/rtk\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "graphify",
+    "source": "https://github.com/Graphify-Labs/graphify",
+    "revision": "0a8cd4e1e342235fe53e881fb5d591bf0460071f",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": "graphify",
+    "content": "# graphify\n\nOpt-in pilot only. Confirm upstream identity, license and pinned revision before install. Compare navigation quality on a disposable repository; exclude secrets and generated output.\n\nSource: https://github.com/Graphify-Labs/graphify\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 0a8cd4e1e342235fe53e881fb5d591bf0460071f. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "browser-devtools",
+    "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "revision": "b770c91cb16a37cc5ab93f76efd387cb7f7af6c3",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "node"
+    ],
+    "executable": null,
+    "content": "# browser-devtools\n\nUse a pinned browser MCP after reviewing permissions. Verify UI, console and network. Screenshots do not prove backend acceptance.\n\nSource: https://github.com/ChromeDevTools/chrome-devtools-mcp\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: b770c91cb16a37cc5ab93f76efd387cb7f7af6c3. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "frontend",
+    "source": "https://react.dev/learn",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "node"
+    ],
+    "executable": null,
+    "content": "# frontend\n\nPreserve design system, semantics, accessibility, keyboard and reduced-motion support. Test actual user flow.\n\nSource: https://react.dev/learn\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "database",
+    "source": "https://www.sqlite.org/docs.html",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# database\n\nReview schema migrations, backups and rollback. Test transactions and recovery; never substitute a live customer database for a fixture.\n\nSource: https://www.sqlite.org/docs.html\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "security",
+    "source": "https://github.com/EmbarkStudios/cargo-deny",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "rust"
+    ],
+    "executable": "cargo-deny",
+    "content": "# security\n\nRun pinned dependency/license checks and secret scan. Keep failures visible; no blind allowlists.\n\nSource: https://github.com/EmbarkStudios/cargo-deny\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "ci",
+    "source": "https://docs.github.com/actions",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# ci\n\nUse least-privilege workflow tokens and reviewed action revisions. Separate validation, artifacts and explicit release publication.\n\nSource: https://docs.github.com/actions\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "observability",
+    "source": "https://docs.rs/tracing",
+    "revision": null,
+    "version": null,
+    "scope": "project",
+    "last_verified": null,
+    "profiles": [
+      "rust"
+    ],
+    "executable": null,
+    "content": "# observability\n\nEmit bounded redacted events with stable run/task IDs. No credentials or raw customer payloads.\n\nSource: https://docs.rs/tracing\nUpstream installation: not verified; select a pinned release before installing.\n"
+  },
+  {
+    "id": "superpowers",
+    "source": "https://github.com/obra/superpowers",
+    "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# superpowers\n\nOptional workflow style. Review and pin upstream revision before copying instructions; preserve project rules and user style.\n\nSource: https://github.com/obra/superpowers\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 2ce8aa15d05bd57213e6f746f953aafb7ded7a8b. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "ponytail",
+    "source": "https://github.com/DietrichGebert/ponytail",
+    "revision": "09c434ab73ca43761c5d8b0c5d341926c2fba710",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# ponytail\n\nOptional, discovery only. Resolve exact upstream and license with operator before installation. Never execute a mutable remote script.\n\nSource: https://github.com/DietrichGebert/ponytail\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 09c434ab73ca43761c5d8b0c5d341926c2fba710. Metadata checked 2026-10-28; execution not yet tested.\n"
+  },
+  {
+    "id": "caveman",
+    "source": "https://github.com/JuliusBrussee/caveman",
+    "revision": "9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4",
+    "version": null,
+    "scope": "project",
+    "last_verified": "2026-10-28",
+    "profiles": [
+      "generic"
+    ],
+    "executable": null,
+    "content": "# caveman\n\nOptional, discovery only. Resolve exact upstream and license with operator before installation. Do not impose a communication style.\n\nSource: https://github.com/JuliusBrussee/caveman\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4. Metadata checked 2026-10-28; execution not yet tested.\n"
+  }
+]

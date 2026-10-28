@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "logo.webp": {
+    "source": "Existing Illumitech brand asset",
+    "owner": "Illumitech",
+    "modified": false
+  },
+  "cover.webp": {
+    "source": "built-in imagegen",
+    "date": "2026-10-28",
+    "optimization": "WebP quality 84",
+    "prompt": "Wide 16:9 editorial 3D illustration for Illumitech Forge; no text or logos; graphite #151b20, orange #ff7a1a, petrol green #0b5b57. Luminous precision-crafted cube, three connected checkpoints leading to a stable teal geometric structure, blueprint lines, cinematic light, sparse composition. No robots or fire.",
+    "alt_pt": "Uma pe\u00e7a laranja atravessa tr\u00eas checkpoints at\u00e9 uma estrutura verde-petr\u00f3leo, sobre fundo grafite"
+  },
+  "memory.webp": {
+    "source": "built-in imagegen",
+    "date": "2026-10-28",
+    "optimization": "WebP quality 84",
+    "prompt": "Editorial 16:9 3D illustration: two separated petrol-green translucent archives, orange light ribbon through a verification prism, dark graphite precision workshop. Safe continuity and isolated copies. No text, logos, numbers or robots.",
+    "alt_pt": "Dois arquivos isolados conectados por luz laranja atrav\u00e9s de um prisma de verifica\u00e7\u00e3o"
+  }
+}
