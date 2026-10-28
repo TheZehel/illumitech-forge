@@ -15,6 +15,7 @@ Version 0.1.0 publication requires integrated acceptance, a validated memory upg
 ## Install and try
 
 Supports macOS ARM64 and Linux x86_64. Rust 1.94.0 and Git are required for source builds.
+The CI Linux binary requires glibc 2.39 or newer (Ubuntu 24.04); other distributions can build from source.
 Windows has no operational support yet. Install and authenticate agent CLIs separately.
 
 ```sh

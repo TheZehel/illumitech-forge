@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "source_commit": "6c4bbea7a189a9ee2459eb67e0807d8ed02337fa",
+  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40728932643",
+  "ci_result": "success",
+  "platforms": [
+    "macos-14 / ARM64",
+    "ubuntu-24.04 / x86_64"
+  ],
+  "tests_per_platform": 27,
+  "artifact_checksums_verified": true,
+  "artifacts": [
+    {
+      "name": "illumitech-forge-v0.1.0-aarch64-apple-darwin.tar.gz",
+      "sha256": "b08e2bc1dee3a0601b4b5ce73f8e6b5d1121ecad3774a07788d1b42902f7edad",
+      "bytes": 4236095
+    },
+    {
+      "name": "illumitech-forge-v0.1.0-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "9c81a81940ea0c083487080758c38430268bdd45376b430056434df180ab816b",
+      "bytes": 4720995
+    }
+  ],
+  "release_published": false,
+  "release_blockers": [
+    "Claude native acceptance deferred by user",
+    "Native hook trust and lifecycle capture deferred by user",
+    "Final integrated release review not completed"
+  ],
+  "smoke_tests": {
+    "macos_arm64": "passed --version",
+    "linux_x86_64_ubuntu_24_04": "passed --version",
+    "linux_debian_12": "unsupported: requires GLIBC_2.39"
+  },
+  "linux_minimum_glibc": "2.39"
+}

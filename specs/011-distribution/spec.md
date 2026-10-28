@@ -1,6 +1,6 @@
 # FORGE-011 — Distribuição
 
-Status: planned; completion requires recorded evidence.
+Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
 
 ## Dependências
 FORGE-007, FORGE-008, FORGE-009, FORGE-010

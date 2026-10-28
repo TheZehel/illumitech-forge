@@ -1,6 +1,6 @@
 # FORGE-007 — Catálogo e bootstrap
 
-Status: planned; completion requires recorded evidence.
+Status: implemented and locally verified; integrated release acceptance remains separate.
 
 ## Dependências
 FORGE-001, FORGE-002

@@ -1,6 +1,6 @@
 # FORGE-004 — Execução nativa
 
-Status: planned; completion requires recorded evidence.
+Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
 
 ## Dependências
 FORGE-002, FORGE-003

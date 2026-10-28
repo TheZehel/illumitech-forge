@@ -1,6 +1,6 @@
 # FORGE-005 — Aceite e evidências
 
-Status: planned; completion requires recorded evidence.
+Status: implemented and locally verified; integrated release acceptance remains separate.
 
 ## Dependências
 FORGE-003, FORGE-004

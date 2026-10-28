@@ -26,3 +26,5 @@ Upstream reference: [v3.2.9](https://github.com/akitaonrails/ai-memory/releases/
 [OKF migration](https://github.com/akitaonrails/ai-memory/blob/v3.2.9/docs/okf.md).
 Operational backup paths and private inventories are deliberately kept outside this repository.
 Actual outcomes and remaining gates appear in verification.md.
+
+Validated result: [migration evidence](memory-upgrade-result.json). The current server is 3.2.9 on Docker/Colima. Native helper clients are used only for host hooks/bridges; no native server migration occurred.

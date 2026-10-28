@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "source_sha256": "c7813de418775d17d7d6c224420ec767f45f586122962824f764832d1915a147",
+  "task_count": 12,
+  "legacy_state_imported": false,
+  "all_candidates_read_only": true,
+  "all_acceptance_requires_human_review": true,
+  "inspection_created_state": false,
+  "loop_tests_passed": 52,
+  "isolated_loop_commit": "10396c9",
+  "source": "Loop bootstrap manifest"
+}

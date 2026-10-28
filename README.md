@@ -15,7 +15,8 @@ quando os gates de integração, memória e revisão humana estiverem comprovado
 
 ## Instalação
 
-Requer macOS ARM64 ou Linux x86_64, Git e a toolchain Rust 1.94.0. Windows ainda não tem
+Requer macOS ARM64 ou Linux x86_64, Git e a toolchain Rust 1.94.0.
+O binário Linux da CI requer glibc 2.39 ou superior (Ubuntu 24.04); outras distribuições podem compilar do código-fonte. Windows ainda não tem
 suporte operacional. Codex e Claude Code são instalados e autenticados separadamente.
 
 ```sh

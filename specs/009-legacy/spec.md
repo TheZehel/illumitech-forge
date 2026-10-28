@@ -1,6 +1,6 @@
 # FORGE-009 — Adoção do legado
 
-Status: planned; completion requires recorded evidence.
+Status: implemented and locally verified; integrated release acceptance remains separate.
 
 ## Dependências
 FORGE-002, FORGE-005

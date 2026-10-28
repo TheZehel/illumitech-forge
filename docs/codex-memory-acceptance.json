@@ -29,6 +29,8 @@
   "limitations": [
     "Claude acceptance remains deferred.",
     "No durable memory page was explicitly written for this test.",
-    "Session record count does not by itself prove lifecycle observation deduplication."
-  ]
+    "Session record count does not by itself prove lifecycle observation deduplication.",
+    "Native hook trust and verification of new lifecycle capture were explicitly deferred by the user."
+  ],
+  "lifecycle_capture": "deferred_by_user"
 }

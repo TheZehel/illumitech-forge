@@ -54,7 +54,7 @@
   {
     "id": "rtk",
     "source": "https://github.com/rtk-ai/rtk",
-    "revision": "e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5",
+    "revision": "753a3b0e939f2e4490fc24e3a1984010f40a103c",
     "version": "1.1.0",
     "scope": "project",
     "last_verified": "2026-10-28",

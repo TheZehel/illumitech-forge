@@ -1,51 +1,53 @@
 # Verification ledger
 
-Snapshot: 2026-10-28. This ledger distinguishes verified implementation from operational acceptance.
+Snapshot: 2026-10-28. Implementation evidence and integrated release acceptance are separate.
 
 | Gate | Result | Evidence |
 |---|---|---|
-| Rust formatting | passed | cargo fmt --check |
-| Clippy warnings denied | passed | workspace, all targets |
-| Automated tests | passed | 27 tests; manifest, false acceptance, crash/orphan, locks, timeout, output, cancellation, human review, pause/resume |
-| Documentation build | passed | cargo doc --workspace --no-deps |
+| Formatting, Clippy, documentation | passed | local checks and native CI; warnings denied |
+| Automated Forge tests | passed | 27 per platform, including false acceptance, crash/orphan, locks, timeout, bounded output, cancellation, human approval and pause/resume |
 | Spec validation | passed | 12 specs, 24 permanent task IDs |
-| Dependency advisories | passed | OSV queried 211 locked registry packages; zero findings after replacing unsafe-libyaml and updating SHA-2 |
+| Dependency advisories | passed | OSV: 211 locked registry packages, zero findings |
 | Third-party notices | passed | 211 dependencies inventoried; no missing notices |
 | Secret scan | passed | gitleaks, redacted output, no findings |
-| Legacy bootstrap | passed (planning only) | isolated Loop worktree, inspect + dry-run; 52 Loop tests |
-| Codex baseline | passed | real native CLI; implementation and read-only review, independent external gate |
-| Codex toolkit | passed | real native implementation + read-only review; clarified review prompt shared by both arms |
-| Claude native | blocked | existing API-key auth returned insufficient credit; existing model configuration incompatible. User requested Codex-first validation |
-| ai-memory backup | passed | online snapshot + complete frozen copy, private external storage, SHA-256 |
-| ai-memory rehearsal | passed | clean 3.2.9 copy: integrity, all IDs, 40 projects, 615 pages and content preserved; old-version restore validated |
-| ai-memory production cutover | passed; client acceptance partial | 3.2.9 active on a separate volume; final frozen backup; old volume and image retained |
-| CI macOS/Linux | running | first macOS job passed; latest reconciliation regression requires a fresh run |
-| Private release v0.1.0 | blocked | integrated acceptance, memory and human review gates remain |
+| Legacy bootstrap/import | passed (planning and import only) | [12 read-only candidates](legacy-import.json), isolated Loop worktree, inspect/dry-run and 52 tests |
+| Codex baseline/toolkit | passed | [real native implementation and read-only review](codex-acceptance.json), external pinned behavioral evaluator |
+| Codex mandatory memory | passed for scoped recovery | [fresh native MCP calls](codex-memory-acceptance.json), previous sessions available in the correct fixture project |
+| New lifecycle capture | deferred by user | new hook trust not granted; capture must not be inferred from successful MCP reads |
+| Claude native | deferred by user | initial existing API-key auth returned insufficient credit; incompatible configured model; no further runs attempted |
+| ai-memory rehearsal | passed | isolated old/new copies; integrity, IDs and content preserved; old-version restore validated |
+| ai-memory production upgrade | passed; integrated client acceptance partial | [3.2.9 active](memory-upgrade-result.json), final backups, separate volume, retained 1.17.3 image and volume |
+| ai-memory client configuration | passed | idempotent install; unrelated settings preserved; one ai-memory handler per event |
+| Forge repository memory scope | pending | marker configured for illumitech/illumitech-forge; scope registration awaits authorized lifecycle capture or explicit bootstrap; doctor fails closed |
+| CI macOS/Linux | passed | [run 40728932643](https://github.com/TheZehel/illumitech-forge/actions/runs/40728932643), code commit 6c4bbea |
+| Binary archives and checksums | passed | [distribution evidence](distribution-result.json); downloaded CI archives verified locally |
+| Private repository | published | [TheZehel/illumitech-forge](https://github.com/TheZehel/illumitech-forge), MIT, private visibility verified |
+| Private release v0.1.0 | blocked | Claude, native capture/scope continuity and final human release review remain pending; no tag or release published |
 
-The first Codex run exposed a fixture issue: Python import created __pycache__. Forge correctly
-blocked acceptance because the evaluator changed the worktree, even though its exit code was 0.
-The evaluator now disables bytecode generation; explicit reconciliation invalidated previous evidence.
+The first Codex evaluator imported Python and created bytecode. Forge blocked acceptance because
+the evaluator changed the worktree, even though it exited 0. The corrected evaluator disables
+bytecode; explicit reconciliation invalidated old evidence. The review prompt was clarified identically
+in both arms after an initial toolkit timeout. This small evaluation establishes correctness and
+preservation, not a performance, cost or general agent-quality benchmark.
 
-Core review: the user explicitly approved the Rust core for real-client acceptance in this session.
-This is not approval to waive the pending Claude or memory acceptance requirements.
+A pinned artifact ignored by Git still requires explicit reconciliation if changed. The regression
+was reproduced before correction; the 27-test suite and native CI passed afterwards.
 
-Private operational artifacts, native session identifiers, personal paths and raw output stay outside
-this repository. The product source contains no production memory corpus or credentials.
+The first production migration rolled back automatically because the operator used an unavailable
+HTTP health route. The corrected MCP handshake passed after another final backup and migration to
+a fresh volume. No migrated database was opened with the old binary. The final snapshot preserves
+all old records and all 624 existing page bodies/metadata. The OKF migration also produced 42
+deterministic project bundle indexes, which the live wiki watcher indexed. Automatic profile
+harvesting and scheduled improvement are disabled; no durable knowledge note was explicitly written.
 
-Codex acceptance details: [client scenarios](codex-acceptance.json) and
-[mandatory memory](codex-memory-acceptance.json). The fresh session called the real MCP tools and
-recovered earlier sessions in the expected project scope; new lifecycle capture is pending native
-hook trust. Both client configurations passed idempotent hook installation, preservation of unrelated
-settings and one ai-memory handler per event. Claude was not run again after the user's deferral.
+[Tool pilots](tool-pilots.json) cover only disposable fixtures. RTK was not installed globally;
+Graphify ran code-only in an isolated environment. No LLM benchmark or savings claim follows.
 
-The first production cutover rolled back automatically because the operator probe used an unavailable
-HTTP route. The corrected MCP handshake passed after a new final backup and migration to another
-separate volume. The earlier migrated volume was never opened by the old binary.
+The user approved the Rust core for real acceptance, then explicitly deferred Claude execution and
+new lifecycle capture. These decisions do not waive the original integrated release gates. Daemon
+mode remains a documented future extension; this version uses foreground supervision and persistent
+control commands. The Linux CI binary requires glibc 2.39 (Ubuntu 24.04); source builds remain available.
 
-The macOS ARM64 archive has been built and smoke-tested locally. Linux x86_64 and native CI remain
-pending. [Tool pilots](tool-pilots.json) cover only small disposable fixtures, with no performance claim.
-
-Release remains blocked until Claude acceptance, lifecycle capture/continuity, native CI and final
-human release review pass. No v0.1.0 tag or GitHub release has been published.
-
-Regression: changing a pinned artifact ignored by Git now requires `resume --reconcile`, before execution or state transitions.
+Private operational artifacts, session identifiers, host paths, raw output and memory corpus remain
+outside this repository. Documentation-only reconciliation after code commit 6c4bbea does not change
+the tested binary inputs. Build artifacts are staged locally and in the private Actions run, not released.

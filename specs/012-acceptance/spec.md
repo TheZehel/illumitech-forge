@@ -1,6 +1,6 @@
 # FORGE-012 — Aceitação integrada
 
-Status: planned; completion requires recorded evidence.
+Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
 
 ## Dependências
 FORGE-001, FORGE-002, FORGE-003, FORGE-004, FORGE-005, FORGE-006, FORGE-007, FORGE-008, FORGE-009, FORGE-010

@@ -1,6 +1,6 @@
 # FORGE-001 — Fundação e identidade
 
-Status: planned; completion requires recorded evidence.
+Status: implemented and locally verified; integrated release acceptance remains separate.
 
 ## Dependências
 Nenhuma

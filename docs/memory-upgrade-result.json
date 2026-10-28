@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "versions": {
+    "before": "1.17.3",
+    "after": "3.2.9"
+  },
+  "runtime": "Docker/Colima",
+  "checks": {
+    "isolated_rehearsal": true,
+    "old_version_restore": true,
+    "production_mcp_handshake": true,
+    "original_records_preserved": true,
+    "offline_integrity_ok": true,
+    "missing_scope_rejected": true,
+    "separate_old_and_new_volumes": true,
+    "profile_generation_disabled": true
+  },
+  "migration": {
+    "workspaces": {
+      "old_count": 3,
+      "new_count": 3,
+      "missing_old_ids": 0,
+      "new_ids": 0
+    },
+    "projects": {
+      "old_count": 42,
+      "new_count": 42,
+      "missing_old_ids": 0,
+      "new_ids": 0
+    },
+    "pages": {
+      "old_count": 624,
+      "new_count": 666,
+      "missing_old_ids": 0,
+      "new_ids": 42,
+      "changed_old_records": 0
+    },
+    "sessions": {
+      "old_count": 775,
+      "new_count": 775,
+      "missing_old_ids": 0,
+      "new_ids": 0
+    },
+    "observations": {
+      "old_count": 859432,
+      "new_count": 859495,
+      "missing_old_ids": 0,
+      "new_ids": 63
+    }
+  },
+  "new_page_categories": {
+    "generated_okf_bundle_indexes": 42
+  },
+  "integrations": {
+    "codex": {
+      "unrelated_configuration_preserved": true,
+      "idempotent_reapply": true,
+      "max_memory_handlers_per_event": 1,
+      "native_session_acceptance": "MCP recovery passed; lifecycle capture deferred by user"
+    },
+    "claude-code": {
+      "unrelated_configuration_preserved": true,
+      "idempotent_reapply": true,
+      "max_memory_handlers_per_event": 1,
+      "native_session_acceptance": "deferred by user"
+    }
+  },
+  "limitations": [
+    "Native Codex MCP recovery passed; lifecycle capture explicitly deferred by user.",
+    "Claude configuration is prepared, but real Claude session acceptance is deferred.",
+    "Private backups, corpus and configuration inventories are excluded from the repository."
+  ],
+  "migration_note": "The OKF migration creates one deterministic index.md per project; the live wiki watcher indexed these 42 new bundle indexes. All 624 pre-existing page records remained unchanged.",
+  "forge_repo_scope": {
+    "workspace": "illumitech",
+    "project": "illumitech-forge",
+    "status": "not_registered",
+    "doctor_result": "blocked",
+    "next_step": "Register through an authorized lifecycle session after native hook trust or an explicitly requested scoped bootstrap; no unscoped fallback."
+  }
+}

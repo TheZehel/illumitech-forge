@@ -1,6 +1,6 @@
 # FORGE-006 — Memória integrada
 
-Status: planned; completion requires recorded evidence.
+Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
 
 ## Dependências
 FORGE-004, FORGE-005

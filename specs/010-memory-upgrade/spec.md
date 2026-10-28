@@ -1,6 +1,6 @@
 # FORGE-010 — Atualização ai-memory
 
-Status: planned; completion requires recorded evidence.
+Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
 
 ## Dependências
 FORGE-006
