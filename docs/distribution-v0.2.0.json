@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source_commit": "3eab629f07b599b012484299794e5621bbf0879c",
+  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40765582769",
+  "ci_result": "success",
+  "platforms": [
+    "macos-14 / ARM64",
+    "ubuntu-24.04 / x86_64"
+  ],
+  "tests_per_platform": 44,
+  "artifact_checksums_verified": true,
+  "artifacts": [
+    {
+      "name": "illumitech-forge-v0.2.0-aarch64-apple-darwin.tar.gz",
+      "sha256": "2748da30251e5ab27d3c2bf425efff983dea8f587675d38ee1b642f6edcee79a",
+      "bytes": 4434227
+    },
+    {
+      "name": "illumitech-forge-v0.2.0-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "ef70031cd33ecb7247178e876fd8edaf9accf1c476299b8fdeb64919d1b86353",
+      "bytes": 4938604
+    }
+  ],
+  "smoke_tests": {
+    "macos_demo": "passed",
+    "linux_binary": "passed"
+  },
+  "memory_required": false,
+  "release_published": false,
+  "pending": "Revision-bound human release approval"
+}

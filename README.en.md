@@ -4,14 +4,16 @@
 
 **From contract to evidence.** A Rust CLI for coordinating releases with Codex and Claude Code.
 An agent saying “done” never proves that a task passed.
-**v0.1.0: Codex validated; Claude experimental.** [Approved scope](docs/adr/0001-first-delivery-scope.md).
+**Validated v0.2.0 candidate: opt-in daemon, draft PRs and Spec Kit import.**
+Codex is the validated client; Claude remains experimental. [Approved scope](docs/adr/0001-first-delivery-scope.md).
 
-[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification.md)
+[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification-v0.2.0.md)
 
 ![An orange engineered cube passes three checkpoints toward a petrol-green structure](docs/assets/cover.webp)
 
 Initially private, MIT-licensed from the first version. Public visibility is a later explicit decision.
-Version 0.1.0 publication requires integrated acceptance, a validated memory upgrade and human review.
+[Version 0.1.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.1.0) was published after human approval.
+The next version has a separate [operational acceptance ledger](docs/operational-parity.md).
 
 ## Install and try
 
@@ -58,7 +60,7 @@ to the evaluated fingerprint and cannot survive a material revision change.
 
 `memory doctor` verifies MCP capability and explicit workspace/project scope; `memory query` returns
 bounded sourced context. Configure `memory.required: true` to fail closed; optional mode records
-degradation. HTTPS is required except on loopback. Tokens are environment-variable references.
+degradation. Memory is optional for execution and publication. HTTPS is required except on loopback. Tokens are environment-variable references.
 Forge neither accesses the memory database nor writes durable pages or duplicates lifecycle hooks.
 Shared procedures live in `skills/core/SKILL.md`.
 
@@ -85,10 +87,14 @@ python3 scripts/licenses.py
 `eval run` executes fixture manifests through the same engine. Tests cover false completion, stale
 approval, required memory, locks, timeout, output bounds, cancellation, pause/resume and repeated
 setup. Real clients and cross-platform CI remain separate acceptance evidence in the ledger.
-`release import-loop` produces a reviewable candidate; historical completion is never imported.
+`release import-loop` expands pending Spec Kit tasks into reviewable candidates with stable IDs;
+`release import-spec` imports specs directly. Historical completion is never execution evidence.
 The Python Loop remains operational while projects migrate gradually.
 
-The 12 specs cover the full delivery contract. A daemon, web dashboard, native memory runtime and
-public visibility are future extensions. No paid benchmarks or official Harness² framework are bundled.
+The 13 specs cover the delivery contract. The opt-in foreground daemon supports persistent queue
+controls and failure latches. Optional draft PR automation requires an isolated worktree and human
+Git identity, reevaluates gates after commit and recovers without duplicate publication. It never merges
+or publishes releases automatically. See [operations and adoption limits](docs/operational-parity.md).
+A web dashboard, native memory runtime and public visibility remain future extensions. No paid benchmarks or official Harness² framework are bundled.
 
 Illumitech · MIT. See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES). No unmeasured performance badges.

@@ -1,4 +1,4 @@
-use anyhow::{Context as _, Result, bail, ensure};
+use anyhow::{Context as _, Result, ensure};
 use forge_adapters::{clients, memory::MemoryClient, process};
 use forge_domain::*;
 use serde_json::{Value, json};
@@ -37,9 +37,9 @@ impl Context {
         })
     }
     pub fn inspect(&self) -> Result<Value> {
-        let commands=self.manifest.tasks.iter().map(|t|json!({"id":t.id,"repo":t.repo,"executor":t.executor,"argv":argv(t,"[bounded memory context]"),"dependencies":t.dependencies,"acceptance":t.acceptance,"timeout_seconds":t.timeout_seconds,"max_attempts":t.max_attempts})).collect::<Vec<_>>();
+        let commands=self.manifest.tasks.iter().map(|t|json!({"id":t.id,"repo":t.repo,"priority":t.priority,"executor":t.executor,"argv":argv(t,"[bounded memory context]"),"dependencies":t.dependencies,"acceptance":t.acceptance,"timeout_seconds":t.timeout_seconds,"max_attempts":t.max_attempts})).collect::<Vec<_>>();
         Ok(
-            json!({"schema_version":1,"release_id":self.manifest.release_id,"manifest_hash":self.hash,"order":self.manifest.validate()?,"repos":self.roots,"tasks":commands,"gates":self.manifest.gates,"memory":self.manifest.memory,"publication":"explicit_only","state":"not_modified"}),
+            json!({"schema_version":1,"release_id":self.manifest.release_id,"manifest_hash":self.hash,"order":self.manifest.validate()?,"repos":self.roots,"tasks":commands,"gates":self.manifest.gates,"memory":self.manifest.memory,"automation":self.manifest.automation,"publication":"explicit_or_manifest_opt_in_draft_pr","state":"not_modified"}),
         )
     }
 }
@@ -214,6 +214,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
     store.save(&run, "prepared", &json!({"manifest_hash":c.hash}))?;
     if resume {
         store.set_control(&run.release_id, "resume")?;
+        store.remove_metadata(&format!("daemon-block:{}", run.release_id))?;
     }
     run.memory = match memory_check(&c, Some("rules OR decisions OR gotchas")).await {
         Ok(v) => v,
@@ -607,6 +608,9 @@ fn artifacts_current(c: &Context, run: &Run) -> bool {
     })
 }
 pub fn assert_publishable(c: &Context) -> Result<Run> {
+    assert_ready(c, true)
+}
+pub fn assert_ready(c: &Context, human: bool) -> Result<Run> {
     let (_, run) = saved(c)?;
     ensure!(
         run.manifest_hash == c.hash
@@ -623,14 +627,59 @@ pub fn assert_publishable(c: &Context) -> Result<Run> {
         "release has not passed all evidence gates"
     );
     ensure!(
-        run.effective_manifest.tasks.iter().any(|t| t
-            .acceptance
-            .iter()
-            .any(|a| matches!(a, Acceptance::Human { .. }))),
+        !human
+            || run.effective_manifest.tasks.iter().any(|t| t
+                .acceptance
+                .iter()
+                .any(|a| matches!(a, Acceptance::Human { .. }))),
         "publication requires a human acceptance gate"
     );
-    if !c.manifest.memory.required {
-        bail!("publication requires verified mandatory memory");
+    ensure!(
+        !c.manifest.memory.required || run.memory["status"] == "passed",
+        "required memory has not passed"
+    );
+    Ok(run)
+}
+
+/// After a journaled local commit, gates must be checked against its new revision.
+/// This never re-executes agent tasks or transfers an old human approval.
+pub async fn reevaluate_commit(c: &Context, cancel: watch::Receiver<bool>) -> Result<Run> {
+    ensure!(!*cancel.borrow(), "publication cancelled");
+    let mut store = Store::open(&c.db, false)?;
+    let mut run = store.load(&c.manifest.release_id)?.context("missing run")?;
+    ensure!(
+        run.manifest_hash == c.hash,
+        "manifest changed during publication"
+    );
+    ensure!(
+        run.tasks.values().all(|t| t.pid.is_none()),
+        "active process during publication"
+    );
+    store.clear_approvals(&run.release_id)?;
+    run.revisions = revisions(&c.roots)?;
+    run.status = "evaluating".into();
+    for task in run.tasks.values_mut() {
+        task.status = "evaluating".into();
+        task.evidence.retain(|e| e.kind == "execution");
+        task.revision = None;
     }
+    store.save(&run, "publication_commit_evaluation_started", &json!({}))?;
+    for task in &c.manifest.tasks {
+        ensure!(!*cancel.borrow(), "publication cancelled");
+        evaluate(c, &mut store, &mut run, task, cancel.clone()).await?;
+    }
+    run.status = if run.tasks.values().all(|t| t.status == "passed") {
+        "passed"
+    } else if run.tasks.values().any(|t| t.status == "awaiting_approval") {
+        "awaiting_approval"
+    } else {
+        "blocked"
+    }
+    .into();
+    store.save(
+        &run,
+        "publication_commit_evaluated",
+        &json!({"status":run.status}),
+    )?;
     Ok(run)
 }

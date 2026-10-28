@@ -63,6 +63,7 @@ impl Store {
             CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY AUTOINCREMENT, release_id TEXT NOT NULL, at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')), kind TEXT NOT NULL, body TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS controls (release_id TEXT PRIMARY KEY, action TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS approvals (release_id TEXT NOT NULL, task_id TEXT NOT NULL, gate_id TEXT NOT NULL, manifest_hash TEXT NOT NULL, fingerprint TEXT NOT NULL, reviewer TEXT NOT NULL, PRIMARY KEY(release_id,task_id,gate_id));
+            CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, body TEXT NOT NULL);
             PRAGMA user_version=1;")?;
         }
         ensure!(
@@ -78,6 +79,36 @@ impl Store {
             .optional()?;
         body.map(|s| serde_json::from_str(&s).map_err(Into::into))
             .transpose()
+    }
+    pub fn metadata(&self, key: &str) -> Result<Option<Value>> {
+        let exists: bool = self.conn.query_row(
+            "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='metadata')",
+            [],
+            |r| r.get(0),
+        )?;
+        if !exists {
+            return Ok(None);
+        }
+        let body: Option<String> = self
+            .conn
+            .query_row("SELECT body FROM metadata WHERE key=?1", [key], |r| {
+                r.get(0)
+            })
+            .optional()?;
+        body.map(|s| serde_json::from_str(&s).map_err(Into::into))
+            .transpose()
+    }
+    pub fn set_metadata(&self, key: &str, body: &Value) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO metadata VALUES(?1,?2) ON CONFLICT(key) DO UPDATE SET body=excluded.body",
+            params![key, body.to_string()],
+        )?;
+        Ok(())
+    }
+    pub fn remove_metadata(&self, key: &str) -> Result<()> {
+        self.conn
+            .execute("DELETE FROM metadata WHERE key=?1", [key])?;
+        Ok(())
     }
     pub fn save(&mut self, run: &Run, kind: &str, detail: &Value) -> Result<()> {
         let tx = self.conn.transaction()?;

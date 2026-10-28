@@ -16,6 +16,8 @@ pub struct Manifest {
     pub gates: Vec<Gate>,
     #[serde(default)]
     pub memory: Memory,
+    #[serde(default)]
+    pub automation: Automation,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -32,6 +34,8 @@ pub struct Task {
     pub description: String,
     #[serde(default)]
     pub dependencies: Vec<String>,
+    #[serde(default = "priority")]
+    pub priority: i32,
     pub executor: Executor,
     pub acceptance: Vec<Acceptance>,
     #[serde(default = "task_timeout")]
@@ -47,6 +51,43 @@ fn gate_timeout() -> u64 {
 }
 fn attempts() -> u32 {
     3
+}
+fn priority() -> i32 {
+    100
+}
+fn yes() -> bool {
+    true
+}
+fn origin() -> String {
+    "origin".into()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Automation {
+    pub enabled: bool,
+    pub require_clean_worktree: bool,
+    pub publish: Option<DraftPr>,
+}
+impl Default for Automation {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            require_clean_worktree: true,
+            publish: None,
+        }
+    }
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DraftPr {
+    pub repository: String,
+    pub branch: String,
+    pub base_branch: String,
+    #[serde(default = "origin")]
+    pub remote: String,
+    #[serde(default = "yes")]
+    pub draft: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
@@ -132,6 +173,25 @@ impl Manifest {
             "repos and tasks cannot be empty"
         );
         ensure!(self.tasks.len() <= 1000, "too many tasks");
+        if let Some(p) = &self.automation.publish {
+            ensure!(
+                self.repos.len() == 1 && self.automation.require_clean_worktree,
+                "draft automation requires one initially clean worktree"
+            );
+            ensure!(
+                p.draft
+                    && p.repository.split('/').count() == 2
+                    && p.repository.split('/').all(valid_id),
+                "invalid draft PR target"
+            );
+            ensure!(
+                valid_id(&p.remote)
+                    && !p.branch.is_empty()
+                    && !p.base_branch.is_empty()
+                    && p.branch != p.base_branch,
+                "invalid draft PR branch/remote"
+            );
+        }
         for (id, repo) in &self.repos {
             ensure!(
                 valid_id(id) && !repo.path.as_os_str().is_empty(),
@@ -235,7 +295,10 @@ impl Manifest {
             let Some(t) = self
                 .tasks
                 .iter()
-                .find(|t| !done.contains(&t.id) && t.dependencies.iter().all(|d| done.contains(d)))
+                .filter(|t| {
+                    !done.contains(&t.id) && t.dependencies.iter().all(|d| done.contains(d))
+                })
+                .min_by_key(|t| t.priority)
             else {
                 bail!("dependency cycle")
             };

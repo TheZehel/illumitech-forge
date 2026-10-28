@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "version": "0.2.0",
+  "pilot_pr": "https://github.com/TheZehel/illumitech-forge/pull/1",
+  "pilot_commit": "9352a739ace722fb512ce8a339d9d358ead6a13d",
+  "author": "Allison Yuri",
+  "memory_configured": false,
+  "task_executions": 1,
+  "postcommit_evaluations": 1,
+  "repeat_daemon": "already_recorded",
+  "explicit_draft_retry": "reused",
+  "persistent_pause_resume": "passed",
+  "automatic_merge": false,
+  "release_publication": false,
+  "later_remote_transition": "draft changed to ready for review externally; Forge refused automatic reuse"
+}
