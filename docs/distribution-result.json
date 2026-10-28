@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "source_commit": "4e4942d455ee9ccc1450fbf520342f86af1274b9",
-  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40730758972",
+  "source_commit": "fea909886e95645597c7b1cdafd8f7013d5b3f5a",
+  "workflow_run": "https://github.com/TheZehel/illumitech-forge/actions/runs/40756018143",
   "ci_result": "success",
   "platforms": [
     "macos-14 / ARM64",
@@ -12,13 +12,13 @@
   "artifacts": [
     {
       "name": "illumitech-forge-v0.1.0-aarch64-apple-darwin.tar.gz",
-      "sha256": "980c2c8be357190e26fdde8efed02a1df1fe4e67c561d243cbed5e7f59bb249c",
-      "bytes": 4236060
+      "sha256": "1dce0e31ae02e3a057e8aa151160f1874b0aaef41fe1a8758f5aaee929a21ebe",
+      "bytes": 4240040
     },
     {
       "name": "illumitech-forge-v0.1.0-x86_64-unknown-linux-gnu.tar.gz",
-      "sha256": "5c20fe938d9aff795b80de12886d2896789b42a1da461e78a923745a4bf49d61",
-      "bytes": 4720999
+      "sha256": "7e10ffa37f933b4135b938d24a2f33c12fa6a9a25146cfe56208d4703f7f3f10",
+      "bytes": 4724802
     }
   ],
   "release_published": false,
@@ -26,10 +26,11 @@
     "Final human release review and explicit publication"
   ],
   "smoke_tests": {
-    "macos_arm64": "passed --version",
-    "linux_x86_64_ubuntu_24_04": "passed --version",
+    "macos_arm64": "passed: downloaded archive, checksums, bundled inspect/dry-run/run/report demo",
+    "linux_x86_64_ubuntu_24_04": "passed: downloaded archive, checksums and --version in read-only networkless container",
     "linux_debian_12": "unsupported: requires GLIBC_2.39"
   },
   "linux_minimum_glibc": "2.39",
-  "scope_decision": "v0.1.0 focused on Codex; Claude experimental (ADR 0001)"
+  "scope_decision": "v0.1.0 focused on Codex; Claude experimental (ADR 0001)",
+  "bundled_examples_and_guide": true
 }

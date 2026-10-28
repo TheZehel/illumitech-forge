@@ -19,7 +19,7 @@ Snapshot: 2026-10-28. Implementation evidence and integrated release acceptance 
 | ai-memory production upgrade | passed for Codex scope | [3.2.9 active](memory-upgrade-result.json), final backups, separate volume, retained 1.17.3 image and volume |
 | ai-memory client configuration | passed | idempotent install; unrelated settings preserved; one ai-memory handler per event |
 | Forge repository memory scope | passed | explicit marker, registered by real SessionStart; memory doctor verified illumitech/illumitech-forge |
-| CI macOS/Linux | passed | [run 40730758972](https://github.com/TheZehel/illumitech-forge/actions/runs/40730758972), code commit 4e4942d |
+| CI macOS/Linux | passed | [run 40756018143](https://github.com/TheZehel/illumitech-forge/actions/runs/40756018143), packaging commit fea9098 |
 | Binary archives and checksums | passed | [distribution evidence](distribution-result.json); downloaded CI archives verified locally |
 | Private repository | published | [TheZehel/illumitech-forge](https://github.com/TheZehel/illumitech-forge), MIT, private visibility verified |
 | Private release v0.1.0 | awaiting final review | Codex scope approved; final candidate review and explicit publication remain; GitHub release is the publication receipt |
