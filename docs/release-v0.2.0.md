@@ -12,9 +12,12 @@ tarefas Spec Kit e publicação de releases sem exigir ai-memory.
 - Publicação com tags e assets genéricos, checksums e aceite humano na revisão atual.
 - ai-memory opcional em execução e publicação; required true continua bloqueando sem verificação.
 
-43 testes locais, formatação, Clippy, documentação e avisos de 211 dependências passaram.
+44 testes locais, formatação, Clippy, documentação e avisos de 211 dependências passaram.
 O piloto remoto sem memória criou e reutilizou o [draft #1](https://github.com/TheZehel/illumitech-forge/pull/1),
-com autoria de Allison Yuri e uma execução da tarefa. CI nas duas plataformas e pacotes finais
+com autoria de Allison Yuri e uma execução da tarefa. A execução nativa somente leitura pelo
+Forge 0.2 também passou, com preservação do worktree. Os testes incluem interrupção de staging,
+URL rewrites, recuperação de journal e invalidação de aceites após commit.
+CI nas duas plataformas e pacotes finais
 serão associados à revisão antes do aceite para publicação.
 
 A v0.1.0 permanece preservada. Claude continua experimental. Não há instalação de serviço,

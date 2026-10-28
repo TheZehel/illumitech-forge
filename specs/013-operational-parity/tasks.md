@@ -6,7 +6,8 @@
 - [x] F013-T04: Draft PR idempotente com identidade humana; evidência: Git real, falha parcial e PR existente.
 - [ ] F013-T05: CI, piloto e documentação de adoção; evidência: uso real e comparação com o Loop preservado.
 
-Evidência local: 43 testes, fmt, Clippy sem warnings, cargo doc e 211 dependências com avisos completos.
+Evidência local: 44 testes, fmt, Clippy sem warnings, cargo doc e 211 dependências com avisos completos.
 Piloto remoto: draft PR #1, commit 9352a73, autoria Allison Yuri, sem memória, uma execução, reuso e pausa/retomada.
 Revisão inicial detectou cancelamento da publicação e destinos Git efetivos; corrigidos com regressões.
-CI e revisão final permanecem pendentes para T05.
+A segunda revisão detectou espera frágil em testes de sinais e staging sem cancelamento; ambos corrigidos.
+CI da revisão final permanece pendente para T05.

@@ -94,5 +94,10 @@ Piloto remoto [#1](https://github.com/TheZehel/illumitech-forge/pull/1) passou c
 sem memória, uma execução da tarefa e reutilização do mesmo commit/PR. Pausa e retomada passaram.
 [Recibo sanitizado](parity-pilot.json). A revisão inicial detectou cancelamento da publicação e
 remotos efetivos não verificados; as correções têm regressões para SIGTERM, pushurl e URL rewrites.
-A suíte local passou com 43 testes. CI macOS/Linux e revisão das correções ainda estão pendentes.
+A suíte local passou com 44 testes, incluindo cancelamento de um filtro Git bloqueado durante staging.
+A espera nos testes de sinais agora confirma o estado antes de sinalizar e limpa processos em falhas.
+O [cliente nativo real](native-parity-acceptance.json) também passou pelo Forge 0.2 sem alterações no
+worktree nem memória obrigatória. O PR do piloto foi posteriormente marcado pronto para revisão
+externamente; o Forge bloqueou a repetição por não ser mais draft, preservando a mudança remota.
+CI macOS/Linux da revisão final ainda está pendente.
 A configuração global e o roteamento dos projetos permanecem no Loop até esses aceites.

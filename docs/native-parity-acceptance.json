@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "version": "0.2.0",
+  "mode": "native_read_only",
+  "memory_required": false,
+  "task_attempts": 1,
+  "evidence": [
+    {
+      "kind": "execution",
+      "outcome": "passed"
+    },
+    {
+      "kind": "gate",
+      "outcome": "passed"
+    }
+  ],
+  "readonly_preserved": true
+}

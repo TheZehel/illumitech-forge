@@ -12,5 +12,6 @@
   "explicit_draft_retry": "reused",
   "persistent_pause_resume": "passed",
   "automatic_merge": false,
-  "release_publication": false
+  "release_publication": false,
+  "later_remote_transition": "draft changed to ready for review externally; Forge refused automatic reuse"
 }

@@ -359,7 +359,12 @@ pub async fn draft_pr_with_cancel(
                 "sensitive file path requires manual publication review"
             );
         }
-        git(root, &["add", "--all"])?;
+        command(
+            root,
+            vec!["git".into(), "add".into(), "--all".into()],
+            cancel,
+        )
+        .await?;
         let diff = command(
             root,
             vec!["git".into(), "diff".into(), "--cached".into()],

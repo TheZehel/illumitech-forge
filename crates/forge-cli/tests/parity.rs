@@ -1,9 +1,55 @@
 use serde_json::{Value, json};
 use std::{
     path::{Path, PathBuf},
-    process::{Command, Stdio},
-    time::Duration,
+    process::{Child, Command, Stdio},
+    time::{Duration, Instant},
 };
+
+// Readiness is a state transition, not a fixed sleep. Keep failed tests from leaving daemons alive.
+struct ChildGuard(Child);
+impl std::ops::Deref for ChildGuard {
+    type Target = Child;
+    fn deref(&self) -> &Child {
+        &self.0
+    }
+}
+impl std::ops::DerefMut for ChildGuard {
+    fn deref_mut(&mut self) -> &mut Child {
+        &mut self.0
+    }
+}
+impl Drop for ChildGuard {
+    fn drop(&mut self) {
+        if self.0.try_wait().ok().flatten().is_none() {
+            let _ = Command::new("kill")
+                .args(["-TERM", &self.0.id().to_string()])
+                .stderr(Stdio::null())
+                .status();
+            let deadline = Instant::now() + Duration::from_secs(5);
+            while Instant::now() < deadline {
+                if self.0.try_wait().ok().flatten().is_some() {
+                    return;
+                }
+                std::thread::sleep(Duration::from_millis(25));
+            }
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+}
+fn wait_until(mut ready: impl FnMut() -> bool) {
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while Instant::now() < deadline {
+        if ready() {
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    assert!(
+        ready(),
+        "fixture did not reach the required state within 30 seconds"
+    );
+}
 
 struct Rig {
     _dir: tempfile::TempDir,
@@ -217,8 +263,8 @@ fn daemon_dry_run_and_status_are_read_only_and_lock_is_exclusive() {
     );
     assert!(r.call(&["daemon-control", "status"]).0);
     assert!(!r.state.exists());
-    let mut child = r
-        .command(&[
+    let mut child = ChildGuard(
+        r.command(&[
             "daemon",
             "--releases-dir",
             r.manifest.parent().unwrap().to_str().unwrap(),
@@ -227,18 +273,15 @@ fn daemon_dry_run_and_status_are_read_only_and_lock_is_exclusive() {
         ])
         .stdout(Stdio::null())
         .spawn()
-        .unwrap();
-    for _ in 0..100 {
-        if r.state.join("state.sqlite").exists()
+        .unwrap(),
+    );
+    wait_until(|| {
+        r.state.join("state.sqlite").exists()
             && forge_domain::Store::open(&r.state.join("state.sqlite"), true)
                 .ok()
                 .and_then(|s| s.load("pilot").ok().flatten())
                 .is_some_and(|r| r.status == "passed")
-        {
-            break;
-        }
-        std::thread::sleep(Duration::from_millis(30));
-    }
+    });
     let (ok, v) = r.daemon();
     assert!(!ok);
     assert!(v["error"].as_str().unwrap().contains("another daemon"));
@@ -442,22 +485,17 @@ fn daemon_sigterm_cancels_active_process_and_persists_stop() {
         m["tasks"][0]["executor"]["argv"] =
             json!(["sh", "-c", "echo $$ > child.pid; exec sleep 60"])
     });
-    let mut child = r
-        .command(&[
+    let mut child = ChildGuard(
+        r.command(&[
             "daemon",
             "--releases-dir",
             r.manifest.parent().unwrap().to_str().unwrap(),
         ])
         .stdout(Stdio::null())
         .spawn()
-        .unwrap();
-    for _ in 0..200 {
-        if r.repo.join("child.pid").exists() {
-            break;
-        }
-        std::thread::sleep(Duration::from_millis(25));
-    }
-    assert!(r.repo.join("child.pid").exists());
+        .unwrap(),
+    );
+    wait_until(|| r.repo.join("child.pid").exists());
     let pid = std::fs::read_to_string(r.repo.join("child.pid")).unwrap();
     Command::new("kill")
         .args(["-TERM", &child.id().to_string()])
@@ -642,8 +680,8 @@ fn sigterm_during_publication_stops_before_push_or_create() {
     let r = Rig::new();
     r.automate(true);
     std::fs::write(r.root.join("block-list"), "").unwrap();
-    let mut child = r
-        .command(&[
+    let mut child = ChildGuard(
+        r.command(&[
             "daemon",
             "--releases-dir",
             r.manifest.parent().unwrap().to_str().unwrap(),
@@ -651,14 +689,9 @@ fn sigterm_during_publication_stops_before_push_or_create() {
         ])
         .stdout(Stdio::null())
         .spawn()
-        .unwrap();
-    for _ in 0..400 {
-        if r.root.join("list-waiting").exists() {
-            break;
-        }
-        std::thread::sleep(Duration::from_millis(25));
-    }
-    assert!(r.root.join("list-waiting").exists());
+        .unwrap(),
+    );
+    wait_until(|| r.root.join("list-waiting").exists());
     Command::new("kill")
         .args(["-TERM", &child.id().to_string()])
         .status()
@@ -717,4 +750,47 @@ fn spec_metadata_preserves_dependencies_priority_and_rejects_dangling_ids() {
     )
     .unwrap();
     assert!(!r.call(&args).0);
+}
+
+#[test]
+fn sigterm_during_git_clean_filter_stops_publication() {
+    let r = Rig::new();
+    r.automate(true);
+    std::fs::write(
+        r.repo.join(".gitattributes"),
+        "executions.txt filter=waiting\n",
+    )
+    .unwrap();
+    git(&r.repo, &["add", ".gitattributes"]);
+    git(&r.repo, &["commit", "-qm", "Fixture filter contract"]);
+    let filter = r.root.join("filter.py");
+    std::fs::write(&filter,"import pathlib,sys,time\npathlib.Path(__file__).with_name('filter-waiting').touch()\ntime.sleep(60)\nprint(sys.stdin.read(),end='')\n").unwrap();
+    git(
+        &r.repo,
+        &[
+            "config",
+            "filter.waiting.clean",
+            &format!("python3 '{}'", filter.display()),
+        ],
+    );
+    git(&r.repo, &["config", "filter.waiting.required", "true"]);
+    let mut child = ChildGuard(
+        r.command(&[
+            "daemon",
+            "--releases-dir",
+            r.manifest.parent().unwrap().to_str().unwrap(),
+            "--once",
+        ])
+        .stdout(Stdio::null())
+        .spawn()
+        .unwrap(),
+    );
+    wait_until(|| r.root.join("filter-waiting").exists());
+    Command::new("kill")
+        .args(["-TERM", &child.id().to_string()])
+        .status()
+        .unwrap();
+    wait_until(|| child.try_wait().unwrap().is_some());
+    assert!(!r.root.join("gh-calls.jsonl").exists());
+    assert!(git(&r.root.join("remote.git"), &["for-each-ref", "refs/heads"]).is_empty());
 }
