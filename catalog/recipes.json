@@ -55,27 +55,27 @@
     "id": "rtk",
     "source": "https://github.com/rtk-ai/rtk",
     "revision": "e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5",
-    "version": null,
+    "version": "1.1.0",
     "scope": "project",
     "last_verified": "2026-10-28",
     "profiles": [
       "generic"
     ],
     "executable": "rtk",
-    "content": "# rtk\n\nOpt-in pilot: same fixture with and without output compression; measure output bytes, errors, elapsed time and evidence completeness. Never replace unredacted evidence with summaries.\n\nSource: https://github.com/rtk-ai/rtk\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5. Metadata checked 2026-10-28; execution not yet tested.\n"
+    "content": "# rtk\n\nOpt-in pilot: same fixture with and without output compression; measure output bytes, errors, elapsed time and evidence completeness. Never replace unredacted evidence with summaries.\n\nSource: https://github.com/rtk-ai/rtk\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: e05c7bdfacfcfe1f845d11f47339e4eae63eb3f5. Metadata checked 2026-10-28; execution not yet tested.\n\nLimited pilot: see docs/tool-pilots.json. No global installation or performance claim.\n"
   },
   {
     "id": "graphify",
     "source": "https://github.com/Graphify-Labs/graphify",
     "revision": "0a8cd4e1e342235fe53e881fb5d591bf0460071f",
-    "version": null,
+    "version": "0.9.97",
     "scope": "project",
     "last_verified": "2026-10-28",
     "profiles": [
       "generic"
     ],
     "executable": "graphify",
-    "content": "# graphify\n\nOpt-in pilot only. Confirm upstream identity, license and pinned revision before install. Compare navigation quality on a disposable repository; exclude secrets and generated output.\n\nSource: https://github.com/Graphify-Labs/graphify\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 0a8cd4e1e342235fe53e881fb5d591bf0460071f. Metadata checked 2026-10-28; execution not yet tested.\n"
+    "content": "# graphify\n\nOpt-in pilot only. Confirm upstream identity, license and pinned revision before install. Compare navigation quality on a disposable repository; exclude secrets and generated output.\n\nSource: https://github.com/Graphify-Labs/graphify\nUpstream installation: not verified; select a pinned release before installing.\nReviewed source revision: 0a8cd4e1e342235fe53e881fb5d591bf0460071f. Metadata checked 2026-10-28; execution not yet tested.\n\nLimited pilot: see docs/tool-pilots.json. No global installation or performance claim.\n"
   },
   {
     "id": "browser-devtools",

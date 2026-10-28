@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "rtk": {
+    "version": "1.1.0",
+    "scope": "Read-only git status in one disposable repository; release checksum verified; no hooks installed",
+    "result": "passed",
+    "observations": {
+      "native": {
+        "exit": 0,
+        "output_bytes": 33,
+        "elapsed_ms": 25.8,
+        "calculator_visible": true
+      },
+      "rtk": {
+        "exit": 0,
+        "output_bytes": 32,
+        "elapsed_ms": 62.8,
+        "calculator_visible": true
+      },
+      "scope": "one disposable fixture; byte counts are not token/cost or accuracy benchmark"
+    }
+  },
+  "graphify": {
+    "version": "0.9.97",
+    "revision": "0a8cd4e1e342235fe53e881fb5d591bf0460071f",
+    "scope": "Pinned source installed in an isolated environment; code-only extraction of a synthetic Python module",
+    "result": "passed",
+    "nodes": 3,
+    "edges": 3,
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "limitations": [
+    "No general token, speed, cost, quality or security claims follow from these pilots.",
+    "No global hooks or production project files were changed."
+  ]
+}

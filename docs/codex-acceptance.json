@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "method": "Real native Codex CLI, external pinned behavioral evaluator; one disposable repository per arm. N=1; no performance inference.",
+  "scenarios": [
+    {
+      "arm": "baseline",
+      "status": "passed",
+      "manifest_hash": "79496cf4ea3de4a048c5e4648d6afb713d7e0ed01d630695fd39f68b7366bdc2",
+      "tasks": {
+        "implement": {
+          "status": "passed",
+          "attempts": 1,
+          "evidence": [
+            {
+              "detail": "{\"code\":0,\"elapsed_ms\":28458,\"readonly_preserved\":true,\"reason\":\"exited\",\"truncated\":false}",
+              "digest": null,
+              "id": "implement",
+              "kind": "execution",
+              "outcome": "passed"
+            },
+            {
+              "detail": "reason=exited, exit=Some(0)",
+              "digest": "cd1fa5c2868546eea36736eacf2c4502ff5f0120607da1523b75d0ea75a12a2c",
+              "id": "external-behavior",
+              "kind": "gate",
+              "outcome": "passed"
+            }
+          ]
+        },
+        "review": {
+          "status": "passed",
+          "attempts": 1,
+          "evidence": [
+            {
+              "detail": "{\"code\":0,\"elapsed_ms\":21918,\"readonly_preserved\":true,\"reason\":\"exited\",\"truncated\":false}",
+              "digest": null,
+              "id": "review",
+              "kind": "execution",
+              "outcome": "passed"
+            },
+            {
+              "detail": "reason=exited, exit=Some(0)",
+              "digest": "6aee7e0ec2460b525b588fef69f7746926caf22d8f175c4c2228eb8dfdf246ee",
+              "id": "external-behavior",
+              "kind": "gate",
+              "outcome": "passed"
+            }
+          ]
+        }
+      },
+      "memory": {
+        "reason": "memory not configured",
+        "status": "degraded"
+      }
+    },
+    {
+      "arm": "toolkit",
+      "status": "passed",
+      "manifest_hash": "fb889340516de54cd12d6a4dad0561cb637ffe1b21f7ec1ddeb8ae8035c01e91",
+      "tasks": {
+        "implement": {
+          "status": "passed",
+          "attempts": 1,
+          "evidence": [
+            {
+              "detail": "{\"code\":0,\"elapsed_ms\":40138,\"readonly_preserved\":true,\"reason\":\"exited\",\"truncated\":false}",
+              "digest": null,
+              "id": "implement",
+              "kind": "execution",
+              "outcome": "passed"
+            },
+            {
+              "detail": "reason=exited, exit=Some(0)",
+              "digest": "6aee7e0ec2460b525b588fef69f7746926caf22d8f175c4c2228eb8dfdf246ee",
+              "id": "external-behavior",
+              "kind": "gate",
+              "outcome": "passed"
+            }
+          ]
+        },
+        "review": {
+          "status": "passed",
+          "attempts": 1,
+          "evidence": [
+            {
+              "detail": "{\"code\":0,\"elapsed_ms\":25612,\"readonly_preserved\":true,\"reason\":\"exited\",\"truncated\":false}",
+              "digest": null,
+              "id": "review",
+              "kind": "execution",
+              "outcome": "passed"
+            },
+            {
+              "detail": "reason=exited, exit=Some(0)",
+              "digest": "ba9f951aed74a4b67e741759d4f4e1e56f8be1889fbe5496155b23443a4e1391",
+              "id": "external-behavior",
+              "kind": "gate",
+              "outcome": "passed"
+            }
+          ]
+        }
+      },
+      "memory": {
+        "reason": "memory not configured",
+        "status": "degraded"
+      }
+    }
+  ],
+  "limitations": [
+    "Memory was optional and degraded during these client adapter evaluations.",
+    "Claude acceptance is deferred at user request.",
+    "The evaluator was corrected to avoid bytecode writes; evidence was explicitly reconciled.",
+    "The review prompt was clarified identically in both arms after an initial toolkit timeout.",
+    "These scenarios establish correctness and preservation, not a speed, cost or quality benchmark."
+  ]
+}

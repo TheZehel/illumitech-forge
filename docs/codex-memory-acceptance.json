@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "status": "passed",
+  "memory_status": "passed",
+  "memory_required": true,
+  "server_version": "3.2.9",
+  "scope": {
+    "workspace": "illumitech",
+    "project": "forge-eval-codex-baseline",
+    "resolved_by": "explicit"
+  },
+  "native_mcp_calls": [
+    {
+      "tool": "memory_recent",
+      "status": "completed",
+      "is_error": false
+    },
+    {
+      "tool": "memory_briefing",
+      "status": "completed",
+      "is_error": false
+    }
+  ],
+  "earlier_sessions_visible": 5,
+  "current_session_records": 0,
+  "read_only_preserved": true,
+  "external_behavior_gate": "passed",
+  "limitations": [
+    "Claude acceptance remains deferred.",
+    "No durable memory page was explicitly written for this test.",
+    "Session record count does not by itself prove lifecycle observation deduplication."
+  ]
+}
