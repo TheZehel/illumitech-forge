@@ -18,11 +18,11 @@ Verify the matching line before extracting:
 ```sh
 # macOS ARM64
 grep 'aarch64-apple-darwin.tar.gz$' SHA256SUMS | shasum -a 256 -c -
-tar -xzf illumitech-forge-v0.1.0-aarch64-apple-darwin.tar.gz
+tar -xzf illumitech-forge-v0.2.0-aarch64-apple-darwin.tar.gz
 
 # Linux x86_64: use these two commands instead
 grep 'x86_64-unknown-linux-gnu.tar.gz$' SHA256SUMS | sha256sum -c -
-tar -xzf illumitech-forge-v0.1.0-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf illumitech-forge-v0.2.0-x86_64-unknown-linux-gnu.tar.gz
 ```
 
 Os comandos seguintes partem da pasta onde você extraiu o arquivo.
@@ -76,7 +76,7 @@ An independent evaluator checks behavior. Memory is optional in this example.
 - Configure workspace e projeto explicitamente; `memory doctor` deve confirmar o mesmo escopo
   usado pelos hooks. Um projeto novo precisa de uma sessão nativa antes de exigir memória.
 - Claude permanece experimental e sem aceitação real nesta versão. Não é requisito para usar Codex.
-- Publicação exige uma ação separada e um aceite humano vinculado à revisão. Não ocorre ao terminar tarefas.
+- Publicação exige uma ação separada e um aceite humano vinculado à revisão. Não ocorre ao terminar tarefas. Draft PR automático é uma opção separada, desativada por padrão.
 - O binário macOS não é notarizado; esta entrega não inclui instalação automática nem serviço em background.
 
 For ai-memory 3.2.9, disable automatic startup backfill in the native client's configuration,

@@ -4,15 +4,16 @@
 
 **Do contrato à evidência.** CLI em Rust para coordenar releases com Codex e Claude Code,
 sem confundir a resposta de um agente com trabalho verificado.
-**v0.1.0: Codex validado; Claude experimental.** [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
+**v0.2.0 em validação: daemon opt-in, draft PR e importação Spec Kit.**
+Codex é o cliente validado; Claude permanece experimental. [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
 
 [English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências atuais](docs/verification.md) · [Specs](specs)
 
 ![Uma peça laranja atravessa três checkpoints até uma estrutura verde-petróleo, sobre fundo grafite](docs/assets/cover.webp)
 
 Privado inicialmente, licenciado sob **MIT** desde a primeira versão. O código está preparado
-para uma abertura pública futura, por decisão explícita. A versão 0.1.0 só será publicada
-quando os gates de integração, memória e revisão humana estiverem comprovados.
+para uma abertura pública futura, por decisão explícita. A [v0.1.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.1.0) foi publicada após aceite humano.
+A [paridade operacional](docs/operational-parity.md) da próxima entrega tem evidências separadas.
 
 ## Instalação
 
@@ -100,7 +101,7 @@ nunca valores no manifest. `memory doctor` verifica a capacidade e o escopo devo
 `memory query` recupera até cinco fontes com trechos limitados.
 
 `required: true` bloqueia execução quando memória ou escopo não podem ser comprovados.
-Modo opcional registra degradação. O Forge não acessa o banco do ai-memory, não escreve páginas
+Sem configuração de memória, o Forge executa e publica normalmente. Modo opcional registra degradação. O Forge não acessa o banco do ai-memory, não escreve páginas
 permanentes e não instala hooks. As integrações nativas existentes continuam responsáveis pela
 captura; procedimentos compartilhados ficam em `skills/core/SKILL.md`.
 No ai-memory 3.2.9, desative o backfill automático no cliente nativo para que ele não
@@ -142,15 +143,19 @@ locks, cancelamento, timeout, saída excessiva, pausa/retomada e setup repetido.
 `eval run` executa manifests de fixtures com o mesmo motor e os mesmos gates.
 
 `release import-loop` gera um candidato revisável. Estados antigos nunca viram evidência atual;
-gates e tarefas implícitas do Spec Kit devem ser mapeados e revisados. O Loop Python continua
+tarefas pendentes do Spec Kit são expandidas com IDs estáveis e gates exigem conversão revisada.
+`release import-spec` gera candidatos diretamente de specs. O Loop Python continua
 operacional e a migração é gradual. [Procedimento de atualização ai-memory](docs/memory-upgrade.md).
 
 ## Roadmap e créditos
 
-As [12 specs](specs) rastreiam fundação, contratos, recuperação, execução, evidências, memória,
+As [13 specs](specs) rastreiam fundação, contratos, recuperação, execução, evidências, memória,
 catálogo, avaliações, legado, atualização da memória, distribuição e aceitação integrada.
-Daemon opt-in, dashboard web, runtime nativo da memória e abertura pública são extensões futuras;
-a primeira versão executa em primeiro plano com controle persistente por outra instância.
+O daemon opt-in supervisiona a fila em primeiro plano; `daemon-control` pausa e retoma a fila.
+O contrato pode habilitar commit e draft PR, sempre em worktree isolado com identidade humana,
+reavaliação após commit e recuperação sem duplicação. Nenhum merge ou release é automático.
+Veja o [guia de operação e limites de adoção](docs/operational-parity.md).
+Dashboard web, runtime nativo da memória e abertura pública permanecem no roadmap.
 
 Illumitech · MIT. Créditos e licenças de terceiros em [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
 Inspirado no ciclo determinístico do Loop Engineering e em avaliações controladas de agentes.

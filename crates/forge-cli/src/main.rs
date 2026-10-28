@@ -1,6 +1,9 @@
+mod daemon;
 mod engine;
+mod importing;
 mod project;
-use anyhow::{Context, Result, ensure};
+mod publication;
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 use forge_adapters::process;
 use serde_json::{Value, json};
@@ -23,6 +26,20 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    Daemon {
+        #[arg(long)]
+        releases_dir: PathBuf,
+        #[arg(long)]
+        once: bool,
+        #[arg(long, default_value_t = 60)]
+        interval_seconds: u64,
+        #[arg(long)]
+        dry_run: bool,
+    },
+    DaemonControl {
+        #[command(subcommand)]
+        command: DaemonControl,
+    },
     Init {
         #[arg(default_value = ".")]
         path: PathBuf,
@@ -81,6 +98,21 @@ enum SpecCommand {
 }
 #[derive(Subcommand)]
 enum ReleaseCommand {
+    ImportSpec {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long, required = true)]
+        spec: Vec<String>,
+        #[arg(long)]
+        release_id: String,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    DraftPr {
+        manifest: PathBuf,
+        #[arg(long)]
+        dry_run: bool,
+    },
     Inspect {
         manifest: PathBuf,
     },
@@ -117,6 +149,21 @@ enum ReleaseCommand {
         notes: PathBuf,
         #[arg(long)]
         dry_run: bool,
+    },
+}
+#[derive(Subcommand)]
+enum DaemonControl {
+    Status,
+    Pause {
+        #[arg(long)]
+        reason: Option<String>,
+    },
+    Resume,
+    Retry {
+        #[arg(long)]
+        release: String,
+        #[arg(long)]
+        reason: String,
     },
 }
 #[derive(Subcommand)]
@@ -186,6 +233,31 @@ async fn main() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::Daemon {
+            releases_dir,
+            once,
+            interval_seconds,
+            dry_run,
+        } => {
+            daemon::run(
+                releases_dir,
+                &cli.state_dir,
+                *once,
+                *interval_seconds,
+                *dry_run,
+            )
+            .await
+        }
+        Command::DaemonControl { command } => match command {
+            DaemonControl::Status => daemon::control(&cli.state_dir, "status", None),
+            DaemonControl::Pause { reason } => {
+                daemon::control(&cli.state_dir, "pause", reason.as_deref())
+            }
+            DaemonControl::Resume => daemon::control(&cli.state_dir, "resume", None),
+            DaemonControl::Retry { release, reason } => {
+                daemon::retry(&cli.state_dir, release, reason)
+            }
+        },
         Command::Init { path } => project::init(path),
         Command::Doctor => doctor().await,
         Command::Spec { command } => match command {
@@ -193,6 +265,15 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
             SpecCommand::Check { root } => project::spec_check(root),
         },
         Command::Release { command } => match command {
+            ReleaseCommand::ImportSpec {
+                root,
+                spec,
+                release_id,
+                output,
+            } => importing::import_spec(root, spec, release_id, output.as_deref()),
+            ReleaseCommand::DraftPr { manifest, dry_run } => {
+                publication::draft_pr(&ctx(manifest)?, *dry_run).await
+            }
             ReleaseCommand::Inspect { manifest } => ctx(manifest)?.inspect(),
             ReleaseCommand::Run { manifest, dry_run } => {
                 let c = ctx(manifest)?;
@@ -210,7 +291,7 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
                 fingerprint,
             } => engine::approve(&ctx(manifest)?, task, gate, reviewer, fingerprint),
             ReleaseCommand::ImportLoop { input, output } => {
-                project::import_loop(input, output.as_deref())
+                importing::import_loop(input, output.as_deref())
             }
             ReleaseCommand::Publish {
                 manifest,
@@ -219,7 +300,10 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
                 assets,
                 notes,
                 dry_run,
-            } => publish(&ctx(manifest)?, repository, tag, assets, notes, *dry_run).await,
+            } => {
+                publication::release(&ctx(manifest)?, repository, tag, assets, notes, *dry_run)
+                    .await
+            }
         },
         Command::Status { manifest } => engine::status(&ctx(manifest)?, false),
         Command::Report { manifest } => engine::status(&ctx(manifest)?, true),
@@ -296,81 +380,4 @@ async fn doctor() -> Result<Value> {
     Ok(
         json!({"schema_version":1,"platform":std::env::consts::OS,"operational_support":cfg!(unix),"checks":checks}),
     )
-}
-async fn publish(
-    c: &engine::Context,
-    repository: &str,
-    tag: &str,
-    assets: &Path,
-    notes: &Path,
-    dry_run: bool,
-) -> Result<Value> {
-    let _locks = forge_domain::WorktreeLocks::acquire(&c.roots)?;
-    let run = engine::assert_publishable(c)?;
-    ensure!(
-        repository.split('/').count() == 2 && repository.split('/').all(forge_domain::valid_id),
-        "invalid repository"
-    );
-    ensure!(tag == "v0.1.0", "this release contract supports v0.1.0");
-    ensure!(notes.is_file(), "release notes missing");
-    let checksums = std::fs::read_to_string(assets.join("SHA256SUMS"))?;
-    let mut files = Vec::new();
-    for name in [
-        "illumitech-forge-v0.1.0-aarch64-apple-darwin.tar.gz",
-        "illumitech-forge-v0.1.0-x86_64-unknown-linux-gnu.tar.gz",
-    ] {
-        let path = assets.join(name);
-        let bytes = std::fs::read(&path).context("required release binary archive absent")?;
-        let line = format!("{}  {}", forge_domain::digest(&bytes), name);
-        ensure!(checksums.lines().any(|l| l == line), "checksum mismatch");
-        files.push(path);
-    }
-    files.push(assets.join("SHA256SUMS"));
-    if dry_run {
-        return Ok(
-            json!({"schema_version":1,"status":"passed","dry_run":true,"repository":repository,"tag":tag,"assets":files}),
-        );
-    }
-    let (_tx, rx) = watch::channel(false);
-    let view = process::run(
-        &[
-            "gh".into(),
-            "repo".into(),
-            "view".into(),
-            repository.into(),
-            "--json".into(),
-            "visibility".into(),
-        ],
-        &c.base,
-        30,
-        rx.clone(),
-    )
-    .await?;
-    ensure!(
-        view.passed() && serde_json::from_str::<Value>(&view.stdout)?["visibility"] == "PRIVATE",
-        "target repository must be private"
-    );
-    let mut argv = vec![
-        "gh".into(),
-        "release".into(),
-        "create".into(),
-        tag.into(),
-        "--repo".into(),
-        repository.into(),
-        "--verify-tag".into(),
-        "--title".into(),
-        format!("Illumitech Forge {tag}"),
-        "--notes-file".into(),
-        notes.display().to_string(),
-    ];
-    argv.extend(files.iter().map(|p| p.display().to_string()));
-    let result = process::run(&argv, &c.base, 120, rx).await?;
-    ensure!(result.passed(), "publication failed: {}", result.stderr);
-    let mut store = forge_domain::Store::open(&c.db, false)?;
-    store.save(
-        &run,
-        "published",
-        &json!({"repository":repository,"tag":tag,"url":result.stdout}),
-    )?;
-    Ok(json!({"schema_version":1,"published":true,"url":result.stdout}))
 }
