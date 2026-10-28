@@ -4,10 +4,10 @@
 
 **From contract to evidence.** A Rust CLI for coordinating releases with Codex and Claude Code.
 An agent saying “done” never proves that a task passed.
-**v0.2.0 under validation: opt-in daemon, draft PRs and Spec Kit import.**
+**Validated v0.2.0 candidate: opt-in daemon, draft PRs and Spec Kit import.**
 Codex is the validated client; Claude remains experimental. [Approved scope](docs/adr/0001-first-delivery-scope.md).
 
-[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification.md)
+[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification-v0.2.0.md)
 
 ![An orange engineered cube passes three checkpoints toward a petrol-green structure](docs/assets/cover.webp)
 

@@ -4,10 +4,10 @@
 
 **Do contrato à evidência.** CLI em Rust para coordenar releases com Codex e Claude Code,
 sem confundir a resposta de um agente com trabalho verificado.
-**v0.2.0 em validação: daemon opt-in, draft PR e importação Spec Kit.**
+**Candidata v0.2.0 validada: daemon opt-in, draft PR e importação Spec Kit.**
 Codex é o cliente validado; Claude permanece experimental. [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
 
-[English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências atuais](docs/verification.md) · [Specs](specs)
+[English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências atuais](docs/verification-v0.2.0.md) · [Specs](specs)
 
 ![Uma peça laranja atravessa três checkpoints até uma estrutura verde-petróleo, sobre fundo grafite](docs/assets/cover.webp)
 
@@ -139,7 +139,7 @@ python3 scripts/licenses.py
 
 Os testes cobrem falso aceite textual, alteração de revisão, escopo obrigatório indisponível,
 locks, cancelamento, timeout, saída excessiva, pausa/retomada e setup repetido. Consulte o
-[ledger](docs/verification.md) para separar testes locais, clientes reais e CI.
+[ledger](docs/verification-v0.2.0.md) para separar testes locais, clientes reais e CI.
 `eval run` executa manifests de fixtures com o mesmo motor e os mesmos gates.
 
 `release import-loop` gera um candidato revisável. Estados antigos nunca viram evidência atual;

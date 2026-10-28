@@ -17,8 +17,11 @@ O piloto remoto sem memória criou e reutilizou o [draft #1](https://github.com/
 com autoria de Allison Yuri e uma execução da tarefa. A execução nativa somente leitura pelo
 Forge 0.2 também passou, com preservação do worktree. Os testes incluem interrupção de staging,
 URL rewrites, recuperação de journal e invalidação de aceites após commit.
-CI nas duas plataformas e pacotes finais
-serão associados à revisão antes do aceite para publicação.
+[CI macOS/Linux](https://github.com/TheZehel/illumitech-forge/actions/runs/40765582769) passou com
+44 testes por plataforma. Os dois pacotes e checksums foram verificados; o exemplo macOS e a
+execução Linux isolada passaram. Fonte dos binários: `3eab629`. Consulte o
+[ledger final da candidata](verification-v0.2.0.md). Falta somente o aceite humano da revisão para
+publicação privada; nenhuma troca global foi realizada.
 
 A v0.1.0 permanece preservada. Claude continua experimental. Não há instalação de serviço,
 migração automática dos projetos ou equivalência com integrações opcionais do Loop como LangSmith.
