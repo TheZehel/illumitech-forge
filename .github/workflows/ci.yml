@@ -20,6 +20,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify Windows PATH contract
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-windows-path.ps1
       - name: Install pinned toolchain
         run: rustup toolchain install 1.94.0 --profile minimal --component rustfmt --component clippy
       - run: cargo fmt --check

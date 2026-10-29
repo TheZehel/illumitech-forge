@@ -15,7 +15,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Installed executable failed' }
     & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 $hash -InstallDir $install
     & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 $hash -InstallDir $install
-    if (([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $install }).Count -ne 1) { throw 'PATH is not idempotent' }
+    if (@([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $install }).Count -ne 1) { throw 'PATH is not idempotent' }
     Set-Content -LiteralPath (Join-Path $install 'unrelated.txt') 'preserve'
     $license = Join-Path $install 'LICENSE'
     $original = [IO.File]::ReadAllBytes($license)

@@ -1,8 +1,7 @@
 # Windows portability candidate (FORGE-014)
 
 The published **0.2.0 remains macOS ARM64 / Linux x86_64 only**. This worktree
-adds an unreleased Windows 11 x86_64, MSVC, PowerShell 7 candidate. Windows CI
-configuration is not a passing CI run. No authenticated Windows agent acceptance
+adds an unreleased Windows 11 x86_64, MSVC, PowerShell 7 candidate. Native CI evidence is tracked by revision; configuration alone is not acceptance. No authenticated Windows agent acceptance
 has been performed on the macOS implementation host. Windows ARM64 and Windows
 PowerShell 5.1 are not supported; scripts require PowerShell 7 and stop on 5.1.
 
@@ -111,58 +110,16 @@ installer at an existing published 0.2.0 installation for this task.
   No Windows release, existing-artifact replacement or global installation is
   authorized by this implementation. Mock Git/gh success is not live acceptance.
 
-## Implementation-host validation and exact changed files
+## Validation scope
 
-Host: macOS ARM64, Rust 1.94.0. Passed `cargo fmt --check`,
-`cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace`
-(44 tests), `cargo doc --workspace --no-deps`, and
-`python3 scripts/test_package.py` (one fixture ZIP inventory/checksum regression).
-Windows-only tests and PowerShell install tests did not execute on this host.
-The packaging regression uses a labelled fixture EXE; it is not a Windows build.
-No commit, push, release, service, installed-binary replacement or durable memory write.
+The implementation host is macOS ARM64 with Rust 1.94.0. Local formatting,
+Clippy, 44 Rust tests, documentation and the ZIP inventory regression passed.
+The fixture ZIP test alone does not prove Windows execution. Native Windows CI
+runs the shared and platform-specific suites, builds the EXE and exercises
+PowerShell installation, preservation and pilot preparation.
 
-Files modified or added for this task:
-
-- `.github/workflows/ci.yml`
-- `Cargo.lock`
-- `README.en.md`
-- `README.md`
-- `crates/forge-adapters/Cargo.toml`
-- `crates/forge-adapters/src/clients.rs`
-- `crates/forge-adapters/src/process.rs`
-- `crates/forge-adapters/src/process/windows.rs`
-- `crates/forge-adapters/tests/windows.rs`
-- `crates/forge-cli/src/daemon.rs`
-- `crates/forge-cli/src/engine.rs`
-- `crates/forge-cli/src/main.rs`
-- `crates/forge-cli/src/publication.rs`
-- `crates/forge-cli/tests/common/mod.rs`
-- `crates/forge-cli/tests/lifecycle.rs`
-- `crates/forge-cli/tests/parity.rs`
-- `docs/windows-portability.md`
-- `examples/windows/workflow.ps1`
-- `scripts/install.ps1`
-- `scripts/package.py`
-- `scripts/test-windows-install.ps1`
-- `scripts/test_package.py`
-- `scripts/uninstall.ps1`
-
-### Atomic follow-up validation scope
-
-This follow-up changes only adapter process creation, its Windows dependency
-features/tests and this document. Native MSVC CI, ZIP packaging and PowerShell
-install/uninstall already exist and are retained. `windows-sys` 0.61.2 bindings
-were inspected for the API signatures and feature gates; `Win32_System_Pipes`
-replaces the no-longer-needed ToolHelp feature. Only the macOS target is installed
-on this host; no Windows compile or runtime success is inferred from macOS gates.
-The Windows CI run is managed separately by the user.
-
-For FORGE-WINDOWS-ATOMIC, macOS ARM64 / Rust 1.94.0 passed
-`cargo fmt --check`, `cargo clippy --workspace --all-targets -- -D warnings`,
-`cargo test --workspace` (44 tests) and `cargo doc --workspace --no-deps`.
-No Windows target/toolchain was installed, and Windows-only regressions were not
-executed here. No commit, push, publication, global configuration or durable
-memory write was performed.
+No authenticated Windows 11 pilot has been run. The published v0.2.0 and local
+installation remain unchanged. No service or autostart is enabled.
 
 ## Deferred authenticated pilot
 
