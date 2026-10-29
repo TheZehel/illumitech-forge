@@ -163,3 +163,24 @@ For FORGE-WINDOWS-ATOMIC, macOS ARM64 / Rust 1.94.0 passed
 No Windows target/toolchain was installed, and Windows-only regressions were not
 executed here. No commit, push, publication, global configuration or durable
 memory write was performed.
+
+## Deferred authenticated pilot
+
+`scripts/windows-native-pilot.ps1` prepares a disposable repository with spaces and
+Unicode, a pinned external evaluator and external state. It preserves existing
+folders by requiring a new root. ai-memory is optional and no hooks are installed.
+
+```powershell
+# Preparation only: inspect and dry-run; no agent invocation.
+.\scripts\windows-native-pilot.ps1 -Root "$env:TEMP\forge-native-review"
+# After reviewing the generated manifest, use its exact paths:
+illumitech-forge --state-dir "$env:TEMP\forge-native-review\state" release run "$env:TEMP\forge-native-review\native-pilot.json"
+illumitech-forge --state-dir "$env:TEMP\forge-native-review\state" report "$env:TEMP\forge-native-review\native-pilot.json"
+```
+
+Alternatively, `-Run` opts into immediate execution in a new root. The pilot uses
+the authenticated native client with its configured model and tests implementation,
+read-only review, arithmetic behavior and file preservation. A separate CI smoke
+checks preparation and positive/negative evaluator fixtures, without invoking an
+agent. It does not satisfy the authenticated Windows 11 pilot, interactive Ctrl+C,
+or live draft PR acceptance gates listed above.

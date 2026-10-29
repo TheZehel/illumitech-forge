@@ -12,7 +12,7 @@ names=['LICENSE','THIRD_PARTY_NOTICES','THIRD_PARTY_LICENSES','docs/dependencies
        'docs/quickstart.md','docs/operational-parity.md','docs/contracts.md','scripts/demo.py','scripts/agent-fixtures.py']
 if windows:
  archive=out/f'illumitech-forge-v{version}-windows-candidate-{target}.zip'
- names += ['scripts/install.ps1','scripts/uninstall.ps1','examples/windows','docs/windows-portability.md']
+ names += ['scripts/install.ps1','scripts/uninstall.ps1','scripts/windows-native-pilot.ps1','examples/windows','docs/windows-portability.md']
  files={'illumitech-forge.exe':binary}
  for name in names:
   path=root/name

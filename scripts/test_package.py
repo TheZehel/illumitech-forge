@@ -20,7 +20,7 @@ class WindowsPackage(unittest.TestCase):
             files = ['LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES/dependency/LICENSE',
                      'docs/dependencies.json', 'docs/quickstart.md', 'docs/operational-parity.md',
                      'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py',
-                     'scripts/install.ps1', 'scripts/uninstall.ps1', 'examples/windows/workflow.ps1',
+                     'scripts/install.ps1', 'scripts/uninstall.ps1','scripts/windows-native-pilot.ps1', 'examples/windows/workflow.ps1',
                      'docs/windows-portability.md']
             for name in files:
                 path = root / name

@@ -35,6 +35,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/test-windows-install.ps1
+      - name: Verify deferred native pilot preparation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-windows-pilot.ps1
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: illumitech-forge-${{ matrix.target }}
