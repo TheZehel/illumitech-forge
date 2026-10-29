@@ -78,6 +78,61 @@ pub fn structured_ok(client: &str, r: &ProcessResult) -> Result<Value> {
         Ok(serde_json::json!({"thread_id":thread,"event_count":events.len()}))
     }
 }
+/// PATH discovery does not execute a shell or search the agent's working directory.
+pub fn find_executable(name: &str) -> Option<std::path::PathBuf> {
+    let path = std::env::var_os("PATH")?;
+    std::env::split_paths(&path)
+        .filter(|p| p.is_absolute())
+        .flat_map(|p| {
+            #[cfg(windows)]
+            let candidates = if std::path::Path::new(name).extension().is_none() {
+                vec![p.join(format!("{name}.exe")), p.join(format!("{name}.com"))]
+            } else {
+                vec![p.join(name)]
+            };
+            #[cfg(not(windows))]
+            let candidates = vec![p.join(name)];
+            candidates
+        })
+        .find(|p| {
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                p.metadata()
+                    .is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
+            }
+            #[cfg(not(unix))]
+            {
+                p.is_file()
+            }
+        })
+}
+
+pub fn resolve_command(name: &str, cwd: &std::path::Path) -> Result<std::path::PathBuf> {
+    #[cfg(windows)]
+    {
+        let path = std::path::Path::new(name);
+        let path = if path.is_absolute() {
+            path.to_path_buf()
+        } else if path.components().count() > 1 {
+            cwd.join(path)
+        } else {
+            find_executable(name).ok_or_else(|| anyhow::anyhow!("native executable not found: {name}; install an EXE or configure an explicit executable path (CMD/BAT/PS1 wrappers are not implicit shells)"))?
+        };
+        ensure!(
+            path.extension()
+                .is_some_and(|e| e.eq_ignore_ascii_case("exe") || e.eq_ignore_ascii_case("com")),
+            "use a native EXE, or explicit pwsh -File for a trusted PowerShell script; batch wrappers are unsupported"
+        );
+        Ok(path)
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = cwd;
+        Ok(name.into())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

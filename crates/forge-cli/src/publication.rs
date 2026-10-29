@@ -22,13 +22,13 @@ impl Signals {
                 if let Ok(mut term) =
                     tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
                 {
-                    tokio::select! { _=tokio::signal::ctrl_c()=>{}, _=term.recv()=>{} }
+                    tokio::select! { _=process::interrupt()=>{}, _=term.recv()=>{} }
                 } else {
-                    let _ = tokio::signal::ctrl_c().await;
+                    let _ = process::interrupt().await;
                 }
             }
             #[cfg(not(unix))]
-            let _ = tokio::signal::ctrl_c().await;
+            let _ = process::interrupt().await;
             let _ = tx.send(true);
         });
         Self { receiver, task }

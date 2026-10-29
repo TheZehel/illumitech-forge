@@ -331,7 +331,7 @@ checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
 name = "forge-adapters"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "libc",
@@ -341,11 +341,12 @@ dependencies = [
  "sha2",
  "tempfile",
  "tokio",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
 name = "forge-catalog"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "serde",
@@ -356,7 +357,7 @@ dependencies = [
 
 [[package]]
 name = "forge-cli"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -376,7 +377,7 @@ dependencies = [
 
 [[package]]
 name = "forge-domain"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "fs2",

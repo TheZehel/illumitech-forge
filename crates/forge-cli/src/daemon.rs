@@ -3,6 +3,7 @@ use crate::{
     publication,
 };
 use anyhow::{Result, ensure};
+use forge_adapters::process;
 use forge_domain::{Store, git};
 use fs2::FileExt;
 use serde_json::{Value, json};
@@ -213,13 +214,13 @@ pub async fn run(dir: &Path, state: &Path, once: bool, interval: u64, dry: bool)
             if let Ok(mut term) =
                 tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
             {
-                tokio::select! { _=tokio::signal::ctrl_c()=>{}, _=term.recv()=>{} }
+                tokio::select! { _=process::interrupt()=>{}, _=term.recv()=>{} }
             } else {
-                let _ = tokio::signal::ctrl_c().await;
+                let _ = process::interrupt().await;
             }
         }
         #[cfg(not(unix))]
-        let _ = tokio::signal::ctrl_c().await;
+        let _ = process::interrupt().await;
         let _ = stop_tx.send(true);
         if let Ok(mut store) = Store::open(&signal_db, false)
             && let Ok(Some(Value::String(id))) = store.metadata("daemon_active_release")
