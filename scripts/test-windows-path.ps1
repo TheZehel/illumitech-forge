@@ -24,6 +24,9 @@ try {
             $explicit = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
             $registry = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path')
             Write-Output "explicitLength=$($explicit.Length) registryLength=$($registry.Length) explicitMatches=$($explicit.Contains($destination)) registryMatches=$($registry.Contains($destination))"
+            Write-Output ('Expected fixture: ' + ($destination | ConvertTo-Json -Compress))
+            Write-Output ('Managed fixture: ' + ($marker.directory | ConvertTo-Json -Compress))
+            Write-Output ('Fixture PATH entries: ' + (@($actual -split ';' | Where-Object { $_ -match 'forge path|forge install' }) | ConvertTo-Json -Compress))
             $index = $actual.IndexOf($root, [StringComparison]::OrdinalIgnoreCase)
             Write-Output "PATH length=$($actual.Length) expectedLength=$($destination.Length) rootIndex=$index endsWithExpected=$($actual.EndsWith($destination))"
             if ($index -ge 0) { Write-Output ('Fixture suffix: ' + ($actual.Substring($index) | ConvertTo-Json -Compress)) }
