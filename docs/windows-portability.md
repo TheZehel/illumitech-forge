@@ -10,11 +10,11 @@ PowerShell 5.1 are not supported; scripts require PowerShell 7 and stop on 5.1.
 
 | Unix assumption / location | Windows implementation / validation |
 | --- | --- |
-| `forge-adapters/process.rs`: process groups, SIGTERM/SIGKILL | Private, non-inheritable Job Object with KILL_ON_JOB_CLOSE, no breakaway. Spawn suspended, assign Job, resume primary thread. Terminate entire Job on timeout/cancel/output overflow/normal parent exit/future abort. |
+| `forge-adapters/process.rs`: process groups, SIGTERM/SIGKILL | Private, non-inheritable Job Object with KILL_ON_JOB_CLOSE, no breakaway. Atomic `CreateProcessW` membership via `PROC_THREAD_ATTRIBUTE_JOB_LIST`; explicit stdio-only `HANDLE_LIST`. Terminate entire Job on timeout/cancel/output overflow/normal parent exit/future abort. |
 | `engine.rs`: external `kill -0` | Native OpenProcess + zero-time WaitForSingleObject. Access denied/unknown errors count as alive; never reconcile based on absence of permission. PID reuse conservatively blocks reconciliation. Unix uses kill(2), preserving EPERM as alive. |
 | CLI Ctrl+C and daemon/publication SIGTERM | Ctrl+C on both platforms; Windows also handles Ctrl+Break. Native tests send Ctrl+Break through a separate controller attached to the child’s private console, never the test runner's group. |
 | PATH names and Unix executable mode | Windows discovers `.exe` / `.com` in absolute PATH entries, or explicit native paths. No implicit shell, current-directory search or PATHEXT script execution. `.cmd`, `.bat`, `.ps1` wrappers fail with guidance; use native agent distribution or an explicit trusted `pwsh.exe -File` executor. |
-| Argument quoting | `Command::args`, no concatenation/raw arguments. Native regressions include empty arguments, spaces, quotes, trailing backslash, Unicode, metacharacters and CRLF. Client model and permission arguments unchanged. |
+| Argument quoting | Unix retains `Command::args`; Windows uses explicit application path and UTF-16 CRT argv quoting, without a shell. Native regressions include empty arguments, spaces, quotes, trailing backslash, Unicode, metacharacters and CRLF. Client model and permission arguments unchanged. |
 | fs2 worktree locks / SQLite WAL | Existing cross-platform libraries retained. Core lifecycle tests run on Windows too: lock conflict, cancellation, pause/resume, approval, tamper detection, bounded retries, crash/reconciliation. No schema changes. |
 | Revision Unix mode bits | Unix mode hashing retained under cfg(unix); Windows hashes bytes and paths. Fingerprints are platform-local evidence, not portable approvals. Canonical paths still enforce evaluator/state/artifact boundaries. Windows junction escape has a native test. |
 | Tests using `/tmp`, sh/sleep/yes and executable shebangs | Unix adapter cases retained; Windows native adapter suite covers trees and output. Shared CLI tests use explicit Python native fixtures; test-only EXE shims replace shebang wrappers for Git/gh. Python/Rust are CI dependencies, not installed-binary dependencies. |
@@ -22,27 +22,48 @@ PowerShell 5.1 are not supported; scripts require PowerShell 7 and stop on 5.1.
 | tar.gz / Python packaging | Unix archives unchanged. Windows candidate ZIP includes EXE, MIT, dependency notices/licenses, PowerShell scripts/examples, internal SHA256SUMS and external archive `.sha256`. No release upload step. |
 | Bash-oriented usage | `examples/windows/workflow.ps1` covers inspect, dry-run, run, status, pause/resume/cancel and spec import. No admin, WSL, Bash, service or Docker requirement. |
 
-## Containment design and limit
+## Atomic containment design (FORGE-WINDOWS-ATOMIC)
 
-The Job handle is owned by the supervisor and is never inherited. Windows closes
-it if Forge crashes, killing associated descendants. Assignment/resume failures
-fail closed and kill the suspended child. Nested jobs are supported on the Windows
-11 target; assignment failure is an error, never a fallback to parent-only kill.
-Windows cancellation is immediate termination, not a graceful POSIX TERM phase.
+The private Job uses `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`, is non-inheritable,
+and allows no breakaway. Stable Rust 1.94 calls documented `CreateProcessW` with
+`STARTUPINFOEXW`, `EXTENDED_STARTUPINFO_PRESENT` and
+`PROC_THREAD_ATTRIBUTE_JOB_LIST`. Membership is part of creation, eliminating the
+previous create-suspended / assign-Job gap. There is no post-creation assignment,
+thread enumeration, resume API, nightly API or parent-only fallback. Failure to
+establish membership fails creation. Nested-job restrictions remain errors.
 
-There is a narrow crash window between CreateProcess(CREATE_SUSPENDED) and Job
-assignment: an abrupt supervisor termination there can leave a **suspended** root
-process, which cannot yet execute or spawn descendants. The native crash tests
-cover the recorded/running state after assignment. This pre-assignment window is
-not claimed solved: atomic PROC_THREAD_ATTRIBUTE_JOB_LIST creation is a remaining
-hardening gate before operational acceptance. Rust 1.94's standard-library custom
-startup-attribute API is unstable; this implementation uses stable Tokio spawning
-and documented ToolHelp/ResumeThread APIs. Never silently resume an orphan.
+`PROC_THREAD_ATTRIBUTE_HANDLE_LIST` limits inheritance to stdin/stdout/stderr pipe
+ends; neither the Job nor parent-side pipe handles are inherited. Stdin is EOF.
+The application path is explicit; arguments use Microsoft CRT quote/backslash
+rules and mutable UTF-16 storage, with NUL and command-line length rejection.
+Cwd is UTF-16; the environment is inherited. No shell interpolation is used.
+Attribute storage is aligned and released with `DeleteProcThreadAttributeList`;
+all owned handles close on errors. The attribute values live through deletion.
+
+The existing bounded drain and cancellation flow is retained. Windows reads the
+anonymous pipes through Tokio file readers and polls the process handle with
+zero-duration waits and a 10 ms async delay. Cancelling a wait leaves no detached
+blocking process wait. On timeout, cancellation, output overflow, parent exit,
+observer error or future abort, the Job terminates the tree. Hard supervisor
+termination closes the Job in the OS. Windows cancellation is immediate, without
+a POSIX TERM grace phase. Unix spawning and supervision behavior is unchanged.
+
+Added native regressions check membership immediately after `CreateProcessW`,
+then hard-terminate the supervisor before spawn returns (no Rust destructors),
+and verify the child dies. Other regressions cover failed creation, input
+rejection, unrelated inheritable-handle exclusion, observer failure cleanup,
+stdin EOF and stderr bounds. Existing descendant, argv/Unicode/CRLF, cancellation,
+crash/reconciliation and shared lifecycle coverage remains enabled.
+These Windows-only regressions are source candidates, **not executed
+Windows evidence on this macOS host**. They cannot inject a crash inside the
+kernel API: atomicity there relies on the documented creation contract.
 
 Sources: [Microsoft Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects),
-[AssignProcessToJobObject](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-assignprocesstojobobject),
-[atomic Job assignment and suspended-process crash window](https://devblogs.microsoft.com/oldnewthing/20230209-00/?p=107812),
-[Rust Windows CommandExt](https://doc.rust-lang.org/std/os/windows/process/trait.CommandExt.html).
+[creation attributes: JOB_LIST and HANDLE_LIST](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-updateprocthreadattribute),
+[CreateProcessW](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw),
+[attribute-list allocation](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-initializeprocthreadattributelist),
+[CRT argument parsing](https://learn.microsoft.com/en-us/cpp/c-language/parsing-c-command-line-arguments),
+[atomic Job assignment](https://devblogs.microsoft.com/oldnewthing/20230209-00/?p=107812).
 
 ## Per-user installation
 
@@ -81,8 +102,9 @@ installer at an existing published 0.2.0 installation for this task.
 - Run on real Windows 11/PowerShell 7 with authenticated native Codex, Git and gh;
   validate permissions/model, spaces/Unicode, Ctrl+C, timeout, hard crash,
   orphan reconciliation, filesystem preservation and isolated draft PR/resume.
-- Close or explicitly resolve the pre-assignment crash window above before
-  claiming complete orphan containment.
+- Confirm atomic creation and its boundary regressions in the separately run
+  Windows CI. Native authenticated Windows pilot is explicitly deferred by the
+  user; runtime acceptance remains pending.
 - Memory remains optional. If enabled, verify MCP scope without Docker or duplicate
   hooks. Claude remains experimental and needs a separate authenticated pilot.
 - Human approval must bind to the exact reviewed revision and Windows checksums.
@@ -124,3 +146,20 @@ Files modified or added for this task:
 - `scripts/test-windows-install.ps1`
 - `scripts/test_package.py`
 - `scripts/uninstall.ps1`
+
+### Atomic follow-up validation scope
+
+This follow-up changes only adapter process creation, its Windows dependency
+features/tests and this document. Native MSVC CI, ZIP packaging and PowerShell
+install/uninstall already exist and are retained. `windows-sys` 0.61.2 bindings
+were inspected for the API signatures and feature gates; `Win32_System_Pipes`
+replaces the no-longer-needed ToolHelp feature. Only the macOS target is installed
+on this host; no Windows compile or runtime success is inferred from macOS gates.
+The Windows CI run is managed separately by the user.
+
+For FORGE-WINDOWS-ATOMIC, macOS ARM64 / Rust 1.94.0 passed
+`cargo fmt --check`, `cargo clippy --workspace --all-targets -- -D warnings`,
+`cargo test --workspace` (44 tests) and `cargo doc --workspace --no-deps`.
+No Windows target/toolchain was installed, and Windows-only regressions were not
+executed here. No commit, push, publication, global configuration or durable
+memory write was performed.

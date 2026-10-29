@@ -2,10 +2,11 @@ use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 use std::{
     path::Path,
-    process::Stdio,
     time::{Duration, Instant},
 };
-use tokio::{io::AsyncReadExt, process::Command, sync::watch};
+use tokio::{io::AsyncReadExt, sync::watch};
+#[cfg(unix)]
+use {std::process::Stdio, tokio::process::Command};
 
 pub const OUTPUT_LIMIT: usize = 1024 * 1024;
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,8 +100,6 @@ impl Drop for Group {
 #[cfg(windows)]
 mod windows;
 #[cfg(windows)]
-use windows::Group;
-#[cfg(windows)]
 pub use windows::pid_alive;
 #[cfg(unix)]
 pub fn pid_alive(pid: u32) -> bool {
@@ -132,32 +131,27 @@ pub async fn run_observed(
     ensure!(!argv.is_empty(), "empty command");
     let started = Instant::now();
     let executable = crate::clients::resolve_command(&argv[0], cwd)?;
-    let mut command = Command::new(executable);
-    command
-        .args(&argv[1..])
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .kill_on_drop(true);
     #[cfg(unix)]
-    command.process_group(0);
+    let (mut child, group) = {
+        let mut command = Command::new(executable);
+        command
+            .args(&argv[1..])
+            .current_dir(cwd)
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .kill_on_drop(true);
+        command.process_group(0);
+        let child = command.spawn()?;
+        let group = Group(
+            child
+                .id()
+                .ok_or_else(|| anyhow::anyhow!("missing child PID"))?,
+        );
+        (child, group)
+    };
     #[cfg(windows)]
-    let group = Group::new()?;
-    #[cfg(windows)]
-    command.creation_flags(windows_sys::Win32::System::Threading::CREATE_SUSPENDED);
-    let mut child = command.spawn()?;
-    #[cfg(windows)]
-    if let Err(error) = group.attach_and_resume(&child) {
-        let _ = child.kill().await;
-        return Err(error);
-    }
-    #[cfg(unix)]
-    let group = Group(
-        child
-            .id()
-            .ok_or_else(|| anyhow::anyhow!("missing child PID"))?,
-    );
+    let (mut child, group) = windows::spawn(&executable, &argv[1..], cwd)?;
     on_spawn(
         child
             .id()

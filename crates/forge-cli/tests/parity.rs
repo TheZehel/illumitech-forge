@@ -366,7 +366,7 @@ fn draft_pr_refuses_agent_authorship_and_base_checkout() {
 fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     let r = Rig::new();
     r.change(|m| {
-        m["tasks"][0]["executor"]["argv"] = json!(["true"]);
+        m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
         m["tasks"][0]["acceptance"]
             .as_array_mut()
             .unwrap()

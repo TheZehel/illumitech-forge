@@ -87,7 +87,7 @@ async fn native_argv_crlf_and_output_bound() {
     argv.extend(values.iter().map(|s| s.to_string()));
     let (_tx, rx) = watch::channel(false);
     let r = process::run(&argv, dir.path(), 10, rx).await.unwrap();
-    assert!(r.passed());
+    assert!(r.passed(), "{r:?}");
     assert_eq!(
         serde_json::from_str::<Vec<String>>(&r.stdout).unwrap(),
         values
@@ -116,4 +116,44 @@ fn native_discovery_and_pid_checks() {
             .eq_ignore_ascii_case("exe")
     );
     assert!(clients::resolve_command("C:\\fake.cmd", Path::new(".")).is_err());
+}
+
+#[tokio::test]
+async fn observation_failure_closes_job_and_stdin_is_eof() {
+    let dir = tempfile::tempdir().unwrap();
+    let (_tx, rx) = watch::channel(false);
+    let mut pid = 0;
+    let result = process::run_observed(
+        &python("import time; time.sleep(60)"),
+        dir.path(),
+        10,
+        rx,
+        |child| {
+            pid = child;
+            anyhow::bail!("injected recording failure")
+        },
+    )
+    .await;
+    assert!(result.is_err());
+    assert_ne!(pid, 0);
+    assert_dead(pid).await;
+    let (_tx, rx) = watch::channel(false);
+    let result = process::run(
+        &python("import sys; assert sys.stdin.read() == ''; print('eof'); sys.stderr.write('error stream')"),
+        dir.path(), 10, rx,
+    ).await.unwrap();
+    assert!(result.passed(), "{result:?}");
+    assert_eq!(result.stdout, "eof");
+    assert_eq!(result.stderr, "error stream");
+    let (_tx, rx) = watch::channel(false);
+    let result = process::run(
+        &python("import sys; sys.stderr.write('x'*3000000)"),
+        dir.path(),
+        10,
+        rx,
+    )
+    .await
+    .unwrap();
+    assert!(!result.passed());
+    assert!(result.stderr.len() <= process::OUTPUT_LIMIT);
 }
