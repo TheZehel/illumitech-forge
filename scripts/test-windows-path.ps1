@@ -19,7 +19,13 @@ try {
         $entries = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $destination })
         $marker = Get-Content -LiteralPath (Join-Path $destination '.forge-install.json') -Raw | ConvertFrom-Json
         Write-Output "NoPath=$noPath matchingEntries=$($entries.Count) markerAdded=$($marker.pathAdded)"
-        if (-not $noPath -and $entries.Count -ne 1) { throw 'PATH entry count is not one' }
+        if (-not $noPath -and $entries.Count -ne 1) {
+            $actual = [Environment]::GetEnvironmentVariable('Path', 'User')
+            $index = $actual.IndexOf($root, [StringComparison]::OrdinalIgnoreCase)
+            Write-Output "PATH length=$($actual.Length) expectedLength=$($destination.Length) rootIndex=$index endsWithExpected=$($actual.EndsWith($destination))"
+            if ($index -ge 0) { Write-Output ('Fixture suffix: ' + ($actual.Substring($index) | ConvertTo-Json -Compress)) }
+            throw 'PATH entry count is not one'
+        }
     }
     & "$PSScriptRoot/uninstall.ps1" -InstallDir $destination
     if ([Environment]::GetEnvironmentVariable('Path', 'User') -ne $original) { throw 'Original PATH was not restored' }
