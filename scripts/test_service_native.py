@@ -22,17 +22,22 @@ def main():
     base = [str(binary), "--json", "--state-dir", str(state)]
 
     def service(action):
-        return json.loads(subprocess.check_output(base + ["service", action, "--executable", str(binary), "--releases-dir", str(releases)]))
+        result = subprocess.run(base + ["service", action, "--executable", str(binary), "--releases-dir", str(releases)],
+                                capture_output=True, text=True, timeout=30)
+        if result.returncode:
+            raise AssertionError(f"service {action} failed: {result.stdout[-16000:]} {result.stderr[-2000:]}")
+        return json.loads(result.stdout)
 
     def heartbeat(previous=None):
-        deadline = time.monotonic() + 120
+        deadline = time.monotonic() + (240 if os.name == "nt" else 120)
+        value = {}
         while time.monotonic() < deadline:
             value = service("status")
             beat = value.get("daemon", {}).get("heartbeat") or {}
             if not value.get("heartbeat_stale", True) and beat.get("running") and beat.get("pid") != previous:
                 return beat["pid"]
             time.sleep(2)
-        raise AssertionError("native service did not produce a fresh heartbeat")
+        raise AssertionError("native service did not produce a fresh heartbeat: " + json.dumps(value)[-16000:])
 
     service("plan")
     assert not state.exists()

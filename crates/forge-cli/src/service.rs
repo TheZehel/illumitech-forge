@@ -593,8 +593,22 @@ pub fn execute(options: &Options, state: &Path) -> Result<Value> {
             json!({"status":"passed","installed":false,"supervisor_state":"not_queried_without_owned_definition"}),
         );
     }
-    let mut result = control(&p, options.action, &Native)?;
-    let daemon = crate::daemon::control(state, "status", None)?;
+    status_detail(control(&p, options.action, &Native)?, state)
+}
+fn status_detail(mut result: Value, state: &Path) -> Result<Value> {
+    // A supervisor may start a process before its SQLite schema is initialized.
+    // Inspection reports unavailable state explicitly instead of claiming activity.
+    let daemon = match crate::daemon::control(state, "status", None) {
+        Ok(daemon) => daemon,
+        Err(error) => {
+            result["installed"] = json!(true);
+            result["heartbeat_stale"] = json!(true);
+            result["runtime_state"] = json!("unavailable");
+            result["daemon"] = json!({});
+            result["daemon_error"] = json!(forge_adapters::process::redact(&format!("{error:#}")));
+            return Ok(result);
+        }
+    };
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)?
         .as_secs();
@@ -940,6 +954,20 @@ mod tests {
         symlink(root, &link).unwrap();
         assert!(safe_path(&link.join("new")).is_err());
         assert!(safe_path(&root.join("newline\n")).is_err());
+    }
+    #[test]
+    fn initializing_or_corrupt_database_is_explicitly_unavailable() {
+        let temp = tempfile::tempdir().unwrap();
+        let root = temp.path();
+        let db = root.join("state.sqlite");
+        for bytes in [b"".as_slice(), b"not a database".as_slice()] {
+            fs::write(&db, bytes).unwrap();
+            let value = status_detail(json!({"status":"passed"}), root).unwrap();
+            assert_eq!(value["runtime_state"], "unavailable");
+            assert_eq!(value["heartbeat_stale"], true);
+            assert!(value["daemon_error"].is_string());
+            assert_eq!(fs::read(&db).unwrap(), bytes);
+        }
     }
     #[test]
     fn logs_rotate_three_bounded_files_and_redact_before_storage() {
