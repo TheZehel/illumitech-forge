@@ -11,4 +11,4 @@ Piloto remoto: draft PR #1, commit 9352a73, autoria Allison Yuri, sem memória, 
 Revisão inicial detectou cancelamento da publicação e destinos Git efetivos; corrigidos com regressões.
 A segunda revisão detectou espera frágil em testes de sinais e staging sem cancelamento; ambos corrigidos.
 CI 40765582769 passou com 44 testes por plataforma. Pacotes e piloto final verificados; ver docs/verification-v0.2.0.md.
-A execução técnica de T05 está concluída. Publicação e configuração cotidiana aguardam o aceite humano da revisão.
+A execução técnica de T05 está concluída. A publicação v0.2.0 foi confirmada em [recibo posterior](../../docs/expansion-evidence.md). Configuração cotidiana não é inferida desse recibo; novas revisões exigem seus próprios aceites.

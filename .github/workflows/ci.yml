@@ -29,8 +29,15 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
+      - name: Validate service fixtures without activation
+        run: python scripts/test_service_fixtures.py
       - run: cargo doc --workspace --no-deps --locked
       - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Validate offline memory migration safeguards
+        if: runner.os != 'Windows'
+        run: python3 scripts/test_memory_migration.py
+      - run: python scripts/test_distribution.py
+      - run: python scripts/distribution.py list
       - run: python scripts/test_package.py
       - run: python scripts/licenses.py
       - name: Package binary and notices

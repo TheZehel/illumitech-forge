@@ -1,0 +1,31 @@
+name: Explicit disposable user service smoke
+on:
+  workflow_dispatch:
+    inputs:
+      approve_disposable_user_services:
+        description: Register and start real per-user services on disposable hosted runners
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+jobs:
+  native:
+    if: inputs.approve_disposable_user_services
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: rustup toolchain install 1.94.0 --profile minimal
+      - run: cargo build --locked -p illumitech-forge-cli
+      - name: Native service lifecycle (requires available user supervisor session)
+        shell: bash
+        env:
+          FORGE_SERVICE_NATIVE_TEST: disposable-user-approved
+        run: |
+          binary=target/debug/illumitech-forge
+          if [[ "$RUNNER_OS" == Windows ]]; then binary="$binary.exe"; fi
+          python scripts/test_service_native.py "$binary"

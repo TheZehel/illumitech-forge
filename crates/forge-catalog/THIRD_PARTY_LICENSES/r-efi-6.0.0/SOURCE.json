@@ -1,0 +1,6 @@
+{
+  "repo": "r-efi/r-efi",
+  "revision": "7e1b0322d31d625f81a5656096330934f9cd835d",
+  "license_expression": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+  "notice": "Upstream uses AUTHORS as the license and copyright notice; README explicitly refers to it."
+}

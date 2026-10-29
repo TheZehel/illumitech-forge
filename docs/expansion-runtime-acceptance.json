@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-29",
+  "scope": "Operator-run runtime checks; not approval of an unpublished revision",
+  "native_client": {
+    "client": "Codex",
+    "binary_sha256": "7043fdf2de9ef00fbbf85940fc954a97c7c53840b87c1ad362f6cd9e0e2d64a5",
+    "fixture": "fresh disposable Git repository; stale handoff is not evidence",
+    "implementation": "passed on first attempt",
+    "read_only_review": "passed on first attempt; revisions preserved",
+    "external_behavior_and_preservation_gates": "passed for both tasks",
+    "memory_configuration": "absent; optional integration was not required for execution",
+    "claude": "not executed; explicitly deferred"
+  },
+  "dependency_audit": {
+    "source": "https://api.osv.dev",
+    "locked_registry_packages": 222,
+    "reported_advisories": 0,
+    "scope": "Point-in-time database lookup, not a proof of absence of vulnerabilities"
+  },
+  "dashboard": {
+    "platform": "macOS Chrome",
+    "real_state": "illumitech-forge-v0-2-0",
+    "list_detail_task_gate_events_navigation": "passed",
+    "read_only_and_missing_heartbeat_notices": "visible"
+  },
+  "user_service": {
+    "platform": "macOS launchd",
+    "queue": "isolated and empty",
+    "apply_idempotence": "passed",
+    "start_and_fresh_heartbeat": "passed",
+    "crash_restart_and_pause_preservation": "passed",
+    "stop_remove_and_state_preservation": "passed",
+    "external_noowners_volume": "launchd rejected the original definition location; retest passed with explicit definition-dir on an ownership-enabled volume and operational state on external storage",
+    "linux_native": "pending",
+    "windows_native": "pending"
+  },
+  "ai_memory": {
+    "version": "3.2.9",
+    "native_binary_sha256": "36ff3e02afc180eac8bd451d4678313a6f7954d22521dff47e3cae1a16ecf525",
+    "runtime": "native launchd",
+    "rehearsal": "isolated restore; no external LLM, production hooks or scheduled maintenance",
+    "offline_integrity_and_original_id_preservation": "passed",
+    "original_page_comparison": "unchanged",
+    "full_final_backup": "created and checksummed; private receipt retained externally",
+    "one_writer": "native active; previous Docker container stopped; old volume preserved",
+    "colima": "dedicated VM stopped after confirming no active containers; explicit-scope MCP still passed afterwards",
+    "mcp_scoped_search": "passed",
+    "cross_project_session_access": "rejected by MCP when the same session ID was queried under a different project",
+    "fresh_session_lifecycle": "session-start, user-prompt, tool events, stop and session-end observed through MCP",
+    "capture_sample": {
+      "observations": 47,
+      "duplicate_kind_and_body": 0,
+      "duplicate_hook_registrations": 0
+    },
+    "hook_definitions_changed": false,
+    "integration_required_by_default": false,
+    "claude": "deferred by user"
+  },
+  "limitations": [
+    "Local runtime checks do not replace CI or revision-bound human release approval.",
+    "No authenticated Windows pilot or real Claude run is claimed.",
+    "No crates.io upload or public repository transition is claimed by this receipt.",
+    "Private corpus, credentials, backups, machine paths and operational ledgers remain outside this repository."
+  ]
+}

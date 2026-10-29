@@ -1,6 +1,6 @@
 # FORGE-011 — Distribuição
 
-Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
+Status: verified for v0.1.0; publication reconciled in docs/expansion-evidence.md. No new publication is authorized.
 
 ## Dependências
 FORGE-007, FORGE-008, FORGE-009, FORGE-010

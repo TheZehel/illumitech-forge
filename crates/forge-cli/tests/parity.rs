@@ -143,7 +143,7 @@ impl Rig {
 import sys,json,pathlib,subprocess
 r=pathlib.Path(__file__).resolve().parent.parent;a=sys.argv[1:]
 with (r/'gh-calls.jsonl').open('a') as f:f.write(json.dumps(a)+'\n')
-if a[:2]==['repo','view']:print(json.dumps({'visibility':'PRIVATE'}))
+if a[:2]==['repo','view']:print(json.dumps({'visibility':(r/'visibility').read_text() if (r/'visibility').exists() else 'PRIVATE'}))
 elif a[:2]==['pr','list']:
  if (r/'block-list').exists():
   import time
@@ -433,6 +433,26 @@ fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     let (ok, v) = r.call(&args);
     assert!(ok, "{v}");
     assert_eq!(v["published"], true);
+    assert_eq!(r.call(&dry).1["expected_visibility"], "PRIVATE");
+    let mut public = args.to_vec();
+    public.extend(["--expected-visibility", "PUBLIC"]);
+    // Both mismatch directions refuse before creating a release.
+    assert!(!r.call(&public).0);
+    std::fs::write(r.root.join("visibility"), "PUBLIC").unwrap();
+    let before = std::fs::read_to_string(r.root.join("gh-calls.jsonl")).unwrap();
+    assert!(!r.call(&args).0);
+    let after = std::fs::read_to_string(r.root.join("gh-calls.jsonl")).unwrap();
+    assert!(!after[before.len()..].contains("create"));
+    assert!(r.call(&public).0);
+    assert!(
+        !std::fs::read_to_string(r.root.join("gh-calls.jsonl"))
+            .unwrap()
+            .contains("edit")
+    );
+    // Public selection still requires the exact approved revision.
+    std::fs::write(r.repo.join("changed.txt"), "new revision").unwrap();
+    assert!(!r.call(&public).0);
+    std::fs::remove_file(r.repo.join("changed.txt")).unwrap();
     std::fs::write(assets.join("widget.bin"), "tampered").unwrap();
     assert!(!r.call(&args).0);
 }
@@ -793,4 +813,36 @@ fn sigterm_during_git_clean_filter_stops_publication() {
     wait_until(|| child.try_wait().unwrap().is_some());
     assert!(!r.root.join("gh-calls.jsonl").exists());
     assert!(git(&r.root.join("remote.git"), &["for-each-ref", "refs/heads"]).is_empty());
+}
+
+#[test]
+fn public_visibility_does_not_bypass_human_approval() {
+    let r = Rig::new();
+    r.change(|m| {
+        m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
+        m["tasks"][0]["acceptance"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"kind":"human","id":"owner"}));
+    });
+    assert_eq!(r.release("run").1["run"]["status"], "awaiting_approval");
+    assert!(
+        !r.call(&[
+            "release",
+            "publish",
+            r.manifest.to_str().unwrap(),
+            "--repository",
+            "fixture/project",
+            "--tag",
+            "v1.0.0",
+            "--assets",
+            "assets",
+            "--notes",
+            "notes.md",
+            "--expected-visibility",
+            "PUBLIC"
+        ])
+        .0
+    );
+    assert!(!r.root.join("gh-calls.jsonl").exists());
 }

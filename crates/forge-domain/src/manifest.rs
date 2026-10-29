@@ -68,6 +68,7 @@ pub struct Automation {
     pub enabled: bool,
     pub require_clean_worktree: bool,
     pub publish: Option<DraftPr>,
+    pub observability: Observability,
 }
 impl Default for Automation {
     fn default() -> Self {
@@ -75,8 +76,21 @@ impl Default for Automation {
             enabled: false,
             require_clean_worktree: true,
             publish: None,
+            observability: Observability::default(),
         }
     }
+}
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Observability {
+    pub langsmith: TraceMode,
+}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TraceMode {
+    #[default]
+    Off,
+    Optional,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -360,6 +374,20 @@ mod tests {
     use super::*;
     fn sample() -> Manifest {
         serde_yaml::from_str("schema_version: 1\nrelease_id: test\nrepos: { app: {path: .} }\ntasks:\n- id: a\n  repo: app\n  description: check\n  executor: {kind: command, argv: [echo]}\n  acceptance: [{kind: human, id: review}]\n").unwrap()
+    }
+    #[test]
+    fn observability_is_explicit_and_strict() {
+        assert_eq!(sample().automation.observability.langsmith, TraceMode::Off);
+        let config: Automation =
+            serde_yaml::from_str("observability: {langsmith: optional}").unwrap();
+        assert_eq!(config.observability.langsmith, TraceMode::Optional);
+        assert!(serde_yaml::from_str::<Automation>("observability: {langsmith: enabled}").is_err());
+        assert!(
+            serde_yaml::from_str::<Automation>(
+                "observability: {langsmith: optional, api_key: forbidden}"
+            )
+            .is_err()
+        );
     }
     #[test]
     fn rejects_cycles_duplicates_and_unknown_refs() {

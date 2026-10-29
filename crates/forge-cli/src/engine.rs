@@ -1,4 +1,5 @@
 use anyhow::{Context as _, Result, ensure};
+use forge_adapters::observability::{Phase, Trace};
 use forge_adapters::{clients, memory::MemoryClient, process};
 use forge_domain::*;
 use serde_json::{Value, json};
@@ -156,6 +157,22 @@ pub fn approve(
 }
 
 pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Result<Value> {
+    crate::observability::phase(
+        &c,
+        false,
+        Phase::Release,
+        Box::pin(execute_inner(&c, resume, reconcile)),
+    )
+    .await
+}
+pub async fn execute_in_scope(
+    c: Context,
+    resume: bool,
+    reconcile: Option<String>,
+) -> Result<Value> {
+    Box::pin(execute_inner(&c, resume, reconcile)).await
+}
+async fn execute_inner(c: &Context, resume: bool, reconcile: Option<String>) -> Result<Value> {
     let _locks = WorktreeLocks::acquire(&c.roots)?;
     let mut store = Store::open(&c.db, false)?;
     let current = revisions(&c.roots)?;
@@ -169,7 +186,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                 .any(|t| t.status == "running" || t.pid.is_some());
             let changed = old.manifest_hash != c.hash
                 || old.revisions != current
-                || !artifacts_current(&c, &old);
+                || !artifacts_current(c, &old);
             if let Some(reason) = reconcile {
                 ensure!(!reason.trim().is_empty(), "reconciliation reason required");
                 for t in old.tasks.values() {
@@ -216,7 +233,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
         store.set_control(&run.release_id, "resume")?;
         store.remove_metadata(&format!("daemon-block:{}", run.release_id))?;
     }
-    run.memory = match memory_check(&c, Some("rules OR decisions OR gotchas")).await {
+    run.memory = match memory_check(c, Some("rules OR decisions OR gotchas")).await {
         Ok(v) => v,
         Err(e) => json!({"status":"degraded","reason":process::redact(&e.to_string())}),
     };
@@ -260,6 +277,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                 state.attempts += 1;
                 state.status = "running".into();
                 state.evidence.clear();
+                let mut task_span = Trace::current().span(Phase::Task, Some(&id), state.attempts);
                 store.save(
                     &run,
                     "task_started",
@@ -318,7 +336,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                             blocked = true;
                         }
                         // Bounded logs are local and redacted; keep only the last three attempts per task.
-                        write_log(&c, &id, run.tasks[&id].attempts, r)?;
+                        write_log(c, &id, run.tasks[&id].attempts, r)?;
                         json!({"reason":r.reason,"code":r.code,"elapsed_ms":r.elapsed_ms,"truncated":r.truncated,"readonly_preserved":!readonly||before==after})
                     }
                     Err(e) => {
@@ -349,6 +367,12 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                     digest: None,
                     detail: detail.to_string(),
                 });
+                task_span.finish(if result.as_ref().is_ok_and(|r| r.reason == "cancelled") {
+                    "cancelled"
+                } else {
+                    &s.status
+                });
+                drop(task_span);
                 store.save(&run, "task_exited", &json!({"task":id,"result":detail}))?;
                 if *cancel_rx.borrow() {
                     run.status = "cancelled".into();
@@ -369,7 +393,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                 break;
             }
         }
-        evaluate(&c, &mut store, &mut run, task, cancel_rx.clone()).await?;
+        evaluate(c, &mut store, &mut run, task, cancel_rx.clone()).await?;
         if apply_control(&store, &mut run)? {
             break;
         }
@@ -401,7 +425,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
     if run.tasks.values().all(|t| t.status == "passed") {
         // Later tasks can invalidate earlier evidence: re-evaluate all final worktree gates.
         for task in &c.manifest.tasks {
-            evaluate(&c, &mut store, &mut run, task, cancel_rx.clone()).await?;
+            evaluate(c, &mut store, &mut run, task, cancel_rx.clone()).await?;
         }
         run.status = if run.tasks.values().all(|t| t.status == "passed") {
             "passed"
@@ -424,6 +448,11 @@ async fn evaluate(
 ) -> Result<()> {
     c.manifest.verify_evaluators(&c.base, &c.roots)?;
     let root = &c.roots[&task.repo];
+    let mut verification = Trace::current().span(
+        Phase::Verification,
+        Some(&task.id),
+        run.tasks[&task.id].attempts,
+    );
     let before = revision(root)?;
     let mut evidence = Vec::new();
     let mut waiting = false;
@@ -465,6 +494,11 @@ async fn evaluate(
                     cancel.clone(),
                     tx,
                 ));
+                let mut gate_span = Trace::current().span(
+                    Phase::ValidationGates,
+                    Some(&task.id),
+                    run.tasks[&task.id].attempts,
+                );
                 let result = process::run_observed(&args, &c.base, g.timeout_seconds, rx, |pid| {
                     run.tasks.get_mut(&task.id).unwrap().pid = Some(pid);
                     store.save(
@@ -474,6 +508,12 @@ async fn evaluate(
                     )
                 })
                 .await;
+                gate_span.finish(if result.as_ref().is_ok_and(|r| r.passed()) {
+                    "passed"
+                } else {
+                    "failed"
+                });
+                drop(gate_span);
                 watcher.abort();
                 run.tasks.get_mut(&task.id).unwrap().pid = None;
                 c.manifest.verify_evaluators(&c.base, &c.roots)?;
@@ -536,6 +576,7 @@ async fn evaluate(
     s.evidence.retain(|e| e.kind == "execution");
     s.evidence.extend(evidence);
     run.revisions.insert(task.repo.clone(), after);
+    verification.finish(&s.status);
     store.save(run,"evaluated",&json!({"task":task.id,"status":run.tasks[&task.id].status,"evaluators_preserved_worktree":before==run.revisions[&task.repo]}))?;
     Ok(())
 }
