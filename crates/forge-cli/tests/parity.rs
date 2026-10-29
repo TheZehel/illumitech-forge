@@ -77,6 +77,11 @@ fn git(root: &Path, args: &[&str]) -> String {
 impl Rig {
     fn new() -> Self {
         let dir = tempfile::tempdir().unwrap();
+        // Git for Windows worktree creation rejects verbatim \? prefixes. TempDir
+        // already supplies an absolute native path; Forge still canonicalizes at runtime.
+        #[cfg(windows)]
+        let root = dir.path().to_path_buf();
+        #[cfg(not(windows))]
         let root = dir.path().canonicalize().unwrap();
         let base = root.join("base");
         std::fs::create_dir(&base).unwrap();
