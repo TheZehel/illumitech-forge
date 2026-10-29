@@ -3,10 +3,16 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      approve_disposable_user_services:
+        description: Run only the explicit disposable user service pilots
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
   validate:
+    if: ${{ !inputs.approve_disposable_user_services }}
     strategy:
       fail-fast: false
       matrix:
@@ -56,3 +62,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 14
+  native-services:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.approve_disposable_user_services }}
+    uses: ./.github/workflows/service-native.yml
+    with:
+      approve_disposable_user_services: true

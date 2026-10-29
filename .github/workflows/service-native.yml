@@ -1,5 +1,10 @@
 name: Explicit disposable user service smoke
 on:
+  workflow_call:
+    inputs:
+      approve_disposable_user_services:
+        type: boolean
+        required: true
   workflow_dispatch:
     inputs:
       approve_disposable_user_services:
