@@ -53,9 +53,13 @@ def main():
             subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)
         else:
             os.kill(pid, signal.SIGKILL)
-        heartbeat(pid)
+        restarted_pid = heartbeat(pid)
         assert service("status")["daemon"]["control"]["paused"] is True
         service("stop")
+        if os.name == "nt":
+            # Scheduler stops the host; its private Job must also end the daemon.
+            remaining = subprocess.check_output(["tasklist", "/FI", f"PID eq {restarted_pid}", "/FO", "CSV", "/NH"], text=True)
+            assert f'"{restarted_pid}"' not in remaining, "stop left a daemon child alive"
         service("remove")
         service("remove")
         assert (state / "state.sqlite").exists(), "uninstall deleted operational state"

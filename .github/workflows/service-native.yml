@@ -5,6 +5,9 @@ on:
       approve_disposable_user_services:
         type: boolean
         required: true
+      service_platform:
+        type: string
+        default: all
   workflow_dispatch:
     inputs:
       approve_disposable_user_services:
@@ -12,6 +15,11 @@ on:
         type: boolean
         required: true
         default: false
+      service_platform:
+        description: Limit the pilot to the platform requiring validation
+        type: choice
+        options: [windows-2025, ubuntu-24.04, macos-14, all]
+        default: windows-2025
 permissions:
   contents: read
 jobs:
@@ -20,8 +28,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, ubuntu-24.04, windows-2025]
+        os: ${{ fromJSON(inputs.service_platform == 'windows-2025' && '["windows-2025"]' || inputs.service_platform == 'ubuntu-24.04' && '["ubuntu-24.04"]' || inputs.service_platform == 'macos-14' && '["macos-14"]' || '["macos-14", "ubuntu-24.04", "windows-2025"]') }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: rustup toolchain install 1.94.0 --profile minimal

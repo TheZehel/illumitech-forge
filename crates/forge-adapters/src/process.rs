@@ -121,6 +121,38 @@ pub async fn run(
 ) -> Result<ProcessResult> {
     run_observed(argv, cwd, seconds, cancel, |_| Ok(())).await
 }
+
+/// A long-lived service child stays in a private kill-on-close Job. Unlike task
+/// execution, there is no task deadline or captured output: the daemon owns its
+/// bounded service logs, and duplicate console output is drained without storage.
+#[cfg(windows)]
+pub async fn service_child(
+    argv: &[String],
+    cwd: &Path,
+    mut cancel: watch::Receiver<bool>,
+) -> Result<Option<i32>> {
+    ensure!(!argv.is_empty(), "empty service command");
+    let executable = crate::clients::resolve_command(&argv[0], cwd)?;
+    let (mut child, group) = windows::spawn(&executable, &argv[1..], cwd)?;
+    let mut stdout = child.stdout.take().unwrap();
+    let mut stderr = child.stderr.take().unwrap();
+    // Keep these futures inline: cancellation never leaves detached pipe readers.
+    let out = async { tokio::io::copy(&mut stdout, &mut tokio::io::sink()).await };
+    let err = async { tokio::io::copy(&mut stderr, &mut tokio::io::sink()).await };
+    let wait = async {
+        tokio::select! {
+            status = child.wait() => Ok(Some(status?.code().unwrap_or(1))),
+            _ = async { while !*cancel.borrow() { if cancel.changed().await.is_err() { break; } } } => Ok(None),
+        }
+    };
+    let drain = async {
+        tokio::try_join!(out, err)?;
+        std::future::pending::<Result<Option<i32>>>().await
+    };
+    let result = tokio::select! { result = wait => result, result = drain => result };
+    group.terminate(true);
+    result
+}
 pub async fn run_observed(
     argv: &[String],
     cwd: &Path,

@@ -31,6 +31,12 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    /// Internal bounded Windows daemon supervisor, started only by service start.
+    #[command(hide = true)]
+    ServiceHost {
+        #[arg(long)]
+        releases_dir: PathBuf,
+    },
     /// Preview/install/control a per-user daemon; defaults to preview.
     Service(service::Options),
     /// Painel local somente leitura; Ctrl+C encerra o servidor.
@@ -272,6 +278,7 @@ async fn main() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::ServiceHost { releases_dir } => service::host(releases_dir, &cli.state_dir).await,
         Command::Service(options) => service::execute(options, &cli.state_dir),
         Command::Dashboard { port } => dashboard::serve(&cli.state_dir, *port).await,
         Command::Daemon {

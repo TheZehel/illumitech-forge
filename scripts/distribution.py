@@ -3,7 +3,7 @@
 import argparse
 import hashlib
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import tarfile
 import tempfile
@@ -47,7 +47,7 @@ def validate_files(files):
         raise ValueError('missing required package files')
     for name in files:
         p = PurePosixPath(name)
-        if p.is_absolute() or '..' in p.parts or not (
+        if p.is_absolute() or PureWindowsPath(name).drive or '\\' in name or '..' in p.parts or not (
             name in required | {'Cargo.toml.orig', 'Cargo.lock', '.cargo_vcs_info.json'}
             or p.parts[0] in {'src', 'tests', 'THIRD_PARTY_LICENSES'}
         ) or any(x.startswith('.env') or x in {'credentials.json', 'auth.json'} for x in p.parts):
@@ -73,7 +73,10 @@ def run(mode):
     verify_notices(ROOT, packages)
     package_files = {}
     for name in ORDER:
-        files = cargo(ROOT, 'package', '-p', name, '--list', '--allow-dirty', '--offline', capture=True).splitlines()
+        # Cargo lists native paths on Windows; archive members remain strictly POSIX.
+        files = [entry.replace('\\', '/') for entry in cargo(
+            ROOT, 'package', '-p', name, '--list', '--allow-dirty', '--offline', capture=True
+        ).splitlines()]
         validate_files(files)
         package_files[name] = files
     if mode == 'list':

@@ -43,6 +43,7 @@ def main():
                 assert len(parsed.find("t:Triggers", ns)) == 0
                 assert parsed.find("t:Principals/t:Principal/t:RunLevel", ns).text == "LeastPrivilege"
                 args = parsed.find("t:Actions/t:Exec/t:Arguments", ns).text
+                assert parsed.find("t:Settings/t:RestartOnFailure", ns) is None
                 if os.name == "nt":
                     parse = ctypes.windll.shell32.CommandLineToArgvW
                     parse.argtypes = [ctypes.c_wchar_p, ctypes.POINTER(ctypes.c_int)]
@@ -50,7 +51,7 @@ def main():
                     count = ctypes.c_int()
                     result = parse('"fixture.exe" ' + args, ctypes.byref(count))
                     try:
-                        assert list(result[:count.value])[1:] == expected[1:]
+                        assert list(result[:count.value])[1:] == ["--state-dir", str(state), "service-host", "--releases-dir", str(releases)]
                     finally:
                         free = ctypes.windll.kernel32.LocalFree
                         free.argtypes = [ctypes.c_void_p]

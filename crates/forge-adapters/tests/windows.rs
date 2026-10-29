@@ -119,6 +119,41 @@ fn native_discovery_and_pid_checks() {
 }
 
 #[tokio::test]
+async fn service_child_drains_without_capture_and_owns_descendants() {
+    let dir = tempfile::tempdir().unwrap();
+    let (_tx, rx) = watch::channel(false);
+    let result = tokio::time::timeout(Duration::from_secs(10), process::service_child(
+        &python("import sys; sys.stdout.write('x'*3000000); sys.stderr.write('y'*3000000); sys.exit(7)"),
+        dir.path(), rx,
+    )).await.unwrap().unwrap();
+    assert_eq!(result, Some(7));
+    for abort in [false, true] {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().to_path_buf();
+        let (tx, rx) = watch::channel(false);
+        let task = tokio::spawn(async move {
+            process::service_child(&python("import subprocess,sys,time,pathlib; p=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); pathlib.Path('pid').write_text(str(p.pid)); time.sleep(60)"), &root, rx).await
+        });
+        let pid = wait_pid(&dir.path().join("pid")).await;
+        if abort {
+            task.abort();
+            let _ = task.await;
+        } else {
+            tx.send(true).unwrap();
+            assert_eq!(
+                tokio::time::timeout(Duration::from_secs(5), task)
+                    .await
+                    .unwrap()
+                    .unwrap()
+                    .unwrap(),
+                None
+            );
+        }
+        assert_dead(pid).await;
+    }
+}
+
+#[tokio::test]
 async fn observation_failure_closes_job_and_stdin_is_eof() {
     let dir = tempfile::tempdir().unwrap();
     let (_tx, rx) = watch::channel(false);

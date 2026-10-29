@@ -1,6 +1,7 @@
 name: Validate and build
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
     inputs:
@@ -8,8 +9,16 @@ on:
         description: Run only the explicit disposable user service pilots
         type: boolean
         default: false
+      service_platform:
+        description: Platform for the explicitly approved native pilot
+        type: choice
+        options: [windows-2025, ubuntu-24.04, macos-14, all]
+        default: windows-2025
 permissions:
   contents: read
+concurrency:
+  group: forge-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   validate:
     if: ${{ !inputs.approve_disposable_user_services }}
@@ -24,6 +33,7 @@ jobs:
           - os: windows-2025
             target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Verify Windows PATH contract
@@ -67,3 +77,4 @@ jobs:
     uses: ./.github/workflows/service-native.yml
     with:
       approve_disposable_user_services: true
+      service_platform: ${{ inputs.service_platform }}

@@ -47,6 +47,69 @@ struct Plan {
     file: PathBuf,
     content: String,
 }
+
+#[cfg(not(windows))]
+pub async fn host(_releases: &Path, _state: &Path) -> Result<Value> {
+    anyhow::bail!("service-host is only available on Windows")
+}
+
+#[cfg(windows)]
+pub async fn host(releases: &Path, state: &Path) -> Result<Value> {
+    use forge_adapters::process;
+    use fs2::FileExt;
+    use std::time::Duration;
+    use tokio::sync::watch;
+    external(releases)?;
+    external(state)?;
+    ensure!(releases.is_dir(), "release queue must exist");
+    fs::create_dir_all(state)?;
+    let lock = fs::OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .read(true)
+        .write(true)
+        .open(state.join("service-host.lock"))?;
+    lock.try_lock_exclusive()
+        .context("another service host owns this state")?;
+    let argv = vec![
+        text(&std::env::current_exe()?)?.into(),
+        "--state-dir".into(),
+        text(state)?.into(),
+        "--service-logging".into(),
+        "daemon".into(),
+        "--releases-dir".into(),
+        text(releases)?.into(),
+    ];
+    let (cancel, rx) = watch::channel(false);
+    let work = async {
+        for attempt in 1..=3 {
+            let code = process::service_child(&argv, state, rx.clone()).await?;
+            if code == Some(0) || code.is_none() {
+                return Ok(json!({"status":"passed","attempts":attempt}));
+            }
+            ensure!(
+                code != Some(2),
+                "daemon reported a blocked contract; explicit reconciliation required"
+            );
+            if attempt == 3 {
+                anyhow::bail!(
+                    "daemon failed after three service attempts; explicit service start required"
+                );
+            }
+            tokio::time::sleep(Duration::from_secs(10)).await;
+        }
+        unreachable!()
+    };
+    tokio::pin!(work);
+    tokio::select! {
+        result = &mut work => result,
+        _ = process::interrupt() => {
+            let _ = cancel.send(true);
+            // Dropping the child future closes its Job even on an abrupt scheduler stop.
+            Ok(json!({"status":"passed","cancelled":true}))
+        }
+    }
+}
 fn hash(s: &str) -> String {
     Sha256::digest(s.as_bytes())
         .iter()
@@ -161,7 +224,7 @@ fn render(platform: Platform, id: &str, argv: &[String]) -> String {
         ),
         // No triggers: registration alone never schedules a run. Interactive token only, no password.
         Platform::Windows => format!(
-            "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"><RegistrationInfo><Description>{marker}</Description></RegistrationInfo><Triggers/><Principals><Principal id=\"User\"><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals><Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled><ExecutionTimeLimit>PT0S</ExecutionTimeLimit><RestartOnFailure><Interval>PT1M</Interval><Count>3</Count></RestartOnFailure></Settings><Actions Context=\"User\"><Exec><Command>{}</Command><Arguments>{}</Arguments></Exec></Actions></Task>\n",
+            "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"><RegistrationInfo><Description>{marker}</Description></RegistrationInfo><Triggers/><Principals><Principal id=\"User\"><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals><Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled><ExecutionTimeLimit>PT0S</ExecutionTimeLimit></Settings><Actions Context=\"User\"><Exec><Command>{}</Command><Arguments>{}</Arguments></Exec></Actions></Task>\n",
             xml(&argv[0]),
             xml(&argv[1..]
                 .iter()
@@ -181,7 +244,7 @@ fn plan(options: &Options, state: &Path) -> Result<Plan> {
     }
     let platform = options.platform.unwrap_or_else(native);
     let id = format!("org.illumitech.forge.{}", &hash(text(state)?)[..20]);
-    let argv = vec![
+    let mut argv = vec![
         text(&options.executable)?.into(),
         "--state-dir".into(),
         text(state)?.into(),
@@ -190,6 +253,12 @@ fn plan(options: &Options, state: &Path) -> Result<Plan> {
         "--releases-dir".into(),
         text(&options.releases_dir)?.into(),
     ];
+    if platform == Platform::Windows {
+        // On-demand Task Scheduler failure restarts were not reliable in native CI.
+        // The directly executed host owns bounded retries and a kill-on-close Job.
+        argv.remove(3);
+        argv[3] = "service-host".into();
+    }
     // Staged outside login-discovery directories. apply cannot activate at next login either.
     let extension = match platform {
         Platform::Macos => "plist",

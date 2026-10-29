@@ -32,8 +32,12 @@
     "crash_restart_and_pause_preservation": "passed",
     "stop_remove_and_state_preservation": "passed",
     "external_noowners_volume": "launchd rejected the original definition location; retest passed with explicit definition-dir on an ownership-enabled volume and operational state on external storage",
-    "linux_native": "pending",
-    "windows_native": "pending"
+    "linux_native": "passed in disposable CI: apply/start/status/crash/restart/pause/stop/remove",
+    "windows_native": "pending",
+    "native_ci": "https://github.com/TheZehel/illumitech-forge/actions/runs/40972411607",
+    "native_ci_revision": "52f0a2ffeaa388df9f3253cad8736a6e9a4e9879",
+    "macos_native_ci": "passed",
+    "optimized_macos": "passed with executable on internal storage; external-volume executable stalled in macOS loader before application startup"
   },
   "ai_memory": {
     "version": "3.2.9",

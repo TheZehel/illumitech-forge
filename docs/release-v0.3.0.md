@@ -22,7 +22,7 @@ condicionadas ao aceite da revisão avaliada. Claude continua experimental e adi
 
 ## Evidências
 
-Os gates locais passaram: fmt, Clippy sem warnings, 78 testes Rust, documentação, 16 testes
+Os gates locais passaram: fmt, Clippy sem warnings, 79 testes Rust, documentação, 16 testes
 de migração, cinco de distribuição e um de embalagem. Os quatro arquivos Cargo foram extraídos
 e compilados em workspace temporário; isso não substitui resolução e upload reais no registry.
 OSV não retornou advisories para as 222 dependências consultadas em 2026-10-29.
@@ -39,7 +39,7 @@ autenticação/ownership no crates.io e aceite humano vinculado ao fingerprint.
 ## Limites
 
 - Windows 11 x86_64/PowerShell 7 permanece candidato até o piloto autenticado adiado pelo usuário.
-- O ciclo nativo de serviços em Linux/Windows e a ingestão real LangSmith têm gates próprios pendentes.
+- O ciclo nativo de serviços passou em macOS/Linux na CI; Windows e ingestão real LangSmith ainda têm gates pendentes.
 - O tooling genérico de migração tem testes offline e contratos MCP conferidos; sua execução integral
   de ensaio é distinta da migração operacional já realizada.
 - Claude real não foi executado. Não há fallback silencioso para outro modelo ou API paga.

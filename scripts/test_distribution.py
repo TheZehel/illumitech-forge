@@ -35,7 +35,9 @@ class DistributionContract(unittest.TestCase):
     def test_package_allowlist(self):
         files = ['Cargo.toml', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'dependencies.json', 'src/lib.rs']
         validate_files(files)
-        for bad in ['.env', 'src/.env.production', 'src/../secret', '/absolute', 'state.sqlite', 'docs/internal.md']:
+        validate_files([entry.replace('\\', '/') for entry in files[:-1] + ['src\\lib.rs', 'THIRD_PARTY_LICENSES\\license.txt']])
+        for bad in ['.env', 'src/.env.production', 'src/../secret', '/absolute', 'state.sqlite', 'docs/internal.md',
+                    'src\\..\\secret', 'C:/secret', 'C:secret', '//server/share/secret']:
             with self.assertRaises(ValueError):
                 validate_files(files + [bad])
         with self.assertRaises(ValueError):

@@ -56,7 +56,12 @@ existing tasks and definitions are retained. A failed cleanup remains an error w
 receipts for reconciliation. `stop` then `remove` is also the explicit rollback procedure.
 Do not remove the operator directory to uninstall a service.
 
-The native definition executes Forge directly, reusing daemon locks, pause/retry/reconciliation
+The native definition executes Forge directly. On Windows it invokes an internal service host
+that places the daemon in a private kill-on-close Job, retries crashes up to three total attempts
+with ten seconds between attempts, and stops on a blocked-contract exit without retry. Stopping
+the scheduled task closes the Job and terminates its descendants. No scheduler restart policy
+multiplies the attempt budget. This Windows correction still requires a native CI pilot.
+The daemon reuses its locks, pause/retry/reconciliation
 contracts and signal handling. It passes an internal logging flag: tracing stderr and final JSON
 stdout go to `state-dir/service-logs`, using the existing process redactor. Each stream has one
 active file and two archives, each at most 1 MiB; a single oversized event is capped. launchd and
@@ -76,8 +81,8 @@ approval input set to true. It exercises apply/start/status/crash/restart/pause/
 an empty external queue and retains operational data in the runner temp directory. It does not
 request root, enable linger or manufacture a missing user session. Missing sessions and failed
 native checks leave that platform gate pending/failed, never simulated as passing. Do not run
-`scripts/test_service_native.py` on a development host. No native lifecycle was executed as part
-of this implementation; authenticated clients, provider operations and publishing were not tested.
+`scripts/test_service_native.py` on a development host. The native lifecycle results below were collected separately from fixture tests; authenticated
+Windows clients, provider operations and publishing are outside this lifecycle check.
 
 Native contracts: [systemd ExecStart quoting](https://www.freedesktop.org/software/systemd/man/253/systemd.service.html)
 and [Task Scheduler command interface](https://learn.microsoft.com/en-us/windows/win32/taskschd/schtasks).
@@ -85,5 +90,17 @@ and [Task Scheduler command interface](https://learn.microsoft.com/en-us/windows
 Subsequent operator validation on 2026-10-29 passed the macOS lifecycle with an isolated
 empty queue, including crash/restart, retained pause and state-preserving removal. An initial
 external-volume ownership failure was fixed with `--definition-dir` and retested successfully.
-See [runtime evidence](expansion-runtime-acceptance.json). Linux and Windows native lifecycle
-acceptance remains pending; fixture checks do not close those gates.
+See [runtime evidence](expansion-runtime-acceptance.json). The subsequent [native CI run](https://github.com/TheZehel/illumitech-forge/actions/runs/40972411607)
+also passed macOS and Linux lifecycles at revision `52f0a2f`. Windows recovery remains under
+validation. An optimized macOS executable passed from internal storage; an external-volume
+executable stalled in the macOS loader before application startup. Keep the executable and
+definition on internal user storage for that layout; do not bypass macOS privacy controls.
+
+## CI budget controls
+
+Automatic validation runs once per pull request; branch pushes do not create a second matrix.
+Push validation is restricted to `main`, and newer revisions cancel older runs for the same ref.
+The validation matrix has a 25-minute job limit. Native pilots have a 12-minute limit and a
+`service_platform` selector, defaulting to Windows for manual dispatch; choose `all` explicitly
+when all three lifecycle gates need renewal. These controls preserve failed/pending gates.
+The next Windows correction remains local and unvalidated natively while CI usage is deferred.
