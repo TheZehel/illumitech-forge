@@ -1,5 +1,5 @@
 #![cfg(windows)]
-use forge_adapters::{clients, process};
+use illumitech_forge_adapters::{clients, process};
 use std::{path::Path, time::Duration};
 use tokio::sync::watch;
 fn python(code: &str) -> Vec<String> {
