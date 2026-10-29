@@ -21,6 +21,9 @@ try {
         Write-Output "NoPath=$noPath matchingEntries=$($entries.Count) markerAdded=$($marker.pathAdded)"
         if (-not $noPath -and $entries.Count -ne 1) {
             $actual = [Environment]::GetEnvironmentVariable('Path', 'User')
+            $explicit = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
+            $registry = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path')
+            Write-Output "explicitLength=$($explicit.Length) registryLength=$($registry.Length) explicitMatches=$($explicit.Contains($destination)) registryMatches=$($registry.Contains($destination))"
             $index = $actual.IndexOf($root, [StringComparison]::OrdinalIgnoreCase)
             Write-Output "PATH length=$($actual.Length) expectedLength=$($destination.Length) rootIndex=$index endsWithExpected=$($actual.EndsWith($destination))"
             if ($index -ge 0) { Write-Output ('Fixture suffix: ' + ($actual.Substring($index) | ConvertTo-Json -Compress)) }
