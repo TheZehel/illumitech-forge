@@ -66,7 +66,11 @@ try {
     $path = [string][Environment]::GetEnvironmentVariable('Path', 'User')
     $added = $old -and $old.pathAdded
     if (-not $NoPath -and $InstallDir -notin ($path -split ';')) {
-        [Environment]::SetEnvironmentVariable('Path', (($path.TrimEnd(';') + ';' + $InstallDir).TrimStart(';')), 'User')
+        $updatedPath = if ($path) { $path + ';' + $InstallDir } else { $InstallDir }
+        [Environment]::SetEnvironmentVariable('Path', $updatedPath, [EnvironmentVariableTarget]::User)
+        if ($InstallDir -notin ([Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User) -split ';')) {
+            throw 'User PATH update could not be verified'
+        }
         $added = $true
     }
     @{ schema = 1; directory = $InstallDir; pathAdded = [bool]$added; files = $files } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $marker
