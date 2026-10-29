@@ -4,7 +4,7 @@ $archive = (Get-ChildItem dist/*windows*.zip | Select-Object -First 1).FullName
 $hash = (Get-FileHash -LiteralPath $archive).Hash
 $originalPath = [Environment]::GetEnvironmentVariable('Path', 'User')
 $root = Join-Path $env:TEMP ('forge install café ' + [guid]::NewGuid())
-$install = Join-Path $root 'app'
+$install = [IO.Path]::GetFullPath((Join-Path $root 'app'))
 try {
     try { & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 ('0' * 64) -InstallDir $install -NoPath; throw 'Accepted bad checksum' }
     catch { if ($_.Exception.Message -ne 'Archive SHA256 mismatch') { throw } }
