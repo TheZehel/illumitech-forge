@@ -98,3 +98,5 @@ or publishes releases automatically. See [operations and adoption limits](docs/o
 A web dashboard, native memory runtime and public visibility remain future extensions. No paid benchmarks or official Harness² framework are bundled.
 
 Illumitech · MIT. See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES). No unmeasured performance badges.
+
+Windows 11 x86_64 / PowerShell 7 has an unreleased portability candidate with native CI and ZIP packaging. Native execution and authenticated pilot acceptance remain pending; published v0.2.0 artifacts are unchanged. See the [Windows inventory and gates](docs/windows-portability.md).

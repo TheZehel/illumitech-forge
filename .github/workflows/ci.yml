@@ -15,9 +15,15 @@ jobs:
             target: aarch64-apple-darwin
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
+          - os: windows-2025
+            target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify Windows PATH contract
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-windows-path.ps1
       - name: Install pinned toolchain
         run: rustup toolchain install 1.94.0 --profile minimal --component rustfmt --component clippy
       - run: cargo fmt --check
@@ -25,9 +31,18 @@ jobs:
       - run: cargo test --workspace --locked
       - run: cargo doc --workspace --no-deps --locked
       - run: cargo build --release --locked --target ${{ matrix.target }}
-      - run: python3 scripts/licenses.py
+      - run: python scripts/test_package.py
+      - run: python scripts/licenses.py
       - name: Package binary and notices
-        run: python3 scripts/package.py ${{ matrix.target }}
+        run: python scripts/package.py ${{ matrix.target }}
+      - name: Verify Windows installation and preservation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-windows-install.ps1
+      - name: Verify deferred native pilot preparation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-windows-pilot.ps1
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: illumitech-forge-${{ matrix.target }}

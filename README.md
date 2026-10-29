@@ -160,3 +160,5 @@ Dashboard web, runtime nativo da memória e abertura pública permanecem no road
 Illumitech · MIT. Créditos e licenças de terceiros em [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
 Inspirado no ciclo determinístico do Loop Engineering e em avaliações controladas de agentes.
 Nenhum benchmark pago ou framework oficial Harness² é incluído. Não há badges de desempenho não medido.
+
+Windows 11 x86_64 / PowerShell 7 tem uma implementação candidata, CI nativa e ZIP preparados para a próxima entrega. A execução nativa e o piloto autenticado permanecem pendentes; a v0.2.0 publicada não muda. Consulte o [inventário e gates Windows](docs/windows-portability.md).

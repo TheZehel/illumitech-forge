@@ -175,7 +175,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
                 for t in old.tasks.values() {
                     if let Some(pid) = t.pid {
                         ensure!(
-                            !pid_alive(pid),
+                            !process::pid_alive(pid),
                             "orphan process still exists; inspect it before reconciliation"
                         );
                     }
@@ -229,7 +229,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
     store.save(&run, "started", &json!({"memory":run.memory}))?;
     let (cancel_tx, cancel_rx) = watch::channel(false);
     let interrupt = tokio::spawn(async move {
-        let _ = tokio::signal::ctrl_c().await;
+        let _ = process::interrupt().await;
         let _ = cancel_tx.send(true);
     });
     let mut order: VecDeque<_> = c.manifest.validate()?.into();
@@ -567,14 +567,6 @@ async fn watch_cancel(db: PathBuf, id: String, rx: watch::Receiver<bool>, tx: wa
         }
         tokio::time::sleep(Duration::from_millis(150)).await;
     }
-}
-fn pid_alive(pid: u32) -> bool {
-    std::process::Command::new("kill")
-        .args(["-0", &pid.to_string()])
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .status()
-        .is_ok_and(|s| s.success())
 }
 fn write_log(c: &Context, id: &str, attempt: u32, r: &process::ProcessResult) -> Result<()> {
     let dir =

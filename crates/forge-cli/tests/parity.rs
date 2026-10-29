@@ -1,3 +1,4 @@
+mod common;
 use serde_json::{Value, json};
 use std::{
     path::{Path, PathBuf},
@@ -21,6 +22,7 @@ impl std::ops::DerefMut for ChildGuard {
 impl Drop for ChildGuard {
     fn drop(&mut self) {
         if self.0.try_wait().ok().flatten().is_none() {
+            #[cfg(unix)]
             let _ = Command::new("kill")
                 .args(["-TERM", &self.0.id().to_string()])
                 .stderr(Stdio::null())
@@ -75,13 +77,25 @@ fn git(root: &Path, args: &[&str]) -> String {
 impl Rig {
     fn new() -> Self {
         let dir = tempfile::tempdir().unwrap();
+        // Git for Windows worktree creation rejects verbatim \? prefixes. TempDir
+        // already supplies an absolute native path; Forge still canonicalizes at runtime.
+        #[cfg(windows)]
+        let root = dir.path().to_path_buf();
+        #[cfg(not(windows))]
         let root = dir.path().canonicalize().unwrap();
         let base = root.join("base");
         std::fs::create_dir(&base).unwrap();
         git(&base, &["init", "-q", "-b", "main"]);
         git(&base, &["config", "user.name", "Human Fixture"]);
         git(&base, &["config", "user.email", "human@example.invalid"]);
-        git(&base, &["config", "core.hooksPath", "/dev/null"]);
+        git(
+            &base,
+            &[
+                "config",
+                "core.hooksPath",
+                root.join("no-hooks").to_str().unwrap(),
+            ],
+        );
         std::fs::write(base.join("output.txt"), "verified").unwrap();
         git(&base, &["add", "."]);
         git(&base, &["commit", "-qm", "Initial fixture"]);
@@ -112,14 +126,7 @@ impl Rig {
         let bin = root.join("bin");
         std::fs::create_dir(&bin).unwrap();
         // Transport fixture: keep real remote resolution intact, redirect only network operations.
-        let real_git = Command::new("sh")
-            .args(["-c", "command -v git"])
-            .output()
-            .unwrap();
-        let real_git = String::from_utf8(real_git.stdout)
-            .unwrap()
-            .trim()
-            .to_string();
+        let real_git = forge_adapters::clients::find_executable("git").unwrap();
         let wrapper = format!(
             "#!/usr/bin/env python3\nimport sys,subprocess\na=sys.argv[1:]\nif a and a[0] in ('push','ls-remote') and 'origin' in a:a[a.index('origin')]={}\nsys.exit(subprocess.call([{},*a]))\n",
             serde_json::to_string(&bare).unwrap(),
@@ -159,12 +166,17 @@ else:sys.exit(4)
             std::fs::set_permissions(bin.join("gh"), std::fs::Permissions::from_mode(0o755))
                 .unwrap();
         }
+        #[cfg(windows)]
+        {
+            common::native_shim(&bin, "git");
+            common::native_shim(&bin, "gh");
+        }
         let eval = root.join("evaluate.py");
         std::fs::write(&eval,"import pathlib,sys\nassert (pathlib.Path(sys.argv[1])/'output.txt').read_text()=='verified'\n").unwrap();
         let queue = root.join("queue");
         std::fs::create_dir(&queue).unwrap();
         let manifest = queue.join("pilot.yaml");
-        let m = json!({"schema_version":1,"release_id":"pilot","repos":{"app":{"path":repo}},"tasks":[{"id":"work","repo":"app","description":"test","executor":{"kind":"command","argv":["sh","-c","printf x >> executions.txt"]},"max_attempts":1,"acceptance":[{"kind":"gate","id":"check"}]}],"gates":[{"id":"check","argv":["python3",eval,"{repo}"],"inputs":{eval.display().to_string():forge_domain::digest(&std::fs::read(&eval).unwrap())}}]});
+        let m = json!({"schema_version":1,"release_id":"pilot","repos":{"app":{"path":repo}},"tasks":[{"id":"work","repo":"app","description":"test","executor":{"kind":"command","argv":common::command("printf x >> executions.txt")},"max_attempts":1,"acceptance":[{"kind":"gate","id":"check"}]}],"gates":[{"id":"check","argv":[common::python(),eval,"{repo}"],"inputs":{eval.display().to_string():forge_domain::digest(&std::fs::read(&eval).unwrap())}}]});
         std::fs::write(&manifest, serde_json::to_vec(&m).unwrap()).unwrap();
         let state = root.join("state");
         Self {
@@ -183,6 +195,12 @@ else:sys.exit(4)
     }
     fn command(&self, args: &[&str]) -> Command {
         let mut c = Command::new(env!("CARGO_BIN_EXE_illumitech-forge"));
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            c.creation_flags(0x00000010);
+        } // CREATE_NEW_CONSOLE: isolated native control-event tests
+
         c.args(["--json", "--state-dir", self.state.to_str().unwrap()])
             .args(args)
             .current_dir(&self.root);
@@ -285,10 +303,7 @@ fn daemon_dry_run_and_status_are_read_only_and_lock_is_exclusive() {
     let (ok, v) = r.daemon();
     assert!(!ok);
     assert!(v["error"].as_str().unwrap().contains("another daemon"));
-    Command::new("kill")
-        .args(["-INT", &child.id().to_string()])
-        .status()
-        .unwrap();
+    common::interrupt(child.id());
     assert!(child.wait().unwrap().success());
     assert!(r.daemon().0);
 }
@@ -299,7 +314,7 @@ fn daemon_failure_requires_explicit_intervention() {
     r.automate(false);
     r.change(|m| {
         m["tasks"][0]["executor"]["argv"] =
-            json!(["sh", "-c", "printf x >> executions.txt; exit 1"])
+            json!(common::command("printf x >> executions.txt; exit 1"))
     });
     assert!(!r.daemon().0);
     assert!(!r.daemon().0);
@@ -351,7 +366,7 @@ fn draft_pr_refuses_agent_authorship_and_base_checkout() {
 fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     let r = Rig::new();
     r.change(|m| {
-        m["tasks"][0]["executor"]["argv"] = json!(["true"]);
+        m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
         m["tasks"][0]["acceptance"]
             .as_array_mut()
             .unwrap()
@@ -483,7 +498,7 @@ fn daemon_sigterm_cancels_active_process_and_persists_stop() {
     r.automate(false);
     r.change(|m| {
         m["tasks"][0]["executor"]["argv"] =
-            json!(["sh", "-c", "echo $$ > child.pid; exec sleep 60"])
+            json!(common::command("echo $$ > child.pid; exec sleep 60"))
     });
     let mut child = ChildGuard(
         r.command(&[
@@ -497,10 +512,7 @@ fn daemon_sigterm_cancels_active_process_and_persists_stop() {
     );
     wait_until(|| r.repo.join("child.pid").exists());
     let pid = std::fs::read_to_string(r.repo.join("child.pid")).unwrap();
-    Command::new("kill")
-        .args(["-TERM", &child.id().to_string()])
-        .status()
-        .unwrap();
+    common::interrupt(child.id());
     let mut exited = false;
     for _ in 0..200 {
         if child.try_wait().unwrap().is_some() {
@@ -514,14 +526,9 @@ fn daemon_sigterm_cancels_active_process_and_persists_stop() {
         child.wait().unwrap();
     }
     assert!(exited, "daemon did not stop after TERM");
-    assert!(
-        !Command::new("kill")
-            .args(["-0", pid.trim()])
-            .stderr(Stdio::null())
-            .status()
-            .unwrap()
-            .success()
-    );
+    assert!(!forge_adapters::process::pid_alive(
+        pid.trim().parse().unwrap()
+    ));
     let store = forge_domain::Store::open(&r.state.join("state.sqlite"), true).unwrap();
     assert_eq!(store.load("pilot").unwrap().unwrap().status, "cancelled");
     assert_eq!(
@@ -584,11 +591,9 @@ fn staged_sensitive_path_is_refused_even_when_worktree_is_clean_relative_to_inde
     let r = Rig::new();
     r.automate(true);
     r.change(|m| {
-        m["tasks"][0]["executor"]["argv"] = json!([
-            "sh",
-            "-c",
+        m["tasks"][0]["executor"]["argv"] = json!(common::command(
             "printf fixture > .env.local; git add .env.local"
-        ])
+        ))
     });
     let (ok, v) = r.daemon();
     assert!(!ok, "{v}");
@@ -692,10 +697,7 @@ fn sigterm_during_publication_stops_before_push_or_create() {
         .unwrap(),
     );
     wait_until(|| r.root.join("list-waiting").exists());
-    Command::new("kill")
-        .args(["-TERM", &child.id().to_string()])
-        .status()
-        .unwrap();
+    common::interrupt(child.id());
     let mut exited = false;
     for _ in 0..200 {
         if child.try_wait().unwrap().is_some() {
@@ -726,7 +728,7 @@ fn spec_metadata_preserves_dependencies_priority_and_rejects_dangling_ids() {
     let spec = r.repo.join("specs/001-pilot");
     std::fs::create_dir_all(&spec).unwrap();
     let tasks = "- [ ] T001 Prepare <!-- forge: {\"priority\":20} -->\n- [ ] T002 Implement <!-- forge: {\"dependencies\":[\"T001\"],\"priority\":1} -->\n";
-    std::fs::write(spec.join("tasks.md"), tasks).unwrap();
+    std::fs::write(spec.join("tasks.md"), tasks.replace('\n', "\r\n")).unwrap();
     let args = [
         "release",
         "import-spec",
@@ -752,6 +754,7 @@ fn spec_metadata_preserves_dependencies_priority_and_rejects_dangling_ids() {
     assert!(!r.call(&args).0);
 }
 
+#[cfg(unix)]
 #[test]
 fn sigterm_during_git_clean_filter_stops_publication() {
     let r = Rig::new();
@@ -786,10 +789,7 @@ fn sigterm_during_git_clean_filter_stops_publication() {
         .unwrap(),
     );
     wait_until(|| r.root.join("filter-waiting").exists());
-    Command::new("kill")
-        .args(["-TERM", &child.id().to_string()])
-        .status()
-        .unwrap();
+    common::interrupt(child.id());
     wait_until(|| child.try_wait().unwrap().is_some());
     assert!(!r.root.join("gh-calls.jsonl").exists());
     assert!(git(&r.root.join("remote.git"), &["for-each-ref", "refs/heads"]).is_empty());

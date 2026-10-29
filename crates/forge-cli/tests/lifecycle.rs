@@ -1,3 +1,4 @@
+mod common;
 use serde_json::{Value, json};
 use std::{
     path::PathBuf,
@@ -15,7 +16,7 @@ impl Fixture {
     fn new(command: &str, human: bool) -> Self {
         let dir = tempfile::tempdir().unwrap();
         let root = dir.path().canonicalize().unwrap();
-        let repo = root.join("repo");
+        let repo = root.join("repo espaço 日本");
         std::fs::create_dir(&repo).unwrap();
         for args in [
             vec!["init", "-q"],
@@ -47,7 +48,7 @@ impl Fixture {
         if human {
             acceptance.push(json!({"kind":"human","id":"review"}));
         }
-        let m = json!({"schema_version":1,"release_id":"fixture","repos":{"app":{"path":repo}},"tasks":[{"id":"build","repo":"app","description":"fixture","executor":{"kind":"command","argv":["sh","-c",command]},"acceptance":acceptance,"max_attempts":3,"timeout_seconds":20}],"gates":[{"id":"files","argv":["python3",evaluator,"{repo}"],"inputs":{evaluator.display().to_string():forge_domain::digest(&std::fs::read(&evaluator).unwrap())}}]});
+        let m = json!({"schema_version":1,"release_id":"fixture","repos":{"app":{"path":repo}},"tasks":[{"id":"build","repo":"app","description":"fixture","executor":{"kind":"command","argv":common::command(command)},"acceptance":acceptance,"max_attempts":3,"timeout_seconds":20}],"gates":[{"id":"files","argv":[common::python(),evaluator,"{repo}"],"inputs":{evaluator.display().to_string():forge_domain::digest(&std::fs::read(&evaluator).unwrap())}}]});
         let manifest = root.join("manifest.yaml");
         std::fs::write(&manifest, serde_json::to_vec(&m).unwrap()).unwrap();
         let state = root.join("state");
@@ -258,6 +259,7 @@ fn state_cannot_live_in_agent_worktree() {
             .success()
     );
 }
+#[cfg(unix)]
 #[test]
 fn artifact_symlink_escape_rejected() {
     let f = Fixture::new("true", false);
@@ -285,10 +287,21 @@ fn crash_never_silently_restarts_orphan() {
     let (ok, v) = f.call(&["resume"]);
     assert!(!ok, "{v}");
     assert!(v["error"].as_str().unwrap().contains("orphan"));
+    #[cfg(unix)]
     Command::new("sh")
         .args(["-c", &format!("kill -9 -{pid}")])
         .status()
         .unwrap();
+    #[cfg(windows)]
+    {
+        for _ in 0..100 {
+            if !forge_adapters::process::pid_alive(pid) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        panic!("Job left orphan alive");
+    }
 }
 
 #[test]
@@ -297,4 +310,28 @@ fn evaluator_tampering_invalidates_inspection() {
     std::fs::write(f.root.join("evaluate.py"), "# altered evaluator").unwrap();
     assert!(!f.call(&["release", "inspect"]).0);
     assert!(!f.state.exists());
+}
+
+#[cfg(windows)]
+#[test]
+fn artifact_junction_escape_rejected_without_symlink_privilege() {
+    let f = Fixture::new("true", false);
+    let outside = f.root.join("outside");
+    std::fs::create_dir(&outside).unwrap();
+    std::fs::write(outside.join("output.txt"), "verified").unwrap();
+    let link = f.repo.join("linked");
+    assert!(
+        Command::new("cmd.exe")
+            .args(["/d", "/c", "mklink", "/J"])
+            .arg(&link)
+            .arg(&outside)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    m["tasks"][0]["acceptance"] = json!([{"kind":"artifact","path":"linked/output.txt","sha256":forge_domain::digest(b"verified")}]);
+    std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+    assert!(!f.call(&["release", "run"]).0);
+    std::fs::remove_dir(link).unwrap();
 }

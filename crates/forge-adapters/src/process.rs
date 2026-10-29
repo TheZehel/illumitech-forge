@@ -2,10 +2,11 @@ use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 use std::{
     path::Path,
-    process::Stdio,
     time::{Duration, Instant},
 };
-use tokio::{io::AsyncReadExt, process::Command, sync::watch};
+use tokio::{io::AsyncReadExt, sync::watch};
+#[cfg(unix)]
+use {std::process::Stdio, tokio::process::Command};
 
 pub const OUTPUT_LIMIT: usize = 1024 * 1024;
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -78,20 +79,40 @@ async fn drain<R: tokio::io::AsyncRead + Unpin>(
     Ok((bytes, truncated))
 }
 /// RAII group cleanup also runs if the supervisor future is aborted.
+#[cfg(unix)]
 struct Group(u32);
+#[cfg(unix)]
 impl Group {
-    fn signal(&self, sig: i32) {
+    fn terminate(&self, force: bool) {
+        let sig = if force { libc::SIGKILL } else { libc::SIGTERM };
         #[cfg(unix)]
         unsafe {
             libc::kill(-(self.0 as i32), sig);
         }
     }
 }
+#[cfg(unix)]
 impl Drop for Group {
     fn drop(&mut self) {
-        self.signal(libc::SIGKILL);
+        self.terminate(true);
     }
 }
+#[cfg(windows)]
+mod windows;
+#[cfg(windows)]
+pub use windows::pid_alive;
+#[cfg(unix)]
+pub fn pid_alive(pid: u32) -> bool {
+    if pid == 0 || pid > i32::MAX as u32 {
+        return true;
+    }
+    // Permission denied is not proof of death.
+    unsafe {
+        libc::kill(pid as i32, 0) == 0
+            || std::io::Error::last_os_error().raw_os_error() != Some(libc::ESRCH)
+    }
+}
+
 pub async fn run(
     argv: &[String],
     cwd: &Path,
@@ -109,23 +130,33 @@ pub async fn run_observed(
 ) -> Result<ProcessResult> {
     ensure!(!argv.is_empty(), "empty command");
     let started = Instant::now();
-    let mut command = Command::new(&argv[0]);
-    command
-        .args(&argv[1..])
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .kill_on_drop(true);
+    let executable = crate::clients::resolve_command(&argv[0], cwd)?;
     #[cfg(unix)]
-    command.process_group(0);
-    let mut child = command.spawn()?;
-    let group = Group(
+    let (mut child, group) = {
+        let mut command = Command::new(executable);
+        command
+            .args(&argv[1..])
+            .current_dir(cwd)
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .kill_on_drop(true);
+        command.process_group(0);
+        let child = command.spawn()?;
+        let group = Group(
+            child
+                .id()
+                .ok_or_else(|| anyhow::anyhow!("missing child PID"))?,
+        );
+        (child, group)
+    };
+    #[cfg(windows)]
+    let (mut child, group) = windows::spawn(&executable, &argv[1..], cwd)?;
+    on_spawn(
         child
             .id()
             .ok_or_else(|| anyhow::anyhow!("missing child PID"))?,
-    );
-    on_spawn(group.0)?;
+    )?;
     let (overflow_tx, mut overflow_rx) = watch::channel(false);
     let stdout = tokio::spawn(drain(child.stdout.take().unwrap(), overflow_tx.clone()));
     let stderr = tokio::spawn(drain(child.stderr.take().unwrap(), overflow_tx));
@@ -136,11 +167,11 @@ pub async fn run_observed(
         _=async {while !*overflow_rx.borrow(){if overflow_rx.changed().await.is_err(){std::future::pending::<()>().await;}}}=>(None,"output_limit"),
     };
     let status = if status.is_none() {
-        group.signal(libc::SIGTERM);
+        group.terminate(false);
         match tokio::time::timeout(Duration::from_secs(2), child.wait()).await {
             Ok(s) => Some(s?),
             Err(_) => {
-                group.signal(libc::SIGKILL);
+                group.terminate(true);
                 Some(child.wait().await?)
             }
         }
@@ -148,7 +179,7 @@ pub async fn run_observed(
         status
     };
     // Descendants may retain pipes after the direct child exits.
-    group.signal(libc::SIGKILL);
+    group.terminate(true);
     let (out, out_truncated) = tokio::time::timeout(Duration::from_secs(3), stdout).await???;
     let (err, err_truncated) = tokio::time::timeout(Duration::from_secs(3), stderr).await???;
     Ok(ProcessResult {
@@ -161,9 +192,26 @@ pub async fn run_observed(
     })
 }
 
+/// Console interrupt without replacing the caller's model or permission policy.
+pub async fn interrupt() {
+    #[cfg(windows)]
+    {
+        if let Ok(mut breaks) = tokio::signal::windows::ctrl_break() {
+            tokio::select! { _=tokio::signal::ctrl_c()=>{}, _=breaks.recv()=>{} }
+        } else {
+            let _ = tokio::signal::ctrl_c().await;
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = tokio::signal::ctrl_c().await;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(unix)]
     #[tokio::test]
     async fn timeout_kills_group() {
         let (_tx, rx) = watch::channel(false);
@@ -178,6 +226,7 @@ mod tests {
         assert_eq!(r.reason, "timeout");
         assert!(r.elapsed_ms < 6000);
     }
+    #[cfg(unix)]
     #[tokio::test]
     async fn excessive_output_is_not_success() {
         let (_tx, rx) = watch::channel(false);
@@ -192,6 +241,7 @@ mod tests {
         assert!(!r.passed());
         assert!(r.stdout.len() <= OUTPUT_LIMIT);
     }
+    #[cfg(unix)]
     #[tokio::test]
     async fn cancellation_is_bounded() {
         let (tx, rx) = watch::channel(false);

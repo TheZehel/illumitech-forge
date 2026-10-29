@@ -351,11 +351,7 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
     }
 }
 fn find_executable(name: &str) -> Option<PathBuf> {
-    std::env::var_os("PATH").and_then(|v| {
-        std::env::split_paths(&v)
-            .map(|p| p.join(name))
-            .find(|p| p.is_file())
-    })
+    forge_adapters::clients::find_executable(name)
 }
 async fn doctor() -> Result<Value> {
     let mut checks = Vec::new();
@@ -378,6 +374,6 @@ async fn doctor() -> Result<Value> {
         checks.push(json!({"name":name,"discovered":find_executable(name).is_some(),"capabilities_verified":passed,"authentication_tested":false}));
     }
     Ok(
-        json!({"schema_version":1,"platform":std::env::consts::OS,"operational_support":cfg!(unix),"checks":checks}),
+        json!({"schema_version":1,"platform":std::env::consts::OS,"operational_support":cfg!(unix),"windows_candidate":cfg!(windows),"authenticated_windows_acceptance":false,"checks":checks}),
     )
 }
