@@ -100,3 +100,19 @@ human-approved evidence, a clean evaluated commit, matching remote tag, and vali
 checksums. Any visibility mismatch (including INTERNAL or missing data) fails before release
 creation. The local `--dry-run` reports expected visibility and explicitly says the remote
 visibility was not checked. GitHub release creation and crates.io upload remain distinct.
+
+## Selected local publication path — 2026-10-30
+
+The operator selected local verification followed by crates.io upload and then PR merge,
+without another GitHub Actions run because the included compute quota is nearly exhausted.
+The selected artifact is version 0.3.0. Local macOS gates and extracted-package verification
+must be tied to the reviewed revision; earlier Linux CI remains historical evidence.
+Windows is explicitly experimental. Its latest service-host correction has not passed a
+native Windows pilot; this limitation must remain in the published CLI README.
+The prior Windows failure and deferred gates are not reclassified as passing.
+
+Use `[skip ci]` on the reviewed push and merge commit to avoid spending Actions compute;
+do not bypass required branch protections or turn pending checks into artificial successes.
+crates.io upload makes package source public even while the GitHub repository remains private.
+Repository visibility is a separate operation. Cargo authentication and revision-bound human
+approval still apply. This plan alone does not record a successful upload or merge.

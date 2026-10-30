@@ -17,7 +17,8 @@ The CLI includes a read-only local dashboard, persistent queue controls and expl
 per-user service definitions. It never publishes a release implicitly.
 
 macOS ARM64 and Linux x86_64 are the primary platforms. Windows 11 x86_64 with PowerShell 7
-is a portability candidate; authenticated native acceptance remains pending. Codex is the
+is experimental: authenticated native acceptance and the latest service-host correction remain
+unverified on Windows. Do not use its service integration for unattended workloads yet. Codex is the
 validated client and Claude remains experimental. Install and authenticate clients separately.
 
 ai-memory is optional. Only manifests selecting `memory.required: true` require its availability
