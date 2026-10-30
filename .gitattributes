@@ -1,0 +1,2 @@
+# Preserve upstream notice bytes, including original line endings.
+**/THIRD_PARTY_LICENSES/** -text linguist-vendored

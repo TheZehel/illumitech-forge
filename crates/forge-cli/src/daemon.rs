@@ -118,7 +118,8 @@ async fn cycle(dir: &Path, state: &Path, dry: bool, stop: &watch::Receiver<bool>
             results.push(json!({"release_id":id,"status":"blocked","reason":"explicit resume/reconciliation required","detail":block}));
             continue;
         }
-        let attempt: Result<Value> = async {
+        let attempt = crate::observability::phase(&c, false, forge_adapters::observability::Phase::DaemonCycle,
+            crate::observability::nested(forge_adapters::observability::Phase::Release, Box::pin(async {
             let existing=store.load(&id)?;
             if let Some(old)=existing {
                 ensure!(old.status == "passed", "existing release is {}; use explicit resume/reconciliation",old.status);
@@ -130,7 +131,7 @@ async fn cycle(dir: &Path, state: &Path, dry: bool, stop: &watch::Receiver<bool>
                 }
                 if let Some(config)=&c.manifest.automation.publish { publication::draft_preflight(&c,config)?; }
                 store.set_metadata("daemon_active_release",&json!(id))?;
-                let execution=engine::execute(Context::load(&path,state)?,false,None).await;
+                let execution=engine::execute_in_scope(Context::load(&path,state)?,false,None).await;
                 store.set_metadata("daemon_active_release",&Value::Null)?;
                 let output=execution?;
                 ensure!(output["run"]["status"] == "passed", "release stopped with {}; explicit resume required",output["run"]["status"]);
@@ -145,7 +146,7 @@ async fn cycle(dir: &Path, state: &Path, dry: bool, stop: &watch::Receiver<bool>
                 }
                 publication::draft_pr_with_cancel(&c,false,stop).await
             } else { Ok(json!({"release_id":id,"status":"passed","publication":"disabled"})) }
-        }.await;
+        }))).await;
         match attempt {
             Ok(v) => results.push(v),
             Err(e) => {

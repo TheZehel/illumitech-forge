@@ -335,3 +335,40 @@ fn artifact_junction_escape_rejected_without_symlink_privilege() {
     assert!(!f.call(&["release", "run"]).0);
     std::fs::remove_dir(link).unwrap();
 }
+
+#[test]
+fn optional_observability_preserves_execution_failure_and_dry_run() {
+    let f = Fixture::new("exit 1", false);
+    let mut manifest: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    manifest["automation"] = json!({"observability":{"langsmith":"optional"}});
+    std::fs::write(&f.manifest, serde_json::to_vec(&manifest).unwrap()).unwrap();
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    listener.set_nonblocking(true).unwrap();
+    for (args, dry) in [
+        (vec!["release", "run", "--dry-run"], true),
+        (vec!["release", "run"], false),
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_illumitech-forge"))
+            .args(f.args(&args))
+            .current_dir(&f.root)
+            .env("LANGSMITH_TRACING", "true")
+            .env("LANGSMITH_API_KEY", "fixture-only")
+            .env(
+                "LANGSMITH_ENDPOINT",
+                format!("http://{}", listener.local_addr().unwrap()),
+            )
+            .output()
+            .unwrap();
+        let value: Value = serde_json::from_slice(&output.stdout).unwrap();
+        if dry {
+            assert!(output.status.success());
+            assert!(!f.state.exists());
+        } else {
+            assert!(!output.status.success());
+            assert_eq!(value["run"]["status"], "blocked");
+            assert_eq!(value["run"]["tasks"]["build"]["attempts"], 3);
+        }
+        // Production binaries never allow HTTP, even on loopback.
+        assert!(listener.accept().is_err());
+    }
+}

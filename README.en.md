@@ -4,16 +4,17 @@
 
 **From contract to evidence.** A Rust CLI for coordinating releases with Codex and Claude Code.
 An agent saying “done” never proves that a task passed.
-**Validated v0.2.0 candidate: opt-in daemon, draft PRs and Spec Kit import.**
+**v0.3.0 candidate: local dashboard, per-user services, optional tracing and public distribution.**
 Codex is the validated client; Claude remains experimental. [Approved scope](docs/adr/0001-first-delivery-scope.md).
 
-[Português](README.md) · [Contracts](docs/contracts.md) · [Verification ledger](docs/verification-v0.2.0.md)
+[Português](README.md) · [Contracts](docs/contracts.md) · [Expansion evidence](docs/expansion-runtime-acceptance.json)
 
 ![An orange engineered cube passes three checkpoints toward a petrol-green structure](docs/assets/cover.webp)
 
 Initially private, MIT-licensed from the first version. Public visibility is a later explicit decision.
 [Version 0.1.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.1.0) was published after human approval.
-The next version has a separate [operational acceptance ledger](docs/operational-parity.md).
+[Version 0.2.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.2.0) is also published.
+The current candidate has separate [distribution gates](docs/public-distribution.md).
 
 ## Install and try
 
@@ -36,7 +37,8 @@ python3 scripts/demo.py /tmp/forge-demo
 
 The demo uses a disposable Git repository and an external evaluator; it calls no LLM.
 Private release archives include both platform binaries, SHA-256 checksums and third-party notices.
-Nothing is published to crates.io in this phase.
+Registry packages are prepared; upload and public visibility require the evaluated revision's gates.
+After publication, install with `cargo install illumitech-forge-cli --version 0.3.0 --locked`.
 
 ## Architecture and workflow
 
@@ -91,11 +93,20 @@ setup. Real clients and cross-platform CI remain separate acceptance evidence in
 `release import-spec` imports specs directly. Historical completion is never execution evidence.
 The Python Loop remains operational while projects migrate gradually.
 
-The 13 specs cover the delivery contract. The opt-in foreground daemon supports persistent queue
+The 19 specs cover the delivery contract. The opt-in foreground daemon supports persistent queue
 controls and failure latches. Optional draft PR automation requires an isolated worktree and human
 Git identity, reevaluates gates after commit and recovers without duplicate publication. It never merges
 or publishes releases automatically. See [operations and adoption limits](docs/operational-parity.md).
-A web dashboard, native memory runtime and public visibility remain future extensions. No paid benchmarks or official Harness² framework are bundled.
+The [local dashboard](docs/dashboard.md) reads releases, tasks, gates and events without running
+agents. [Per-user services](docs/user-services.md) have explicit preview, application and control;
+the macOS lifecycle passed an isolated real pilot. Linux/Windows service lifecycle gates remain
+separate. [Tracing](docs/observability.md) is off by default, content-free and fail-open.
+
+The operator's ai-memory 3.2.9 runtime was migrated to native launchd; the dedicated Colima VM
+is stopped and rollback storage is retained. Memory remains optional for Forge users.
+[Migration tooling](docs/native-memory-migration.md) has offline safety tests; its generic workflow
+and the separately recorded operator migration have distinct evidence. Public visibility and
+registry uploads remain explicit operations. No paid benchmarks or official Harness² framework are bundled.
 
 Illumitech · MIT. See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES). No unmeasured performance badges.
 

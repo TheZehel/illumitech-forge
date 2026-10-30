@@ -1,0 +1,10 @@
+Illumitech Forge original code: MIT, copyright Illumitech.
+
+Runtime dependency notices are generated from Cargo.lock and the exact downloaded crate
+LICENSE/COPYING files by scripts/licenses.py. The distribution must include the generated
+THIRD_PARTY_LICENSES directory and dependency inventory. SQLite is public domain.
+
+ai-memory and agent CLIs are external programs, not vendored or relicensed by Forge.
+Optional catalog recipes retain their upstream licensing and installation requirements.
+The Illumitech logo is an existing Illumitech asset. Generated illustrations are recorded
+in docs/assets/provenance.json. Tool references do not imply endorsement.

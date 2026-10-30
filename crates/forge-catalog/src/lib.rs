@@ -20,9 +20,7 @@ pub struct Recipe {
     pub content: String,
 }
 pub fn recipes() -> Result<Vec<Recipe>> {
-    Ok(serde_json::from_str(include_str!(
-        "../../../catalog/recipes.json"
-    ))?)
+    Ok(serde_json::from_str(include_str!("recipes.json"))?)
 }
 fn hash(bytes: &[u8]) -> String {
     Sha256::digest(bytes)

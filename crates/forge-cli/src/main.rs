@@ -1,8 +1,11 @@
 mod daemon;
+mod dashboard;
 mod engine;
 mod importing;
+mod observability;
 mod project;
 mod publication;
+mod service;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use forge_adapters::process;
@@ -19,6 +22,8 @@ use tokio::sync::watch;
 struct Cli {
     #[arg(long, global = true)]
     json: bool,
+    #[arg(long, global = true, hide = true)]
+    service_logging: bool,
     #[arg(long, global = true, default_value = ".forge-state")]
     state_dir: PathBuf,
     #[command(subcommand)]
@@ -26,6 +31,19 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    /// Internal bounded Windows daemon supervisor, started only by service start.
+    #[command(hide = true)]
+    ServiceHost {
+        #[arg(long)]
+        releases_dir: PathBuf,
+    },
+    /// Preview/install/control a per-user daemon; defaults to preview.
+    Service(service::Options),
+    /// Painel local somente leitura; Ctrl+C encerra o servidor.
+    Dashboard {
+        #[arg(long, default_value_t = 0)]
+        port: u16,
+    },
     Daemon {
         #[arg(long)]
         releases_dir: PathBuf,
@@ -139,6 +157,9 @@ enum ReleaseCommand {
     },
     Publish {
         manifest: PathBuf,
+        /// Check this visibility; never change the remote repository.
+        #[arg(long, value_enum, default_value = "PRIVATE")]
+        expected_visibility: publication::ExpectedVisibility,
         #[arg(long)]
         repository: String,
         #[arg(long)]
@@ -200,9 +221,26 @@ enum EvalCommand {
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
+    let logs = if cli.service_logging {
+        match service::Logs::new(&cli.state_dir) {
+            Ok(logs) => Some(logs),
+            Err(e) => {
+                eprintln!("service logging refused: {e}");
+                std::process::exit(2);
+            }
+        }
+    } else {
+        None
+    };
+    let writer = tracing_subscriber::fmt::writer::BoxMakeWriter::new(std::io::stderr);
+    let writer = logs
+        .clone()
+        .map(tracing_subscriber::fmt::writer::BoxMakeWriter::new)
+        .unwrap_or(writer);
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .with_writer(std::io::stderr)
+        .with_ansi(!cli.service_logging)
+        .with_writer(writer)
         .init();
     let result = dispatch(&cli).await;
     let (value, code) = match result {
@@ -223,7 +261,14 @@ async fn main() {
             2,
         ),
     };
-    if cli.json {
+    if let Some(logs) = logs {
+        if logs
+            .write("stdout", serde_json::to_string(&value).unwrap().as_bytes())
+            .is_err()
+        {
+            std::process::exit(2);
+        }
+    } else if cli.json {
         println!("{}", serde_json::to_string(&value).unwrap());
     } else {
         println!("{}", serde_json::to_string_pretty(&value).unwrap());
@@ -233,6 +278,9 @@ async fn main() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::ServiceHost { releases_dir } => service::host(releases_dir, &cli.state_dir).await,
+        Command::Service(options) => service::execute(options, &cli.state_dir),
+        Command::Dashboard { port } => dashboard::serve(&cli.state_dir, *port).await,
         Command::Daemon {
             releases_dir,
             once,
@@ -295,14 +343,23 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
             }
             ReleaseCommand::Publish {
                 manifest,
+                expected_visibility,
                 repository,
                 tag,
                 assets,
                 notes,
                 dry_run,
             } => {
-                publication::release(&ctx(manifest)?, repository, tag, assets, notes, *dry_run)
-                    .await
+                publication::release(
+                    &ctx(manifest)?,
+                    repository,
+                    tag,
+                    assets,
+                    notes,
+                    *dry_run,
+                    *expected_visibility,
+                )
+                .await
             }
         },
         Command::Status { manifest } => engine::status(&ctx(manifest)?, false),

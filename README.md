@@ -4,16 +4,17 @@
 
 **Do contrato à evidência.** CLI em Rust para coordenar releases com Codex e Claude Code,
 sem confundir a resposta de um agente com trabalho verificado.
-**Candidata v0.2.0 validada: daemon opt-in, draft PR e importação Spec Kit.**
+**Candidata v0.3.0: painel local, serviços por usuário, observabilidade opcional e distribuição pública.**
 Codex é o cliente validado; Claude permanece experimental. [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
 
-[English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências atuais](docs/verification-v0.2.0.md) · [Specs](specs)
+[English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências da expansão](docs/expansion-runtime-acceptance.json) · [Specs](specs)
 
 ![Uma peça laranja atravessa três checkpoints até uma estrutura verde-petróleo, sobre fundo grafite](docs/assets/cover.webp)
 
 Privado inicialmente, licenciado sob **MIT** desde a primeira versão. O código está preparado
 para uma abertura pública futura, por decisão explícita. A [v0.1.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.1.0) foi publicada após aceite humano.
-A [paridade operacional](docs/operational-parity.md) da próxima entrega tem evidências separadas.
+A [v0.2.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.2.0) também foi publicada.
+A expansão atual tem [gates de distribuição separados](docs/public-distribution.md).
 
 ## Instalação
 
@@ -31,8 +32,10 @@ cargo build --release --locked
 ./target/release/illumitech-forge doctor
 ```
 
-Não há publicação no crates.io nesta etapa. Os arquivos de uma release privada devem incluir
-binários das duas plataformas, `SHA256SUMS`, MIT e avisos de terceiros.
+Os pacotes crates.io estão preparados; upload e abertura pública dependem dos gates da revisão.
+Após a publicação, a instalação será `cargo install illumitech-forge-cli --version 0.3.0 --locked`.
+Os arquivos de release incluem binários, `SHA256SUMS`, MIT e avisos de terceiros; o pacote Windows
+permanece identificado como candidato até o piloto autenticado.
 
 ## Início rápido
 
@@ -68,10 +71,10 @@ flowchart LR
 
 | Crate | Responsabilidade |
 | --- | --- |
-| `forge-domain` | Manifest, DAG, fingerprints, locks, SQLite e aceites |
-| `forge-adapters` | Processos, clientes nativos e MCP |
-| `forge-catalog` | Receitas seletivas e configuração idempotente |
-| `forge-cli` | Comandos, controle de execução e publicação |
+| `illumitech-forge-domain` | Manifest, DAG, fingerprints, locks, SQLite e aceites |
+| `illumitech-forge-adapters` | Processos, clientes nativos e MCP |
+| `illumitech-forge-catalog` | Receitas seletivas e configuração idempotente |
+| `illumitech-forge-cli` | Comandos, controle de execução e publicação |
 
 SQLite e avaliadores devem ficar **fora dos repositórios graváveis pelos executores**.
 Um lock do sistema operacional por worktree coordena diferentes instâncias. O Forge é um
@@ -149,16 +152,30 @@ operacional e a migração é gradual. [Procedimento de atualização ai-memory]
 
 ## Roadmap e créditos
 
-As [13 specs](specs) rastreiam fundação, contratos, recuperação, execução, evidências, memória,
+As [19 specs](specs) rastreiam fundação, contratos, recuperação, execução, evidências, memória,
 catálogo, avaliações, legado, atualização da memória, distribuição e aceitação integrada.
 O daemon opt-in supervisiona a fila em primeiro plano; `daemon-control` pausa e retoma a fila.
 O contrato pode habilitar commit e draft PR, sempre em worktree isolado com identidade humana,
 reavaliação após commit e recuperação sem duplicação. Nenhum merge ou release é automático.
 Veja o [guia de operação e limites de adoção](docs/operational-parity.md).
-Dashboard web, runtime nativo da memória e abertura pública permanecem no roadmap.
+Cinco frentes estão implementadas; aceite externo e publicação são rastreados separadamente:
+
+- [015 — Dashboard local](specs/015-local-dashboard/spec.md): comando `dashboard` somente leitura; [uso e limites](docs/dashboard.md).
+- [016 — Migração nativa ai-memory](specs/016-native-memory-migration/spec.md): [tooling e runbook de ensaio](docs/native-memory-migration.md); runtime local migrado e validado, memória continua opcional.
+- [017 — Público/crates.io](specs/017-public-release/spec.md): preparação separada de publicação.
+- [018 — Serviços por usuário](specs/018-user-daemon-services/spec.md): preview e ativação explícita.
+- [019 — Observabilidade Loop](specs/019-loop-observability/spec.md): opt-in, sem rede por padrão.
+
+Cada frente inclui plano, tarefas e aceites. Veja a [reconciliação de evidências](docs/expansion-evidence.md)
+e o [inventário real de tracing](docs/loop-tracing-inventory.md). Claude continua experimental,
+explicitamente adiado, sem login ou validação nesta expansão.
 
 Illumitech · MIT. Créditos e licenças de terceiros em [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
 Inspirado no ciclo determinístico do Loop Engineering e em avaliações controladas de agentes.
 Nenhum benchmark pago ou framework oficial Harness² é incluído. Não há badges de desempenho não medido.
 
-Windows 11 x86_64 / PowerShell 7 tem uma implementação candidata, CI nativa e ZIP preparados para a próxima entrega. A execução nativa e o piloto autenticado permanecem pendentes; a v0.2.0 publicada não muda. Consulte o [inventário e gates Windows](docs/windows-portability.md).
+Windows 11 x86_64 / PowerShell 7 tem uma implementação candidata, CI nativa e ZIP preparados para a próxima entrega. A CI nativa passou na revisão de 40917514708; o piloto autenticado e o aceite operacional permanecem pendentes; a v0.2.0 publicada não muda. Consulte o [inventário e gates Windows](docs/windows-portability.md).
+
+A [distribuição pública](docs/public-distribution.md) documenta os pacotes e gates.
+Pacotes locais não comprovam upload; `release publish --expected-visibility PUBLIC|PRIVATE`
+verifica a visibilidade existente, usa PRIVATE como padrão e nunca altera a visibilidade.

@@ -1,6 +1,6 @@
 # FORGE-012 — Aceitação integrada
 
-Status: partially verified; pending gates are tracked in tasks.md and docs/verification.md.
+Status: verified for the Codex v0.1.0 scope; historical publication reconciled in docs/expansion-evidence.md. Claude remains experimental.
 
 ## Dependências
 FORGE-001, FORGE-002, FORGE-003, FORGE-004, FORGE-005, FORGE-006, FORGE-007, FORGE-008, FORGE-009, FORGE-010

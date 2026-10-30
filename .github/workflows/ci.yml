@@ -1,12 +1,27 @@
 name: Validate and build
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      approve_disposable_user_services:
+        description: Run only the explicit disposable user service pilots
+        type: boolean
+        default: false
+      service_platform:
+        description: Platform for the explicitly approved native pilot
+        type: choice
+        options: [windows-2025, ubuntu-24.04, macos-14, all]
+        default: windows-2025
 permissions:
   contents: read
+concurrency:
+  group: forge-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   validate:
+    if: ${{ !inputs.approve_disposable_user_services }}
     strategy:
       fail-fast: false
       matrix:
@@ -18,6 +33,7 @@ jobs:
           - os: windows-2025
             target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Verify Windows PATH contract
@@ -29,8 +45,15 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
+      - name: Validate service fixtures without activation
+        run: python scripts/test_service_fixtures.py
       - run: cargo doc --workspace --no-deps --locked
       - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Validate offline memory migration safeguards
+        if: runner.os != 'Windows'
+        run: python3 scripts/test_memory_migration.py
+      - run: python scripts/test_distribution.py
+      - run: python scripts/distribution.py list
       - run: python scripts/test_package.py
       - run: python scripts/licenses.py
       - name: Package binary and notices
@@ -49,3 +72,9 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 14
+  native-services:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.approve_disposable_user_services }}
+    uses: ./.github/workflows/service-native.yml
+    with:
+      approve_disposable_user_services: true
+      service_platform: ${{ inputs.service_platform }}

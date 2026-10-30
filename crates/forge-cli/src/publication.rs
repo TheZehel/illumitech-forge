@@ -9,6 +9,31 @@ use std::{
 };
 use tokio::sync::watch;
 
+/// Expected remote visibility is a check, never a request to change it.
+#[derive(Clone, Copy, Debug, Default, clap::ValueEnum)]
+#[value(rename_all = "UPPER")]
+pub enum ExpectedVisibility {
+    #[default]
+    Private,
+    Public,
+}
+impl ExpectedVisibility {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Private => "PRIVATE",
+            Self::Public => "PUBLIC",
+        }
+    }
+    fn check(self, info: &Value) -> Result<()> {
+        ensure!(
+            info["visibility"].as_str() == Some(self.as_str()),
+            "target repository visibility must match expected {}",
+            self.as_str()
+        );
+        Ok(())
+    }
+}
+
 struct Signals {
     receiver: watch::Receiver<bool>,
     task: tokio::task::JoinHandle<()>,
@@ -163,6 +188,24 @@ pub async fn release(
     assets: &Path,
     notes: &Path,
     dry: bool,
+    visibility: ExpectedVisibility,
+) -> Result<Value> {
+    crate::observability::phase(
+        c,
+        dry,
+        forge_adapters::observability::Phase::Publish,
+        Box::pin(release_inner(c, repo, tag, assets, notes, dry, visibility)),
+    )
+    .await
+}
+async fn release_inner(
+    c: &Context,
+    repo: &str,
+    tag: &str,
+    assets: &Path,
+    notes: &Path,
+    dry: bool,
+    visibility: ExpectedVisibility,
 ) -> Result<Value> {
     let signals = Signals::new();
     let cancel = &signals.receiver;
@@ -181,7 +224,7 @@ pub async fn release(
     let files = archive_files(assets)?;
     if dry {
         return Ok(
-            json!({"schema_version":1,"status":"passed","dry_run":true,"repository":repo,"tag":tag,"assets":files,"notes":notes}),
+            json!({"schema_version":1,"status":"passed","dry_run":true,"expected_visibility":visibility.as_str(),"remote_visibility_checked":false,"repository":repo,"tag":tag,"assets":files,"notes":notes}),
         );
     }
     let info: Value = serde_json::from_str(
@@ -192,10 +235,7 @@ pub async fn release(
         )
         .await?,
     )?;
-    ensure!(
-        info["visibility"] == "PRIVATE",
-        "target repository must be private"
-    );
+    visibility.check(&info)?;
     let refs = command(
         root,
         vec![
@@ -236,7 +276,7 @@ pub async fn release(
     Store::open(&c.db, false)?.save(
         &run,
         "published",
-        &json!({"repository":repo,"tag":tag,"url":url}),
+        &json!({"repository":repo,"tag":tag,"url":url,"expected_visibility":visibility.as_str()}),
     )?;
     Ok(json!({"schema_version":1,"published":true,"url":url}))
 }
@@ -284,6 +324,15 @@ pub async fn draft_pr_with_cancel(
     dry: bool,
     cancel: &watch::Receiver<bool>,
 ) -> Result<Value> {
+    crate::observability::phase(
+        c,
+        dry,
+        forge_adapters::observability::Phase::Publish,
+        Box::pin(draft_pr_inner(c, dry, cancel)),
+    )
+    .await
+}
+async fn draft_pr_inner(c: &Context, dry: bool, cancel: &watch::Receiver<bool>) -> Result<Value> {
     ensure!(!*cancel.borrow(), "publication cancelled");
     let _locks = WorktreeLocks::acquire(&c.roots)?;
     let config = c
@@ -503,4 +552,26 @@ pub async fn draft_pr_with_cancel(
         &json!({"url":url,"commit":commit.trim()}),
     )?;
     Ok(json!({"schema_version":1,"status":"passed","draft_pr":url,"reused":false}))
+}
+
+#[cfg(test)]
+mod visibility_tests {
+    use super::*;
+
+    #[test]
+    fn visibility_is_explicit_and_fails_closed() {
+        for (expected, accepted) in [
+            (ExpectedVisibility::default(), "PRIVATE"),
+            (ExpectedVisibility::Public, "PUBLIC"),
+        ] {
+            for actual in ["PRIVATE", "PUBLIC", "INTERNAL", "private", ""] {
+                assert_eq!(
+                    expected.check(&json!({"visibility": actual})).is_ok(),
+                    actual == accepted
+                );
+            }
+            assert!(expected.check(&json!({})).is_err());
+            assert!(expected.check(&json!({"visibility": null})).is_err());
+        }
+    }
 }

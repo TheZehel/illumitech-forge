@@ -13,6 +13,16 @@
       ]
     },
     {
+      "name": "android_system_properties",
+      "version": "0.1.6",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "android_system_properties-0.1.6/LICENSE-APACHE",
+        "android_system_properties-0.1.6/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "annotate-snippets",
       "version": "0.12.17",
       "license": "MIT OR Apache-2.0",
@@ -212,6 +222,15 @@
       ]
     },
     {
+      "name": "chrono",
+      "version": "0.4.45",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "chrono-0.4.45/LICENSE.txt"
+      ]
+    },
+    {
       "name": "clap",
       "version": "4.6.7",
       "license": "MIT OR Apache-2.0",
@@ -269,6 +288,16 @@
       "notices": [
         "const-oid-0.10.2/LICENSE-APACHE",
         "const-oid-0.10.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "core-foundation-sys",
+      "version": "0.8.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "core-foundation-sys-0.8.7/LICENSE-APACHE",
+        "core-foundation-sys-0.8.7/LICENSE-MIT"
       ]
     },
     {
@@ -636,6 +665,26 @@
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
         "hyper-util-0.1.21/LICENSE"
+      ]
+    },
+    {
+      "name": "iana-time-zone",
+      "version": "0.1.65",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "iana-time-zone-0.1.65/LICENSE-APACHE",
+        "iana-time-zone-0.1.65/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "iana-time-zone-haiku",
+      "version": "0.1.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "iana-time-zone-haiku-0.1.2/LICENSE-APACHE",
+        "iana-time-zone-haiku-0.1.2/LICENSE-MIT"
       ]
     },
     {
@@ -1700,6 +1749,16 @@
       ]
     },
     {
+      "name": "uuid",
+      "version": "1.23.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "uuid-1.23.3/LICENSE-APACHE",
+        "uuid-1.23.3/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "valuable",
       "version": "0.1.1",
       "license": "MIT",
@@ -1861,6 +1920,36 @@
       ]
     },
     {
+      "name": "windows-core",
+      "version": "0.62.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "windows-core-0.62.2/license-apache-2.0",
+        "windows-core-0.62.2/license-mit"
+      ]
+    },
+    {
+      "name": "windows-implement",
+      "version": "0.60.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "windows-implement-0.60.2/license-apache-2.0",
+        "windows-implement-0.60.2/license-mit"
+      ]
+    },
+    {
+      "name": "windows-interface",
+      "version": "0.59.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "windows-interface-0.59.3/license-apache-2.0",
+        "windows-interface-0.59.3/license-mit"
+      ]
+    },
+    {
       "name": "windows-link",
       "version": "0.2.1",
       "license": "MIT OR Apache-2.0",
@@ -1868,6 +1957,26 @@
       "notices": [
         "windows-link-0.2.1/license-apache-2.0",
         "windows-link-0.2.1/license-mit"
+      ]
+    },
+    {
+      "name": "windows-result",
+      "version": "0.4.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "windows-result-0.4.1/license-apache-2.0",
+        "windows-result-0.4.1/license-mit"
+      ]
+    },
+    {
+      "name": "windows-strings",
+      "version": "0.5.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "windows-strings-0.5.1/license-apache-2.0",
+        "windows-strings-0.5.1/license-mit"
       ]
     },
     {

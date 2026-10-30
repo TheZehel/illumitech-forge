@@ -53,8 +53,8 @@ and verify the child dies. Other regressions cover failed creation, input
 rejection, unrelated inheritable-handle exclusion, observer failure cleanup,
 stdin EOF and stderr bounds. Existing descendant, argv/Unicode/CRLF, cancellation,
 crash/reconciliation and shared lifecycle coverage remains enabled.
-These Windows-only regressions are source candidates, **not executed
-Windows evidence on this macOS host**. They cannot inject a crash inside the
+These Windows-only regressions subsequently passed in [native CI 40917514708](expansion-evidence.md),
+at revision d015ff1a283b946e5f8b83fdb8e2c49e72fd9753, not on this macOS host. They cannot inject a crash inside the
 kernel API: atomicity there relies on the documented creation contract.
 
 Sources: [Microsoft Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects),
@@ -96,13 +96,13 @@ installer at an existing published 0.2.0 installation for this task.
 
 ## Remaining acceptance gates
 
-- Run the committed Windows MSVC CI: build, fmt, Clippy, full shared suite, native
-  Job/argv tests, ZIP checksum/install/uninstall/PATH/preservation checks.
+- Native Windows MSVC CI passed at the revision recorded in [the reconciliation](expansion-evidence.md):
+  build, fmt, Clippy, shared/native tests, packaging, installation and preservation. Rerun for changed revisions.
 - Run on real Windows 11/PowerShell 7 with authenticated native Codex, Git and gh;
   validate permissions/model, spaces/Unicode, Ctrl+C, timeout, hard crash,
   orphan reconciliation, filesystem preservation and isolated draft PR/resume.
-- Confirm atomic creation and its boundary regressions in the separately run
-  Windows CI. Native authenticated Windows pilot is explicitly deferred by the
+- Atomic creation and boundary regressions passed in that native CI run.
+  Native authenticated Windows pilot is explicitly deferred by the
   user; runtime acceptance remains pending.
 - Memory remains optional. If enabled, verify MCP scope without Docker or duplicate
   hooks. Claude remains experimental and needs a separate authenticated pilot.

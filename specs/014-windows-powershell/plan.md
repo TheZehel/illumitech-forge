@@ -9,5 +9,5 @@
 5. Executar piloto real no Windows/PowerShell, incluindo falhas, reconciliação e preservação.
 6. Atualizar matriz de suporte e submeter a revisão exata ao aceite antes da release.
 
-Estado inicial: escopo documentado, implementação e aceitação pendentes.
+Estado reconciliado: implementação e CI nativa verificadas na revisão de [40917514708](../../docs/expansion-evidence.md); piloto autenticado e aceite operacional pendentes.
 A ausência de ambiente Windows não pode ser substituída por mocks ou testes em WSL.
