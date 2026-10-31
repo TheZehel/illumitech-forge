@@ -655,6 +655,7 @@ pub fn execute(options: &Options, state: &Path) -> Result<Value> {
             &receipt.with_extension("result.json"),
             &serde_json::to_vec_pretty(&outcome)?,
         )?;
+        fs2::FileExt::unlock(&lock)?;
         return result;
     }
     if !intact(&p)? {

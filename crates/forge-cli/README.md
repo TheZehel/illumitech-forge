@@ -1,29 +1,30 @@
-# illumitech-forge-cli
+# Illumitech Forge CLI — candidata 1.0.0
 
-Part of [Illumitech Forge](https://github.com/TheZehel/illumitech-forge), an evidence-backed agent execution toolkit.
+CLI Rust com Workbench Illumitech local, specs/DAG, execução nativa, gates externos, métricas,
+orçamentos, paralelismo, revisão, importação de issues e atualização/recuperação verificável.
+Esta versão é candidata local; não foi publicada no crates.io. A versão publicada é 0.3.0.
 
-The binary is named `illumitech-forge`. After this version is published to the registry:
+O binário é `illumitech-forge`. Assets da UI, MIT, inventário e avisos acompanham o pacote.
+Use `--help` e `--json contracts` para consultar interfaces/versões e limites. O cliente nativo
+é instalado/autenticado separadamente, sem fallback para API paga. ai-memory é opcional, por MCP.
 
 ```sh
-cargo install illumitech-forge-cli --version 0.3.0 --locked
-illumitech-forge doctor
-illumitech-forge release inspect release.yaml
-illumitech-forge release run release.yaml --dry-run
+illumitech-forge --state-dir EXTERNAL_STATE release inspect EXTERNAL_MANIFEST
+illumitech-forge --state-dir EXTERNAL_STATE release run EXTERNAL_MANIFEST --dry-run
+illumitech-forge --state-dir EXTERNAL_STATE release run EXTERNAL_MANIFEST
+illumitech-forge --state-dir EXTERNAL_STATE report EXTERNAL_MANIFEST
+illumitech-forge --state-dir EXTERNAL_STATE workbench --root GIT_ROOT --port 0
 ```
 
-Review the dry-run before execution. Tasks pass only through external gates, verified artifacts
-or revision-bound human approval. Keep state and evaluators outside agent-writable repositories.
-The CLI includes a read-only local dashboard, persistent queue controls and explicitly applied
-per-user service definitions. It never publishes a release implicitly.
+Mantenha manifests, avaliadores fixados por hash e estado fora dos worktrees graváveis.
+Texto de agente não prova conclusão. A conversa livre é somente leitura; execução usa um
+contrato revisado. Publicação, CI, serviços, push/merge e instalação global são explícitos.
+Métricas não representam toda a conta; faixas de duração e cache não garantem economia/prazo.
 
-macOS ARM64 and Linux x86_64 are the primary platforms. Windows 11 x86_64 with PowerShell 7
-is experimental: authenticated native acceptance and the latest service-host correction remain
-unverified on Windows. Do not use its service integration for unattended workloads yet. Codex is the
-validated client and Claude remains experimental. Install and authenticate clients separately.
+macOS tem pilotos anteriores; a fonte final exige aceite próprio. Linux ARM64 foi exercitado
+em VM/contêiner, com sandbox nativo bloqueado nesse laboratório. Windows/PowerShell e Claude
+continuam experimentais; Claude foi adiado. Mocks não substituem conta/plataforma nativa.
 
-ai-memory is optional. Only manifests selecting `memory.required: true` require its availability
-and verified scope. Forge does not install memory hooks or bundle the ai-memory server.
-
-See the repository's [quickstart](https://github.com/TheZehel/illumitech-forge/blob/main/docs/quickstart.md)
-and [distribution gates](https://github.com/TheZehel/illumitech-forge/blob/main/docs/public-distribution.md).
-MIT licensed. See LICENSE and THIRD_PARTY_NOTICES.
+Documentação completa e guia em português/inglês no repositório
+[Illumitech Forge](https://github.com/TheZehel/illumitech-forge), em `docs/v1-candidate.md`.
+Copyright Illumitech. Licença MIT; preserve THIRD_PARTY_NOTICES e THIRD_PARTY_LICENSES.

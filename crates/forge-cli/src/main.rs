@@ -1,13 +1,30 @@
+mod budget;
+mod compatibility;
+mod context;
 mod daemon;
 mod dashboard;
+mod duration;
 mod engine;
+mod guided;
 mod importing;
+mod installation;
+mod issue;
+mod native;
 mod observability;
+mod operational;
+mod parallel;
+mod planning;
 mod project;
 mod publication;
+mod review;
 mod service;
+mod snapshots;
+mod templates;
+mod validation_cache;
+mod workbench;
+mod workbench_http;
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use forge_adapters::process;
 use serde_json::{Value, json};
 use std::path::{Path, PathBuf};
@@ -31,6 +48,55 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    /// Describe versioned public contracts without opening state or a native client.
+    Contracts,
+    /// Diagnose or explicitly update a task-local installation (preview by default).
+    Installation {
+        #[command(subcommand)]
+        command: installation::Command,
+    },
+    /// Consistent, verified state snapshots and fresh-target recovery.
+    State {
+        #[command(subcommand)]
+        command: snapshots::Command,
+    },
+    /// Import exactly one selected GitHub issue as a preview-first candidate.
+    Issue {
+        #[command(subcommand)]
+        command: issue::Command,
+    },
+    /// Independent read-only native review; never grants release acceptance.
+    Review {
+        #[command(subcommand)]
+        command: ReviewCommand,
+    },
+    Templates {
+        #[command(subcommand)]
+        command: templates::Command,
+    },
+    Budget {
+        #[command(subcommand)]
+        command: BudgetCommand,
+    },
+    /// Local authenticated UI; Ctrl+C shuts down the native bridge.
+    Workbench {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long, default_value_t = 0)]
+        port: u16,
+        #[arg(long)]
+        app_server: Option<PathBuf>,
+        #[arg(long)]
+        manifest: Option<PathBuf>,
+    },
+    Feature {
+        #[command(subcommand)]
+        command: FeatureCommand,
+    },
+    Plan {
+        #[command(subcommand)]
+        command: PlanCommand,
+    },
     /// Internal bounded Windows daemon supervisor, started only by service start.
     #[command(hide = true)]
     ServiceHost {
@@ -76,6 +142,14 @@ enum Command {
     },
     Report {
         manifest: PathBuf,
+        #[arg(long, default_value_t = 100)]
+        limit: u32,
+        #[arg(long, default_value_t = 0)]
+        offset: u64,
+    },
+    Context {
+        #[command(subcommand)]
+        command: ContextCommand,
     },
     Pause {
         manifest: PathBuf,
@@ -99,6 +173,76 @@ enum Command {
     Eval {
         #[command(subcommand)]
         command: EvalCommand,
+    },
+}
+#[derive(Subcommand)]
+enum ReviewCommand {
+    Plan {
+        manifest: PathBuf,
+    },
+    Run {
+        manifest: PathBuf,
+        #[arg(long)]
+        app_server: Option<PathBuf>,
+    },
+}
+#[derive(Subcommand)]
+enum BudgetCommand {
+    Inspect { manifest: PathBuf },
+}
+#[derive(Subcommand)]
+enum FeatureCommand {
+    New {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        id: String,
+        #[arg(long)]
+        title: String,
+        #[arg(long)]
+        ops_root: PathBuf,
+        #[arg(long, conflicts_with = "apply")]
+        dry_run: bool,
+        #[arg(long)]
+        apply: bool,
+    },
+}
+#[derive(Subcommand)]
+enum PlanCommand {
+    Propose {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        request: String,
+        #[arg(long)]
+        ops_root: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(long)]
+        app_server: Option<PathBuf>,
+        #[arg(long)]
+        previous: Option<PathBuf>,
+        /// Attach planning usage to an explicit release budget.
+        #[arg(long)]
+        manifest: Option<PathBuf>,
+    },
+    Validate {
+        path: PathBuf,
+        #[arg(long)]
+        root: PathBuf,
+    },
+}
+#[derive(Subcommand)]
+enum ContextCommand {
+    /// Preview bounded context locally; never invokes a model or writes state.
+    Plan {
+        manifest: PathBuf,
+        #[arg(long)]
+        task: String,
+        #[arg(long)]
+        budget_tokens: u64,
     },
 }
 #[derive(Subcommand)]
@@ -220,7 +364,10 @@ enum EvalCommand {
 
 #[tokio::main]
 async fn main() {
-    let cli = Cli::parse();
+    let arguments = Cli::command().get_matches();
+    let cli = Cli::from_arg_matches(&arguments).unwrap_or_else(|e| e.exit());
+    let explicit_state =
+        arguments.value_source("state_dir") == Some(clap::parser::ValueSource::CommandLine);
     let logs = if cli.service_logging {
         match service::Logs::new(&cli.state_dir) {
             Ok(logs) => Some(logs),
@@ -242,7 +389,19 @@ async fn main() {
         .with_ansi(!cli.service_logging)
         .with_writer(writer)
         .init();
-    let result = dispatch(&cli).await;
+    let result = if matches!(
+        &cli.command,
+        Command::State {
+            command: snapshots::Command::Snapshot { .. }
+        }
+    ) && !explicit_state
+    {
+        Err(anyhow::anyhow!(
+            "state snapshot requires explicit --state-dir"
+        ))
+    } else {
+        dispatch(&cli).await
+    };
     let (value, code) = match result {
         Ok(v) => {
             let status = v["run"]["status"].as_str().or_else(|| v["status"].as_str());
@@ -257,10 +416,11 @@ async fn main() {
             (v, code)
         }
         Err(e) => (
-            json!({"schema_version":1,"status":"blocked","error":process::redact(&format!("{e:#}"))}),
+            json!({"schema_version":1,"status":"blocked","error_code":"operation_blocked","error":process::redact(&format!("{e:#}"))}),
             2,
         ),
     };
+    let value = compatibility::envelope(value);
     if let Some(logs) = logs {
         if logs
             .write("stdout", serde_json::to_string(&value).unwrap().as_bytes())
@@ -271,6 +431,9 @@ async fn main() {
     } else if cli.json {
         println!("{}", serde_json::to_string(&value).unwrap());
     } else {
+        if let Some(summary) = duration::human(&value) {
+            println!("{summary}");
+        }
         println!("{}", serde_json::to_string_pretty(&value).unwrap());
     }
     std::process::exit(code);
@@ -278,6 +441,89 @@ async fn main() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::Contracts => Ok(compatibility::contracts()),
+        Command::Installation { command } => installation::dispatch(command).await,
+        Command::State { command } => snapshots::dispatch(command, &cli.state_dir),
+        Command::Issue { command } => issue::dispatch(command).await,
+        Command::Review { command } => match command {
+            ReviewCommand::Plan { manifest } => review::plan(&ctx(manifest)?),
+            ReviewCommand::Run {
+                manifest,
+                app_server,
+            } => review::run(&ctx(manifest)?, app_server.as_deref()).await,
+        },
+        Command::Templates { command } => templates::dispatch(command),
+        Command::Budget {
+            command: BudgetCommand::Inspect { manifest },
+        } => budget::inspect(&ctx(manifest)?),
+        Command::Workbench {
+            root,
+            port,
+            app_server,
+            manifest,
+        } => {
+            workbench::serve(
+                root,
+                &cli.state_dir,
+                *port,
+                app_server.clone(),
+                manifest.clone(),
+            )
+            .await
+        }
+        Command::Feature { command } => match command {
+            FeatureCommand::New {
+                root,
+                id,
+                title,
+                ops_root,
+                apply,
+                ..
+            } => guided::feature(root, id, title, ops_root, *apply),
+        },
+        Command::Plan { command } => match command {
+            PlanCommand::Validate { path, root } => planning::validate_file(path, root),
+            PlanCommand::Propose {
+                root,
+                request,
+                ops_root,
+                output,
+                dry_run,
+                app_server,
+                previous,
+                manifest,
+            } => {
+                let reservation = if let Some(path) = manifest.as_ref().filter(|_| !*dry_run) {
+                    let c = ctx(path)?;
+                    let root = guided::root(root)?;
+                    anyhow::ensure!(
+                        c.roots.values().all(|r| r == &root),
+                        "planning manifest project mismatch"
+                    );
+                    let mut nonce = [0u8; 16];
+                    getrandom::fill(&mut nonce)
+                        .map_err(|e| anyhow::anyhow!("secure operation ID: {e}"))?;
+                    Some(budget::Reservation::begin(
+                        &c,
+                        &format!("planning:{}", forge_domain::digest(&nonce)),
+                        "planning",
+                    )?)
+                } else {
+                    None
+                };
+                planning::propose_reserved(
+                    root,
+                    request,
+                    ops_root,
+                    output,
+                    *dry_run,
+                    app_server.as_deref(),
+                    previous.as_deref(),
+                    reservation,
+                )
+                .await
+            }
+        },
         Command::ServiceHost { releases_dir } => service::host(releases_dir, &cli.state_dir).await,
         Command::Service(options) => service::execute(options, &cli.state_dir),
         Command::Dashboard { port } => dashboard::serve(&cli.state_dir, *port).await,
@@ -363,7 +609,19 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
             }
         },
         Command::Status { manifest } => engine::status(&ctx(manifest)?, false),
-        Command::Report { manifest } => engine::status(&ctx(manifest)?, true),
+        Command::Report {
+            manifest,
+            limit,
+            offset,
+        } => engine::status_window(&ctx(manifest)?, true, *limit, *offset),
+        Command::Context {
+            command:
+                ContextCommand::Plan {
+                    manifest,
+                    task,
+                    budget_tokens,
+                },
+        } => context::plan(&ctx(manifest)?, task, *budget_tokens),
         Command::Pause { manifest } => engine::control(&ctx(manifest)?, "pause"),
         Command::Cancel { manifest } => engine::control(&ctx(manifest)?, "cancel"),
         Command::Resume {

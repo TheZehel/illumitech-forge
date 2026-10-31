@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "build": "npm run build",
+  "deterministic_rebuild": "passed",
+  "files": {
+    "THIRD_PARTY_LICENSES.txt": "5c01bb0eeedd4911b58082dad6037112641621bc0694872d5fb2adeafbcd17c3",
+    "assets/index-B7LZBgUV.css": "ec5238b030a83b3ec06372342fdc698882200b63a050cc2bb84503f0a7e04979",
+    "assets/index-NosdMdeu.js": "526a67ca231dde13605ea81c0ed99dee02a149e429435a9b676257ef0953bd33",
+    "index.html": "105d5913d0c3f2ef6aa488a4cd186d33d617e64472617451c5d2ec54c9cd1a75",
+    "logo.webp": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555"
+  }
+}

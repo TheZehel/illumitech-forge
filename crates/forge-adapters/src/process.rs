@@ -23,15 +23,46 @@ impl ProcessResult {
         self.code == Some(0) && self.reason == "exited" && !self.truncated
     }
 }
-pub fn redact(text: &str) -> String {
-    let mut clean = text.to_string();
-    for (key, val) in std::env::vars() {
-        if val.len() >= 8
-            && ["TOKEN", "SECRET", "PASSWORD", "API_KEY"]
-                .iter()
-                .any(|p| key.to_uppercase().contains(p))
-        {
-            clean = clean.replace(&val, "[REDACTED]");
+const SENSITIVE_FIELDS: &[&str] = &[
+    "authorization",
+    "api_key",
+    "apikey",
+    "access_token",
+    "accesstoken",
+    "refresh_token",
+    "refreshtoken",
+    "id_token",
+    "idtoken",
+    "password",
+    "secret",
+    "token",
+    "credential",
+    "credentials",
+    "client_secret",
+    "clientsecret",
+    "private_key",
+    "privatekey",
+    "session_token",
+];
+fn redact_plain(text: &str, secrets: &[String]) -> String {
+    let mut clean = text.to_owned();
+    for value in secrets {
+        clean = clean.replace(value, "[REDACTED]");
+    }
+    // Broken or embedded JSON cannot be sanitized structurally. Detect named
+    // fields even across newlines/escaped quotes and redact the whole fragment.
+    // This changes only the plain fallback; valid event framing stays intact.
+    if clean.contains('"') {
+        let detection = clean.to_ascii_lowercase().replace('\\', "");
+        if SENSITIVE_FIELDS.iter().any(|key| {
+            let needle = format!("\"{key}\"");
+            detection.match_indices(&needle).any(|(offset, _)| {
+                detection[offset + needle.len()..]
+                    .trim_start()
+                    .starts_with(':')
+            })
+        }) {
+            return "[REDACTED sensitive fragment]".into();
         }
     }
     clean
@@ -47,7 +78,7 @@ pub fn redact(text: &str) -> String {
                 "token=",
             ]
             .iter()
-            .any(|s| lower.contains(s))
+            .any(|part| lower.contains(part))
             {
                 "[REDACTED sensitive line]"
             } else {
@@ -57,6 +88,79 @@ pub fn redact(text: &str) -> String {
         .collect::<Vec<_>>()
         .join("\n")
 }
+fn redact_value(value: &mut serde_json::Value, secrets: &[String]) {
+    match value {
+        serde_json::Value::String(text) => {
+            let redacted = redact_plain(text, secrets);
+            // The legacy plain log formatter normalizes line endings. Safe protocol
+            // strings must retain their exact bytes (issue hashes and PR body readback).
+            let normalized = text.lines().collect::<Vec<_>>().join("\n");
+            if redacted != normalized {
+                *text = redacted;
+            }
+        }
+        serde_json::Value::Array(values) => {
+            values.iter_mut().for_each(|v| redact_value(v, secrets))
+        }
+        serde_json::Value::Object(values) => {
+            for (key, value) in values {
+                let sensitive = SENSITIVE_FIELDS.contains(&key.to_ascii_lowercase().as_str());
+                if sensitive {
+                    *value = serde_json::json!("[REDACTED]");
+                } else {
+                    redact_value(value, secrets);
+                }
+            }
+        }
+        _ => {}
+    }
+}
+/// Preserve structured client framing: sanitize values, never replace a JSON event
+/// with an unparseable line. Terminal/error event types remain authoritative.
+pub fn redact(text: &str) -> String {
+    // Snapshot secret values once per bounded capture. Re-reading the environment
+    // for every plain output line made a flood of short lines effectively unbounded.
+    let secrets = std::env::vars()
+        .filter(|(key, value)| {
+            value.len() >= 8
+                && ["TOKEN", "SECRET", "PASSWORD", "API_KEY"]
+                    .iter()
+                    .any(|part| key.to_uppercase().contains(part))
+        })
+        .map(|(_, value)| value)
+        .collect::<Vec<_>>();
+    if let Ok(mut value) = serde_json::from_str::<serde_json::Value>(text) {
+        redact_value(&mut value, &secrets);
+        return serde_json::to_string(&value).expect("serializable redacted JSON");
+    }
+    let mut output = Vec::new();
+    let mut plain = String::new();
+    for line in text.lines() {
+        let structured = matches!(
+            line.trim_start().as_bytes().first(),
+            Some(b'{' | b'[' | b'"')
+        );
+        let parsed = structured
+            .then(|| serde_json::from_str::<serde_json::Value>(line))
+            .and_then(Result::ok);
+        if let Some(mut value) = parsed {
+            if !plain.is_empty() {
+                output.push(redact_plain(&plain, &secrets));
+                plain.clear();
+            }
+            redact_value(&mut value, &secrets);
+            output.push(serde_json::to_string(&value).expect("serializable redacted event"));
+        } else {
+            plain.push_str(line);
+            plain.push('\n');
+        }
+    }
+    if !plain.is_empty() {
+        output.push(redact_plain(&plain, &secrets));
+    }
+    output.join("\n")
+}
+
 async fn drain<R: tokio::io::AsyncRead + Unpin>(
     mut reader: R,
     overflow: watch::Sender<bool>,
@@ -111,6 +215,23 @@ pub fn pid_alive(pid: u32) -> bool {
         libc::kill(pid as i32, 0) == 0
             || std::io::Error::last_os_error().raw_os_error() != Some(libc::ESRCH)
     }
+}
+
+/// Observe a recorded Unix process group without terminating it. A dead leader does
+/// not establish that descendants have stopped. Unknown ownership is fail-closed.
+#[cfg(unix)]
+pub fn group_alive(pid: u32) -> bool {
+    if pid == 0 || pid > i32::MAX as u32 {
+        return true;
+    }
+    unsafe {
+        libc::kill(-(pid as i32), 0) == 0
+            || std::io::Error::last_os_error().raw_os_error() != Some(libc::ESRCH)
+    }
+}
+#[cfg(windows)]
+pub fn group_alive(pid: u32) -> bool {
+    pid_alive(pid)
 }
 
 pub async fn run(
@@ -234,9 +355,15 @@ pub async fn interrupt() {
             let _ = tokio::signal::ctrl_c().await;
         }
     }
-    #[cfg(not(windows))]
+    #[cfg(unix)]
     {
-        let _ = tokio::signal::ctrl_c().await;
+        if let Ok(mut term) =
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+        {
+            tokio::select! { _ = tokio::signal::ctrl_c() => {}, _ = term.recv() => {} }
+        } else {
+            let _ = tokio::signal::ctrl_c().await;
+        }
     }
 }
 
@@ -284,10 +411,123 @@ mod tests {
         assert_eq!(r.reason, "cancelled");
     }
     #[test]
+    fn structured_safe_strings_preserve_exact_content_for_hashes() {
+        let input = serde_json::json!({"body":"Demand\r\n\nwith trailing newline\n", "empty":"\n"});
+        let output: serde_json::Value = serde_json::from_str(&redact(&input.to_string())).unwrap();
+        assert_eq!(input, output);
+    }
+    #[test]
     fn redacts_auth() {
         assert_eq!(
             redact("Authorization: Bearer abc"),
             "[REDACTED sensitive line]"
         );
+    }
+    #[test]
+    fn structured_logs_keep_valid_json_and_redact_secrets() {
+        let log = concat!(
+            "{\"type\":\"thread.started\",\"thread_id\":\"sanitized-thread\"}\n",
+            "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"text\":\"token=fixture-only\\ncontinued\",\"nested\":[{\"password\":\"fixture-only\"}]}}\n",
+            "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":25,\"cached_input_tokens\":10,\"output_tokens\":5}}"
+        );
+        let clean = redact(log);
+        assert!(!clean.contains("fixture-only"));
+        let events: Vec<serde_json::Value> = clean
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
+        assert_eq!(events.len(), 3);
+        assert_eq!(events[0]["thread_id"], "sanitized-thread");
+        assert_eq!(events[1]["item"]["id"], "item_1");
+        assert_eq!(events[2]["type"], "turn.completed");
+        assert_eq!(events[2]["usage"]["cached_input_tokens"], 10);
+        let result = ProcessResult {
+            code: Some(0),
+            reason: "exited".into(),
+            stdout: clean,
+            stderr: String::new(),
+            elapsed_ms: 0,
+            truncated: false,
+        };
+        assert!(crate::clients::structured_ok("codex", &result).is_ok());
+        // Sanitized reproduction of the blocked FORGE-020 shape: exit 0,
+        // sensitive tool output, no terminal completion. Redaction cannot repair it.
+        let mut incomplete = result.clone();
+        incomplete.stdout = redact(&log.lines().take(2).collect::<Vec<_>>().join("\n"));
+        assert!(crate::clients::structured_ok("codex", &incomplete).is_err());
+        let failure = redact(
+            r#"{"type":"turn.failed","error":{"code":"permission_denied","message":"Authorization: Bearer fixture-only"}}"#,
+        );
+        let v: serde_json::Value = serde_json::from_str(&failure).unwrap();
+        assert_eq!(v["error"]["code"], "permission_denied");
+        assert_eq!(v["type"], "turn.failed");
+        assert!(!failure.contains("fixture-only"));
+    }
+    #[test]
+    fn pretty_json_nested_secrets_and_escaped_values_remain_json() {
+        let input = serde_json::json!({"type":"result","session_id":"c","is_error":false,
+            "subtype":"success","result":"quoted \"value\" and \\ path\napi_key=fixture-only",
+            "array":[{"access_token":"fixture-only","usage":{"input_tokens":9}}]});
+        let clean = redact(&serde_json::to_string_pretty(&input).unwrap());
+        let v: serde_json::Value = serde_json::from_str(&clean).unwrap();
+        assert_eq!(v["session_id"], "c");
+        assert_eq!(v["array"][0]["usage"]["input_tokens"], 9);
+        assert!(!clean.contains("fixture-only"));
+        assert_eq!(redact(&clean), clean);
+    }
+}
+
+#[cfg(test)]
+mod credential_value_tests {
+    use super::*;
+    #[test]
+    fn malformed_and_nested_json_text_does_not_leak_named_credentials() {
+        for fragment in [
+            "{\"type\":\"tool\",\"password\":{\"nested\":\"fixture-not-for-logs\"",
+            "{\"PASSWORD\"\n : [\"fixture-not-for-logs\"",
+            r#"{\"access_token\":\"fixture-not-for-logs"#,
+        ] {
+            let clean = redact(fragment);
+            assert!(!clean.contains("fixture-not-for-logs"), "{clean}");
+            assert_eq!(redact(&clean), clean);
+            let outer = serde_json::json!({"type":"turn.failed","id":"event-1","error":{"message":fragment}});
+            let nested: serde_json::Value =
+                serde_json::from_str(&redact(&outer.to_string())).unwrap();
+            assert_eq!(nested["type"], "turn.failed");
+            assert_eq!(nested["id"], "event-1");
+            assert!(!nested.to_string().contains("fixture-not-for-logs"));
+        }
+    }
+    #[test]
+    fn nested_credential_values_are_fully_redacted_without_damaging_envelopes() {
+        let original = serde_json::json!({"type":"turn.completed","id":"event-1","usage":{"input_tokens":5,"output_tokens":2},"token":{"nested":["credential-value"]},"password":["secret-one",{"extra":"secret-two"}]});
+        let clean: serde_json::Value =
+            serde_json::from_str(&redact(&original.to_string())).unwrap();
+        assert_eq!(clean["type"], "turn.completed");
+        assert_eq!(clean["id"], "event-1");
+        assert_eq!(clean["usage"]["input_tokens"], 5);
+        assert_eq!(clean["token"], "[REDACTED]");
+        assert_eq!(clean["password"], "[REDACTED]");
+        assert!(!clean.to_string().contains("credential-value"));
+    }
+}
+
+#[cfg(test)]
+mod flood_tests {
+    #[test]
+    fn flood_redaction_keeps_safe_diagnostics_and_jsonl_boundaries() {
+        let safe = "safe diagnostic\n".repeat(60000);
+        let input = format!(
+            "{safe}\n{{\"type\":\"failure\",\"id\":7,\"credential\":[{{\"nested\":\"synthetic-sensitive-value\"}}]}}\nplain final diagnostic\n"
+        );
+        let clean = super::redact(&input);
+        assert!(clean.starts_with(&format!("{safe}\n")));
+        let frame = clean.lines().find(|line| line.starts_with('{')).unwrap();
+        let frame: serde_json::Value = serde_json::from_str(frame).unwrap();
+        assert_eq!(frame["type"], "failure");
+        assert_eq!(frame["id"], 7);
+        assert_eq!(frame["credential"], "[REDACTED]");
+        assert!(!clean.contains("synthetic-sensitive-value"));
+        assert!(clean.ends_with("plain final diagnostic"));
     }
 }

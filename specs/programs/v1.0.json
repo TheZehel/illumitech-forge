@@ -1,0 +1,418 @@
+{
+  "schema_version": 1,
+  "program_id": "forge-to-v1",
+  "published_baseline": "0.3.0",
+  "state": "planned_not_executed",
+  "repository_worktree": "illumitech-forge-v1",
+  "priorities": [
+    "token_economy",
+    "illumitech_ui",
+    "duration_estimates"
+  ],
+  "policies": {
+    "actions": "off",
+    "publication": "separate_revision_bound_approval",
+    "memory_required": false,
+    "claude": "deferred",
+    "writer_limit": 1,
+    "native_model": "preserve_authorized_configuration",
+    "implementation_attempts": 2,
+    "gate_failures": "fail_closed",
+    "routine_decisions": "autonomous_with_ADR",
+    "source_control": "no_push_or_merge_without_current_scope"
+  },
+  "existing": [
+    {
+      "id": 20,
+      "slug": "020-duration-estimates",
+      "status": "implemented_local_revalidate_in_new_worktree",
+      "evidence": "previous external ledger: duration-estimates-20261030; 99 tests; no approval/state transfer"
+    }
+  ],
+  "features": [
+    {
+      "id": 21,
+      "slug": "021-execution-reliability",
+      "title": "Confiabilidade do protocolo e continuidade",
+      "milestone": "0.4",
+      "dependencies": [],
+      "acceptance": [
+        "Preservar JSON/JSONL válido ao redigir strings sensíveis; não descartar type, IDs, erros ou eventos terminais.",
+        "Reproduzir o log bloqueado no job FORGE-020 com fixture sanitizada; execução 0 sem turn.completed continua bloqueada.",
+        "Separar falhas transitórias de permissão, contrato, autenticação e evidência; retry limitado, sem repetição cega.",
+        "Manter journals completos para recuperação e relatórios paginados/limitados; nenhuma aprovação é transferida."
+      ],
+      "steps": [
+        "Fixar fixtures externas de protocolo, redação e falso aceite; verificar o estimador existente no novo worktree.",
+        "Corrigir adaptadores e continuidade, com testes negativos e preservação de configuração.",
+        "Validar CLI e cliente real em repositório descartável; bootstrap deve usar o código corrigido antes dos jobs nativos seguintes."
+      ],
+      "required_scenarios": [
+        "structured_logs_keep_valid_json_and_redact_secrets",
+        "plain_text_never_completes_a_task",
+        "retry_policy_refuses_permission_and_contract_failures"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 22,
+      "slug": "022-token-economy",
+      "title": "Economizador de tokens",
+      "milestone": "0.4",
+      "dependencies": [
+        21
+      ],
+      "acceptance": [
+        "Medir entrada, cache e saída sem duplicar contadores cumulativos; usage ausente permanece desconhecido.",
+        "Contexto seletivo com fontes e recuperação sob demanda preserva instruções, aceites e isolamento por projeto.",
+        "Evitar chamadas redundantes e incluir consumo de planejamento, resumos, falhas e cancelamentos.",
+        "Comparação controlada mede tokens por entrega aceita, sucesso, retrabalho e latência; sem percentual prometido ou troca silenciosa de modelo."
+      ],
+      "steps": [
+        "Implementar coleta local e baseline reproduzível; registrar limitações de cada cliente.",
+        "Implementar contexto limitado e perfis explícitos, sem novos serviços pagos ou hooks.",
+        "Comparar baseline e otimização em fixtures equivalentes com gates externos; registrar resultados e qualidade."
+      ],
+      "required_scenarios": [
+        "usage_updates_are_not_double_counted",
+        "context_preserves_instructions_and_project_isolation",
+        "economy_counts_failed_and_planning_calls"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 23,
+      "slug": "023-forge-workbench",
+      "title": "UI Illumitech conectada ao Codex",
+      "milestone": "0.5",
+      "dependencies": [
+        21,
+        22
+      ],
+      "acceptance": [
+        "Ponte local tipada App Server, com negociação de capacidades, versões e conta/modelo/permissões autorizados.",
+        "Projetos e sessões, streaming, retomada, interrupção, diffs e aprovações reais, com estados claros de desconexão.",
+        "Layout Illumitech com logo existente, laranja #ff7a1a, grafite e verde-petróleo; navegação por teclado e contraste.",
+        "Conversa livre e execução sob manifest são distintas; resposta do chat não equivale a gate aprovado.",
+        "Tokens e estimativa do plano usam contratos do motor; sem credenciais no frontend, acesso remoto ou importação automática de sessões."
+      ],
+      "steps": [
+        "Validar protocolo por spike e fixtures; registrar ADR de compatibilidade sem pedir escolha técnica rotineira ao usuário.",
+        "Implementar MVP web local com React/TypeScript/Vite e ponte Rust em origem local autenticada; manter empacotamento desktop para 0.9.",
+        "Validar fluxos com browser real e Codex autenticado; falhas, recusa e reconexão não duplicam ações."
+      ],
+      "required_scenarios": [
+        "workbench_session_and_project_isolation",
+        "workbench_approval_denial_is_preserved",
+        "workbench_reconnect_does_not_repeat_writes"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 24,
+      "slug": "024-guided-feature-creation",
+      "title": "Criação guiada de funcionalidades",
+      "milestone": "0.5",
+      "dependencies": [
+        21
+      ],
+      "acceptance": [
+        "feature new prepara spec/plan/tasks e candidato de manifest com IDs permanentes e diretórios operacionais externos.",
+        "Detectar convenções e stack sem sobrescrever arquivos existentes nem executar instalação implicitamente.",
+        "Gerar dependências e aceites verificáveis; campos desconhecidos exigem esclarecimento somente quando impedem uma decisão segura."
+      ],
+      "steps": [
+        "Definir CLI e contratos de templates de projeto, preservando manifest v1.",
+        "Implementar geração idempotente e preview; manter alterações locais e worktrees existentes.",
+        "Validar projeto novo e existente, repetição de setup, conflitos, permissões e caminhos com espaços."
+      ],
+      "required_scenarios": [
+        "feature_preview_does_not_modify_project",
+        "feature_creation_is_idempotent_and_preserves_files",
+        "feature_ids_and_dependencies_are_stable"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 25,
+      "slug": "025-assisted-planning",
+      "title": "Planejamento assistido e prévia de execução",
+      "milestone": "0.5",
+      "dependencies": [
+        22,
+        24
+      ],
+      "acceptance": [
+        "pedido → specs → DAG → comandos/gates → previsão de tempo e consumo antes de executar.",
+        "Cliente nativo produz proposta validada estruturalmente; não inferir conclusão de texto nem habilitar publicação.",
+        "Mudança de escopo mostra delta de plano e atualiza estimativas; decisão técnica rotineira segue política e ADR."
+      ],
+      "steps": [
+        "Implementar contrato de proposta e validação determinística, com timeout e limites.",
+        "Integrar cliente nativo e estimador existente; não delegar autoridade a conteúdo de repositório ou memória.",
+        "Testar plano inválido, ambiguidade relevante, ciclo, referência inexistente e revisão do plano antes de executar."
+      ],
+      "required_scenarios": [
+        "planning_rejects_invalid_dags_and_acceptance",
+        "planning_estimates_before_execution",
+        "planning_never_grants_publish_authority"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 26,
+      "slug": "026-versioned-templates",
+      "title": "Templates de trabalho versionados",
+      "milestone": "0.6",
+      "dependencies": [
+        24,
+        25
+      ],
+      "acceptance": [
+        "Receitas Rust, Node/TypeScript e genérica para bug, feature, revisão, dependências e release.",
+        "Origem, revisão, versão, escopo e compatibilidade explícitos; nada baixado de main é executado automaticamente.",
+        "Personalização por projeto mantém stack e convenções; atualização mostra diff e preserva mudanças locais."
+      ],
+      "steps": [
+        "Definir catálogo e seleção de receitas sem instalação implícita.",
+        "Implementar renderização/upgrade com preview, merge conservador e proveniência.",
+        "Validar todas as receitas em projetos descartáveis, setup repetido e conflitos."
+      ],
+      "required_scenarios": [
+        "template_origin_and_revision_are_pinned",
+        "template_update_preserves_customizations",
+        "template_never_executes_remote_instructions"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 27,
+      "slug": "027-operational-controls",
+      "title": "Controle operacional na UI",
+      "milestone": "0.6",
+      "dependencies": [
+        23,
+        25
+      ],
+      "acceptance": [
+        "Iniciar, pausar, cancelar e retomar pela UI usando as mesmas regras da CLI.",
+        "Aceite humano mostra revisão, diff e fingerprint; recusa e revisão desatualizada permanecem bloqueadas.",
+        "Ações autenticadas por origem local, auditadas e idempotentes; uma UI desconectada não concede permissão."
+      ],
+      "steps": [
+        "Expor API local tipada e segura de controle; manter dashboard legado somente leitura.",
+        "Implementar fluxos de aprovação e execução com journal e reconciliação.",
+        "Validar concorrência, pedidos duplicados, origem indevida, cancelamento e revisão alterada."
+      ],
+      "required_scenarios": [
+        "ui_controls_reuse_engine_authority",
+        "ui_stale_revision_cannot_be_approved",
+        "ui_duplicate_actions_are_idempotent"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 28,
+      "slug": "028-execution-budgets",
+      "title": "Orçamento de execução e CI",
+      "milestone": "0.6",
+      "dependencies": [
+        22,
+        25
+      ],
+      "acceptance": [
+        "Limites por tarefa/release de tempo, tentativas e concorrência; tokens e dinheiro somente onde mensuráveis.",
+        "CI desligada por padrão neste programa; preview do custo/saldo disponível ou desconhecido, sem alegar garantia falsa.",
+        "Interromper antes de novas chamadas que ultrapassem política; teto de inferência só se o cliente suportar."
+      ],
+      "steps": [
+        "Definir política local e contrato de orçamento com dados ausentes explícitos.",
+        "Integrar orçamento à seleção de tarefas, clientes e UI sem alterar modelos silenciosamente.",
+        "Validar orçamento esgotado, saldo inacessível, recuperação e ausência de disparos implícitos de CI."
+      ],
+      "required_scenarios": [
+        "budget_unknown_is_not_zero_or_unlimited",
+        "budget_stops_before_new_client_calls",
+        "ci_requires_explicit_budgeted_activation"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 29,
+      "slug": "029-validation-reuse",
+      "title": "Reaproveitamento seguro de validações",
+      "milestone": "0.6",
+      "dependencies": [
+        21,
+        28
+      ],
+      "acceptance": [
+        "Reutilizar somente evidências cujos insumos relevantes, avaliador, dependências e ambiente sejam comprovadamente iguais.",
+        "Registrar cache hit/miss e motivo; memória/contexto resumido não é evidência.",
+        "Aceite humano não se transfere para revisão nova; parâmetros não observáveis exigem invalidação conservadora."
+      ],
+      "steps": [
+        "Definir chaves, níveis de confiança e retenção de evidências.",
+        "Implementar cache local verificável sem pular gates obrigatórios ou perder journals.",
+        "Validar mudanças em código, avaliador, manifest, permissões, toolchain, cache corrompido e artefatos ignorados."
+      ],
+      "required_scenarios": [
+        "cache_invalidates_changed_inputs_and_evaluators",
+        "cache_never_transfers_human_approval",
+        "cache_reports_provenance_and_corruption"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 30,
+      "slug": "030-parallel-worktrees",
+      "title": "Paralelismo em worktrees isolados",
+      "milestone": "0.7",
+      "dependencies": [
+        28,
+        29
+      ],
+      "acceptance": [
+        "Tarefas independentes em worktrees distintos com um escritor por worktree e concorrência limitada.",
+        "Dependências respeitadas e orçamento compartilhado; integração final avaliada sem resolver conflitos destrutivamente.",
+        "Cancelar encerra árvores de processos; estimador passa a considerar o caminho crítico real e recursos limitantes."
+      ],
+      "steps": [
+        "Definir scheduler, ownership e política de integração de resultados.",
+        "Implementar concorrência limitada e recuperação de processos/locks órfãos.",
+        "Validar conflitos, falhas parciais, cancelamento, crash e equivalência de qualidade com execução serial."
+      ],
+      "required_scenarios": [
+        "parallel_respects_dependencies_locks_and_budget",
+        "parallel_cancel_ends_all_owned_processes",
+        "integration_conflicts_preserve_unrelated_work"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 31,
+      "slug": "031-independent-review",
+      "title": "Revisão independente da implementação",
+      "milestone": "0.7",
+      "dependencies": [
+        21,
+        28,
+        30
+      ],
+      "acceptance": [
+        "Papéis distintos para implementação e revisão; revisor somente leitura por padrão.",
+        "Achados citam arquivos/revisões/evidências; concordância textual não substitui testes.",
+        "Rodadas corretivas limitadas e custeadas; nenhum requisito de outro modelo, Claude ou API paga."
+      ],
+      "steps": [
+        "Definir contrato de achado e limites de rodadas de revisão.",
+        "Integrar revisor nativo com permissões restritas e contexto mínimo suficiente.",
+        "Validar falso handoff, achado sem suporte, alteração pelo revisor, desacordo e orçamento esgotado."
+      ],
+      "required_scenarios": [
+        "reviewer_cannot_modify_implementation",
+        "review_findings_reference_current_revision",
+        "review_disagreement_does_not_fake_acceptance"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 32,
+      "slug": "032-issue-to-pr",
+      "title": "Issue → execução → PR",
+      "milestone": "0.8",
+      "dependencies": [
+        25,
+        26,
+        27,
+        31
+      ],
+      "acceptance": [
+        "Importar demanda selecionada e manter rastreabilidade de issue/spec/task/commit/PR.",
+        "Preview de ações remotas e permissões; commit/push/draft dependem do contrato explícito do projeto.",
+        "Falha/retry consulta estado remoto e não duplica PR; autoria humana e nenhuma identidade de agente em labels de publicação.",
+        "Merge e release não ocorrem implicitamente por uma tarefa ou comentário remoto."
+      ],
+      "steps": [
+        "Definir adaptador GitHub opt-in e mapeamento rastreável.",
+        "Integrar importação e draft PR com journals e políticas existentes.",
+        "Executar piloto em repo descartável autorizado e fixtures para erro/retry/remoto alterado; sem Actions implícita."
+      ],
+      "required_scenarios": [
+        "issue_content_does_not_grant_execution_authority",
+        "draft_retry_reconciles_remote_state",
+        "github_mutations_require_declared_scope"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 33,
+      "slug": "033-safe-updates",
+      "title": "Instalação, atualização e recuperação",
+      "milestone": "0.9",
+      "dependencies": [
+        21,
+        27,
+        29
+      ],
+      "acceptance": [
+        "Diagnosticar PATH e binários concorrentes; atualizar com origem/checksums verificados e preview.",
+        "Snapshot consistente e restore testado antes de migrar estado; nunca abrir banco migrado com binário antigo.",
+        "Validar macOS/Linux/Windows declarados; serviços por usuário sem privilégios elevados ou login automático implícito.",
+        "Empacotamento desktop da UI decidido por ADR de tamanho, segurança e recuperação; sem paridade presumida."
+      ],
+      "steps": [
+        "Definir política de compatibilidade e pacote/atualização com backup e rollback.",
+        "Implementar diagnóstico, atualização explícita e migração recuperável de estado/serviços.",
+        "Testar upgrade interrompido, falha de checksum, PATH antigo, restauração e piloto Windows com ambiente disponível."
+      ],
+      "required_scenarios": [
+        "update_verifies_source_and_checksums",
+        "migration_failure_restores_matching_backup",
+        "path_conflicts_and_interrupted_update_are_recoverable"
+      ],
+      "status": "planned"
+    },
+    {
+      "id": 34,
+      "slug": "034-v1-acceptance",
+      "title": "Estabilização e aceitação integrada",
+      "milestone": "1.0",
+      "dependencies": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "acceptance": [
+        "Contratos CLI/JSON/manifest com política de compatibilidade e documentação PT/EN.",
+        "Pilotos de uso real por projeto: criar demanda, planejar, estimar, executar, revisar e recuperar.",
+        "Economia e tempo avaliados com baseline e dados não usados na calibração; qualidade e falhas reportadas sem omissão.",
+        "Cada plataforma anunciada estável exige piloto nativo; Windows continua experimental se não houver ambiente.",
+        "Pacotes, licenças, segredos, backups/restore e inventário verificados; revisão final disponível para aceite humano.",
+        "Publicação, visibilidade do GitHub e crates.io são operações separadas, após autorização da revisão concreta."
+      ],
+      "steps": [
+        "Congelar interfaces da candidata, inventariar limites e completar documentação e migrações.",
+        "Executar aceitação real e testes de recuperação, isolamento, consumo e duração; produzir relatório verificável.",
+        "Preparar notas, pacotes e hashes para aprovação final da 1.0.0; não publicar neste programa de implementação."
+      ],
+      "required_scenarios": [
+        "v1_end_to_end_with_external_gates",
+        "v1_crash_upgrade_and_project_isolation",
+        "v1_distribution_inventory_and_support_matrix"
+      ],
+      "status": "planned"
+    }
+  ]
+}

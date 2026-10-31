@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "M06 local implementation validation; no native/provider or coordinator acceptance",
+  "checks": {
+    "cargo_fmt_check": "passed",
+    "cargo_clippy_workspace_all_targets_D_warnings": "passed",
+    "cargo_test_workspace": {
+      "status": "passed",
+      "tests": 164
+    },
+    "cargo_doc_workspace_no_deps": "passed",
+    "cli_build": "passed",
+    "ui_typecheck": "passed",
+    "ui_nonwatch_browser_tests": {
+      "status": "passed",
+      "tests": 9,
+      "native_client": "local protocol fixture; not provider acceptance"
+    },
+    "ui_locked_build": "passed",
+    "distribution_contract_tests": {
+      "status": "passed",
+      "tests": 6
+    },
+    "git_diff_check": "passed"
+  },
+  "ui_assets": {
+    "deterministic": true,
+    "files": {
+      "THIRD_PARTY_LICENSES.txt": "5c01bb0eeedd4911b58082dad6037112641621bc0694872d5fb2adeafbcd17c3",
+      "assets/index-B7LZBgUV.css": "ec5238b030a83b3ec06372342fdc698882200b63a050cc2bb84503f0a7e04979",
+      "assets/index-Dl_TF_PA.js": "1f7fc0d5dde5d2e5c7e792e68776a4097dbccb87b49f0903951dd96e034f306d",
+      "index.html": "523214a3b0e763eb15c44aac801c215e7e98c0f7d2ae631901b3a5597751b693",
+      "logo.webp": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555"
+    }
+  },
+  "standalone_packages": {
+    "archive_sha256": {
+      "illumitech-forge-domain-0.3.0.crate": "372c962f78a7b1469250f269fa0ec93f9726b84e655112c1fda5ad4f516b71d0",
+      "illumitech-forge-adapters-0.3.0.crate": "ea275d70ba940b9d9711fb725a67c6046a0af4d599bc16e2fa885c79a42a57dc",
+      "illumitech-forge-catalog-0.3.0.crate": "97bbce218af798f8d0ca4ad3ae686668e692200b4a38801efb04b55d96ecd366",
+      "illumitech-forge-cli-0.3.0.crate": "42247e9816ee749b1c211eec171f5b68fc54d9b0b7536bec1a4b93400983cc68"
+    },
+    "extracted_build": "passed",
+    "resolution": "temporary local patches, not live registry",
+    "upload": "not_performed",
+    "registry_ownership_auth": "pending",
+    "cargo_publish_dry_run": "not_requested"
+  },
+  "limitations": [
+    "Native platform and remote acceptance remain coordinator-owned",
+    "Windows runtime and Claude deferred",
+    "Native token budgets are admission checks, not a hard per-inference ceiling",
+    "Unknown native usage blocks further token-budgeted inference",
+    "Template conflicts produce reviewable merge candidates without overwriting customization",
+    "Cache requires the operator to declare deterministic pinned local evaluators; unknown conditions miss"
+  ],
+  "operations": {
+    "coordinator_state_or_evaluators_modified": false,
+    "commits_push_merge_actions_publication_services_hooks_account_changes": "not_performed"
+  }
+}

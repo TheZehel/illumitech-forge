@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "described",
+  "candidate": "unpublished; local checks do not grant operational acceptance",
+  "contracts": {
+    "cli_json": 1,
+    "http_api": 1,
+    "manifest": 1,
+    "state_sqlite": 1,
+    "workbench_sqlite": 0,
+    "planning": 1,
+    "snapshot": 1,
+    "installation_receipt": 1
+  },
+  "compatibility": {
+    "readers": "Ignore unknown output fields; reject unsupported schema versions. Input contracts reject unknown fields.",
+    "changes": "Additive output fields within v1; removed fields, changed units/meaning or required inputs need a new contract version.",
+    "state": "Additive tables/columns on writable open only. Read-only inspect/status/report never migrate. Do not use an older binary on newer operational state.",
+    "snapshot_minimum_reader_version": "0.3.0",
+    "snapshot_reader_caveat": "Container compatibility floor only; historical state may contain later additive features. Use the matching tool version for operational recovery.",
+    "native": "App Server stdio JSONL, initialize/initialized, experimentalApi:false; unsupported requests remain blocked; no automatic replay. Reference schema: 0.166.0; capability handshake is not a support guarantee."
+  },
+  "exit_codes": {"success": 0, "blocked_failed_cancelled_or_awaiting_approval": 2},
+  "errors": {
+    "cli": {"status": "blocked", "error_code": "operation_blocked", "error": "redacted diagnostic"},
+    "http": {"403": "request_denied", "404": "not_found", "409": "operation_conflict"},
+    "argument_parsing": "Clap diagnostics on stderr; help/version/parse failures are outside the command JSON envelope.",
+    "retry": "Error codes never authorize retry; inspect unknown outcomes and submit a fresh explicit operation."
+  },
+  "platforms": {
+    "macos": "native account exploratory pilots on earlier checkpoints; final candidate acceptance pending",
+    "linux": "deterministic ARM64 VM/container baseline on earlier checkpoint; native account sandbox preflights blocked; final candidate pending",
+    "windows": "experimental; native pilot unavailable",
+    "claude": "deferred; no v1 native acceptance claim"
+  },
+  "publication": "GitHub release, crates.io upload, visibility, push and merge require separate explicit authorization; none is triggered by version 1.0.0."
+}

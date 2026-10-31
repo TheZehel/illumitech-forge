@@ -150,9 +150,11 @@ elif a[:2]==['pr','list']:
   (r/'list-waiting').touch();time.sleep(60)
  print((r/'pr.json').read_text() if (r/'pr.json').exists() else '[]')
 elif a[:2]==['pr','create']:
- if (r/'fail-create').exists():sys.exit(3)
- p={'url':'https://github.com/fixture/project/pull/1','state':'OPEN','isDraft':True,'baseRefName':'main','headRefOid':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()}
- (r/'pr.json').write_text(json.dumps([p]));print(p['url'])
+ p={'url':'https://github.com/fixture/project/pull/1','state':'OPEN','isDraft':True,'baseRefName':'main','headRefOid':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'headRefName':'forge/pilot','headRepository':{'nameWithOwner':'fixture/project'},'title':a[a.index('--title')+1],'body':pathlib.Path(a[a.index('--body-file')+1]).read_text()}
+ (r/'pr.json').write_text(json.dumps([p]))
+ if (r/'fail-create').exists():
+  print('HTTP 504 after provider persisted draft',file=sys.stderr);sys.exit(3)
+ print(p['url'])
 elif a[:2]==['release','create']:
  assert pathlib.Path(a[a.index('--notes-file')+1]).is_absolute()
  assert all(pathlib.Path(x).is_absolute() for x in a[a.index('--notes-file')+2:])
@@ -232,7 +234,14 @@ else:sys.exit(4)
         ])
     }
     fn automate(&self, publish: bool) {
-        self.change(|m| {m["automation"]=json!({"enabled":true});if publish {m["automation"]["publish"]=json!({"repository":"fixture/project","branch":"forge/pilot","base_branch":"main"});}});
+        self.change(|m| {
+            m["automation"] = json!({"enabled":true});
+            if publish {
+                // Explicit disposable transport-fixture consent, never real CI authorization.
+                m["budget"] = json!({"actions":"on"});
+                m["automation"]["publish"] = json!({"repository":"fixture/project","branch":"forge/pilot","base_branch":"main","ci_authorized":true});
+            }
+        });
     }
 }
 
@@ -334,7 +343,8 @@ fn draft_pr_recovers_failed_create_without_duplicate_commits_and_preserves_human
     let r = Rig::new();
     r.automate(true);
     std::fs::write(r.root.join("fail-create"), "").unwrap();
-    assert!(!r.daemon().0);
+    let (ok, recovered) = r.daemon();
+    assert!(ok, "{recovered}");
     let head = git(&r.repo, &["rev-parse", "HEAD"]);
     assert_eq!(
         git(&r.repo, &["log", "-1", "--format=%an"]),
@@ -349,6 +359,11 @@ fn draft_pr_recovers_failed_create_without_duplicate_commits_and_preserves_human
     assert_eq!(v["reused"], true);
     assert_eq!(git(&r.repo, &["rev-parse", "HEAD"]), head);
     assert!(!git(&r.repo, &["log", "-1", "--format=%B"]).contains("Co-authored-by"));
+    let calls = std::fs::read_to_string(r.root.join("gh-calls.jsonl")).unwrap();
+    assert_eq!(
+        calls.lines().filter(|line| line.contains("create")).count(),
+        1
+    );
 }
 
 #[test]
@@ -365,6 +380,8 @@ fn draft_pr_refuses_agent_authorship_and_base_checkout() {
 #[test]
 fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     let r = Rig::new();
+    r.automate(true);
+    r.change(|m| m["automation"]["enabled"] = json!(false));
     r.change(|m| {
         m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
         m["tasks"][0]["acceptance"]

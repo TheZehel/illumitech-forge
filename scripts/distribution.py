@@ -3,6 +3,8 @@
 import argparse
 import hashlib
 import json
+import re
+import shutil
 from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import tarfile
@@ -41,8 +43,10 @@ def validate_graph(packages, order):
                     raise ValueError('invalid publication order')
 
 
-def validate_files(files):
+def validate_files(files, *, ui=False):
     required = {'Cargo.toml', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'dependencies.json'}
+    if ui:
+        required |= {'build.rs', 'ui-dist/index.html', 'ui-dist/logo.webp', 'ui-dist/THIRD_PARTY_LICENSES.txt'}
     if not required <= set(files):
         raise ValueError('missing required package files')
     for name in files:
@@ -50,6 +54,7 @@ def validate_files(files):
         if p.is_absolute() or PureWindowsPath(name).drive or '\\' in name or '..' in p.parts or not (
             name in required | {'Cargo.toml.orig', 'Cargo.lock', '.cargo_vcs_info.json'}
             or p.parts[0] in {'src', 'tests', 'THIRD_PARTY_LICENSES'}
+            or (ui and re.fullmatch(r'ui-dist/assets/[A-Za-z0-9_-]+\.(js|css)', name))
         ) or any(x.startswith('.env') or x in {'credentials.json', 'auth.json'} for x in p.parts):
             raise ValueError('forbidden package file (content withheld)')
 
@@ -68,7 +73,11 @@ def verify_notices(root, packages):
                 raise ValueError('missing or stale dependency notice')
 
 
-def run(mode):
+def run(mode, output=None):
+    if output is not None:
+        output = output.resolve()
+        if output.exists():
+            raise ValueError('candidate output must be fresh; never overwrite prior packages')
     packages = inventory(ROOT)
     verify_notices(ROOT, packages)
     package_files = {}
@@ -77,7 +86,7 @@ def run(mode):
         files = [entry.replace('\\', '/') for entry in cargo(
             ROOT, 'package', '-p', name, '--list', '--allow-dirty', '--offline', capture=True
         ).splitlines()]
-        validate_files(files)
+        validate_files(files, ui=name == ORDER[-1])
         package_files[name] = files
     if mode == 'list':
         print(json.dumps({'package_order': ORDER, 'package_lists': 'passed', 'package_files': package_files, 'upload': 'not_performed'}))
@@ -110,12 +119,24 @@ def run(mode):
                     if not parts or parts[0] != stem or not member.isfile():
                         raise ValueError('unexpected archive entry')
                     files.append('/'.join(parts[1:]))
-                validate_files(files)
+                validate_files(files, ui=name == ORDER[-1])
                 source.extractall(extracted, filter='data')
             members.append(stem)
         patches = '\n'.join(f'{name} = {{ path = "{stem}" }}' for name, stem in zip(ORDER, members))
         (extracted / 'Cargo.toml').write_text('[workspace]\nresolver = "2"\nmembers = ' + json.dumps(members) + '\n[patch.crates-io]\n' + patches + '\n')
         cargo(extracted, 'build', '--workspace', '--offline', '--target-dir', str(temp / 'build'))
+        executable = temp / 'build/debug' / ('illumitech-forge.exe' if __import__('os').name == 'nt' else 'illumitech-forge')
+        contracts = json.loads(subprocess.check_output([executable, '--json', 'contracts'], cwd=extracted))
+        if contracts['contracts']['manifest'] != 1:
+            raise ValueError('extracted CLI contract mismatch')
+        cargo(extracted, 'test', '-p', ORDER[-1], '--bin', 'illumitech-forge',
+              'standalone_package_embeds_all_referenced_ui_assets', '--offline',
+              '--target-dir', str(temp / 'build'))
+        if output is not None:
+            output.mkdir(parents=True)
+            for name in hashes:
+                shutil.copyfile(temp / 'target/package' / name, output / name)
+            (output / 'SHA256SUMS').write_text(''.join(f'{sha}  {name}\n' for name, sha in sorted(hashes.items())))
         print(json.dumps({'archive_sha256': hashes, 'extracted_build': 'passed',
                           'resolution': 'temporary local patches, not live registry',
                           'upload': 'not_performed', 'registry_ownership_auth': 'pending',
@@ -125,4 +146,6 @@ def run(mode):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['list', 'package', 'dry-run'])
-    run(parser.parse_args().mode)
+    parser.add_argument('--output', type=Path, help='Retain verified archives in a fresh local directory')
+    args = parser.parse_args()
+    run(args.mode, args.output)

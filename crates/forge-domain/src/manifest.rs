@@ -18,6 +18,87 @@ pub struct Manifest {
     pub memory: Memory,
     #[serde(default)]
     pub automation: Automation,
+    #[serde(default)]
+    pub context: ContextPolicy,
+    #[serde(default)]
+    pub budget: Budget,
+    #[serde(default)]
+    pub execution: Execution,
+    #[serde(default)]
+    pub review: ReviewPolicy,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<IssueSource>,
+}
+/// Selected demand provenance only; never execution or publication authority.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IssueSource {
+    pub schema_version: u32,
+    pub provider: String,
+    pub repository: String,
+    pub number: u64,
+    pub url: String,
+    pub content_sha256: String,
+    pub provenance: IssueProvenance,
+    pub spec_id: String,
+}
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IssueProvenance {
+    AuthenticatedGh,
+    OfflineSnapshot,
+}
+impl IssueSource {
+    pub fn validate(&self) -> Result<()> {
+        ensure!(
+            self.schema_version == 1 && self.provider == "github",
+            "unsupported issue source"
+        );
+        ensure!(
+            self.repository.split('/').count() == 2 && self.repository.split('/').all(valid_id),
+            "invalid issue repository"
+        );
+        ensure!(
+            self.number > 0 && valid_hash(&self.content_sha256) && valid_id(&self.spec_id),
+            "invalid issue source identity/hash"
+        );
+        ensure!(
+            self.url.eq_ignore_ascii_case(&format!(
+                "https://github.com/{}/issues/{}",
+                self.repository, self.number
+            )),
+            "issue URL host/repository/number mismatch or redirect"
+        );
+        Ok(())
+    }
+}
+/// Bounded local writers. Roots are explicitly supplied; Forge never commits or merges them.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Execution {
+    pub max_parallel: u32,
+}
+impl Default for Execution {
+    fn default() -> Self {
+        Self { max_parallel: 1 }
+    }
+}
+/// Independent native review is advisory; every invocation is explicitly requested.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ReviewPolicy {
+    pub max_iterations: u32,
+    pub max_tokens: Option<u64>,
+    pub timeout_seconds: u64,
+}
+impl Default for ReviewPolicy {
+    fn default() -> Self {
+        Self {
+            max_iterations: 3,
+            max_tokens: None,
+            timeout_seconds: 600,
+        }
+    }
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -42,6 +123,43 @@ pub struct Task {
     pub timeout_seconds: u64,
     #[serde(default = "attempts")]
     pub max_attempts: u32,
+    #[serde(default)]
+    pub context: Option<ContextPolicy>,
+    #[serde(default)]
+    pub budget: Budget,
+}
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ContextPolicy {
+    pub profile: ContextProfile,
+    pub budget_tokens: Option<u64>,
+    /// Optional repo-relative files; instructions and referenced specs are always mandatory.
+    pub sources: Vec<PathBuf>,
+}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ContextProfile {
+    #[default]
+    Full,
+    Bounded,
+}
+impl ContextPolicy {
+    pub fn validate(&self) -> Result<()> {
+        ensure!(self.sources.len() <= 100, "too many context sources");
+        ensure!(
+            self.sources.iter().all(|p| local_path(p)),
+            "context sources require safe repo-relative paths"
+        );
+        ensure!(
+            self.budget_tokens.is_none_or(|n| n > 0 && n <= 1_000_000),
+            "context budget must be 1..=1000000"
+        );
+        ensure!(
+            self.profile != ContextProfile::Bounded || self.budget_tokens.is_some(),
+            "bounded context requires budget_tokens"
+        );
+        Ok(())
+    }
 }
 fn task_timeout() -> u64 {
     1800
@@ -102,6 +220,9 @@ pub struct DraftPr {
     pub remote: String,
     #[serde(default = "yes")]
     pub draft: bool,
+    /// Separate authorization for possible CI side effects, never a quota attestation.
+    #[serde(default)]
+    pub ci_authorized: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
@@ -142,6 +263,63 @@ pub struct Gate {
     pub inputs: BTreeMap<PathBuf, String>,
     #[serde(default = "gate_timeout")]
     pub timeout_seconds: u64,
+    #[serde(default)]
+    pub cache: GateCache,
+}
+/// Admission policy. Missing counters are unknown, never a zero cost estimate.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Budget {
+    pub max_tokens: Option<u64>,
+    pub max_active_seconds: Option<u64>,
+    pub max_attempts: Option<u32>,
+    pub max_concurrency: Option<u32>,
+    pub max_cost_micros: Option<u64>,
+    pub actions: Actions,
+}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Actions {
+    #[default]
+    Off,
+    On,
+}
+impl Budget {
+    fn validate_limits(&self) -> Result<()> {
+        ensure!(
+            self.max_concurrency.is_none_or(|n| (1..=32).contains(&n)),
+            "max_concurrency must be 1..=32"
+        );
+        Ok(())
+    }
+    pub fn validate(&self) -> Result<()> {
+        self.validate_limits()?;
+        ensure!(
+            self.actions == Actions::Off,
+            "CI activation requires separate publication CI authorization; unavailable to task execution"
+        );
+        Ok(())
+    }
+}
+/// Opt-in deterministic local gates only. All inherited environment is hashed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct GateCache {
+    pub enabled: bool,
+    pub ttl_seconds: u64,
+    pub environment: BTreeMap<String, String>,
+    /// Absolute local executable/configuration paths pinned by digest.
+    pub toolchain: BTreeMap<PathBuf, String>,
+}
+impl Default for GateCache {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            ttl_seconds: 300,
+            environment: BTreeMap::new(),
+            toolchain: BTreeMap::new(),
+        }
+    }
 }
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -180,6 +358,42 @@ impl Manifest {
         Ok((m, crate::digest(&bytes)))
     }
     pub fn validate(&self) -> Result<Vec<String>> {
+        ensure!(
+            (1..=32).contains(&self.execution.max_parallel),
+            "max_parallel must be 1..=32"
+        );
+        ensure!(
+            (1..=10).contains(&self.review.max_iterations)
+                && (1..=3600).contains(&self.review.timeout_seconds),
+            "invalid review limits"
+        );
+        self.context.validate()?;
+        // M08 publication CI consent is separate from task execution budgets.
+        self.budget.validate_limits()?;
+        ensure!(
+            self.budget.actions == Actions::Off
+                || self
+                    .automation
+                    .publish
+                    .as_ref()
+                    .is_some_and(|p| p.ci_authorized),
+            "CI activation requires separate publication CI authorization"
+        );
+        if let Some(source) = &self.source {
+            source.validate()?;
+            ensure!(
+                self.repos
+                    .values()
+                    .any(|r| r.specs.contains(&source.spec_id)),
+                "issue spec must be referenced by a repository"
+            );
+            if let Some(publish) = &self.automation.publish {
+                ensure!(
+                    publish.repository.eq_ignore_ascii_case(&source.repository),
+                    "issue/publication repository mismatch"
+                );
+            }
+        }
         ensure!(self.schema_version == 1, "unsupported schema_version");
         ensure!(valid_id(&self.release_id), "invalid release_id");
         ensure!(
@@ -218,6 +432,21 @@ impl Manifest {
         let mut gates = BTreeSet::new();
         for g in &self.gates {
             ensure!(
+                !g.cache.enabled || (1..=86400).contains(&g.cache.ttl_seconds),
+                "cache TTL must be 1..=86400"
+            );
+            ensure!(
+                g.cache.toolchain.values().all(|h| valid_hash(h)),
+                "invalid toolchain digest"
+            );
+            ensure!(
+                g.cache
+                    .environment
+                    .keys()
+                    .all(|k| !k.is_empty() && !k.contains(['=', '\0'])),
+                "invalid environment key"
+            );
+            ensure!(
                 valid_id(&g.id) && gates.insert(&g.id),
                 "duplicate or invalid gate ID"
             );
@@ -239,6 +468,10 @@ impl Manifest {
         }
         let mut ids = BTreeSet::new();
         for t in &self.tasks {
+            t.budget.validate()?;
+            if let Some(context) = &t.context {
+                context.validate()?;
+            }
             ensure!(
                 valid_id(&t.id) && ids.insert(&t.id),
                 "duplicate or invalid task ID"
@@ -388,6 +621,22 @@ mod tests {
             )
             .is_err()
         );
+    }
+    #[test]
+    fn context_is_additive_explicit_and_strict() {
+        let mut m = sample();
+        assert_eq!(m.context.profile, ContextProfile::Full);
+        m.context =
+            serde_yaml::from_str("profile: bounded\nbudget_tokens: 2000\nsources: [src/lib.rs]")
+                .unwrap();
+        m.validate().unwrap();
+        m.context.budget_tokens = None;
+        assert!(m.validate().is_err());
+        m.context.budget_tokens = Some(2000);
+        m.context.sources = vec!["../other-project".into()];
+        assert!(m.validate().is_err());
+        assert!(serde_yaml::from_str::<ContextPolicy>("profile: cheap").is_err());
+        assert!(serde_yaml::from_str::<ContextPolicy>("profile: bounded\nmodel: other").is_err());
     }
     #[test]
     fn rejects_cycles_duplicates_and_unknown_refs() {

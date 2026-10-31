@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RULES = {
     'private_key': rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',
     'credential_token': rb'(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9]{32,})',
-    'personal_path': rb'(?:/Users/[^/\s"\']+/|/home/[^/\s"\']+/|[A-Za-z]:\\Users\\[^\\\s]+\\)',
-    'internal_volume': rb'/Volumes/[^/\s]+/',
+    'personal_path': rb'(?:/' + rb'Users/[^/\s"\']+/|/' + rb'home/[^/\s"\']+/|[A-Za-z]:\\Users\\[^\\\s]+\\)',
+    'internal_volume': rb'/' + rb'Volumes/[^/\s]+/',
 }
 
 

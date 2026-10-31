@@ -1,7 +1,7 @@
 # Windows portability candidate (FORGE-014)
 
-The published **0.2.0 remains macOS ARM64 / Linux x86_64 only**. This worktree
-adds an unreleased Windows 11 x86_64, MSVC, PowerShell 7 candidate. Native CI evidence is tracked by revision; configuration alone is not acceptance. No authenticated Windows agent acceptance
+This 1.0.0 source candidate retains experimental Windows 11 x86_64, MSVC and PowerShell 7
+portability. The published registry version remains 0.3.0. Native CI evidence is tracked by revision; configuration alone is not acceptance. No authenticated Windows agent acceptance
 has been performed on the macOS implementation host. Windows ARM64 and Windows
 PowerShell 5.1 are not supported; scripts require PowerShell 7 and stop on 5.1.
 
@@ -82,7 +82,7 @@ $zip = '.\illumitech-forge-candidate.zip'
 $expected = (Get-Content -LiteralPath "$zip.sha256").Split(' ')[0]
 # Verify the sidecar itself against the reviewed release evidence first.
 .\scripts\install.ps1 -Archive $zip -Sha256 $expected
-# Optional: -InstallDir 'C:\Users\Example\Apps\Forge' -NoPath
+# Optional: -InstallDir (Join-Path $env:LOCALAPPDATA 'Programs\Forge') -NoPath
 .\scripts\uninstall.ps1
 ```
 

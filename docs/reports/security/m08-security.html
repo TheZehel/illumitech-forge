@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relat&oacute;rio de Vulnerabilidades - Illumitech Forge M08</title>
+  <style>
+    :root {
+      --green: #00A651;
+      --green-dark: #004d26;
+      --gold: #FFD700;
+      --blue: #003DA5;
+      --danger: #E63946;
+      --ink: #151515;
+      --muted: #666666;
+      --paper: #ffffff;
+      --line: #dddddd;
+      --soft: #f7f8f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #ececec;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+    .page {
+      position: relative;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 24px auto;
+      padding: 22mm 20mm 24mm;
+      background: var(--paper);
+      border-left: 8px solid var(--green);
+      border-right: 8px solid var(--blue);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+    .watermark {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 360px;
+      height: 360px;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      opacity: 0.07;
+      z-index: 0;
+      border-radius: 34px;
+      filter: grayscale(8%);
+    }
+    .content { position: relative; z-index: 1; }
+    header {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 18px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 2px solid var(--line);
+      margin-bottom: 26px;
+    }
+    .brand-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 2px solid rgba(0, 166, 81, 0.18);
+    }
+    .brand-logo.fallback {
+      display: grid;
+      place-items: center;
+      color: var(--green-dark);
+      font-size: 30px;
+      font-weight: 700;
+      background: var(--soft);
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    h1 { margin: 0; font-size: 28px; line-height: 1.12; letter-spacing: 0; }
+    h2 {
+      margin: 28px 0 10px;
+      color: var(--blue);
+      font-size: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+    h3 { margin: 18px 0 8px; font-size: 15px; color: var(--green-dark); }
+    p { margin: 0 0 10px; }
+    .meta { margin-top: 8px; color: var(--muted); font-size: 13px; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0 22px;
+    }
+    .metric {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--green);
+      padding: 12px;
+      min-height: 92px;
+    }
+    .metric:nth-child(2) { border-top-color: var(--gold); }
+    .metric:nth-child(3) { border-top-color: var(--blue); }
+    .metric strong { display: block; font-size: 24px; line-height: 1; margin-bottom: 8px; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+      font-size: 12px;
+      background: rgba(255, 255, 255, .90);
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f0f4f1; color: #111; font-weight: 700; }
+    pre {
+      background: #f7f8f7;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: auto;
+      padding: 12px;
+      white-space: pre-wrap;
+      font-size: 11px;
+    }
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      background: #f3f3f3;
+      border: 1px solid #e1e1e1;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .status-ok { color: var(--green-dark); font-weight: 700; }
+    .status-risk { color: var(--danger); font-weight: 700; }
+    .note {
+      border-left: 4px solid var(--gold);
+      background: rgba(255, 215, 0, .10);
+      padding: 10px 12px;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    footer {
+      margin-top: 28px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    @media print {
+      body { background: #fff; }
+      .page { width: auto; min-height: auto; margin: 0; box-shadow: none; page-break-after: always; }
+      .watermark { position: fixed; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    
+    <div class="content">
+      <header>
+        <div class="brand-logo fallback">F</div>
+        <div>
+          <p class="eyebrow">Relat&oacute;rio formal de seguran&ccedil;a</p>
+          <h1>Vulnerabilidades e valida&ccedil;&otilde;es de seguran&ccedil;a</h1>
+          <div class="meta">
+            Projeto: <strong>Illumitech Forge M08</strong><br />
+            Branch: <span class="code">feat/v1-program</span><br />
+            Data do relat&oacute;rio: <strong>2026-10-30 17:31:58 -03</strong>
+          </div>
+        </div>
+      </header>
+
+      <section>
+        <h2>1. Sum&aacute;rio executivo</h2>
+        <p>
+          Este relat&oacute;rio consolida as valida&ccedil;&otilde;es de seguran&ccedil;a executadas no reposit&oacute;rio
+          e serve como base para registrar achados confirmados, falsos positivos e riscos residuais.
+        </p>
+        <div class="summary">
+          <div class="metric"><strong>0</strong><span>controles executados pelo gerador</span></div>
+          <div class="metric"><strong>0</strong><span>controles com falha no momento da gera&ccedil;&atilde;o</span></div>
+          <div class="metric"><strong>5</strong><span>notas manuais registradas</span></div>
+        </div>
+        <p class="note">
+          O relat&oacute;rio n&atilde;o deve conter segredos, valores de <span class="code">.env</span> ou credenciais operacionais.
+        </p>
+      </section>
+
+      <section><h2>2. Estado do reposit&oacute;rio</h2><pre>## feat/v1-program...origin/main
+ M .gitignore
+ M Cargo.lock
+ M README.md
+ M crates/forge-adapters/Cargo.toml
+ M crates/forge-adapters/src/lib.rs
+ M crates/forge-adapters/src/process.rs
+ M crates/forge-cli/Cargo.toml
+ M crates/forge-cli/README.md
+ M crates/forge-cli/src/engine.rs
+ M crates/forge-cli/src/importing.rs
+ M crates/forge-cli/src/main.rs
+ M crates/forge-cli/src/publication.rs
+ M crates/forge-cli/src/service.rs
+ M crates/forge-cli/tests/lifecycle.rs
+ M crates/forge-domain/src/lib.rs
+ M crates/forge-domain/src/manifest.rs
+ M crates/forge-domain/src/revision.rs
+ M crates/forge-domain/src/state.rs
+ M docs/contracts.md
+ M docs/public-distribution.md
+ M scripts/distribution.py
+ M scripts/test_distribution.py
+?? apps/
+?? crates/forge-adapters/src/reliability.rs
+?? crates/forge-adapters/src/usage.rs
+?? crates/forge-cli/build.rs
+?? crates/forge-cli/src/budget.rs
+?? crates/forge-cli/src/context.rs
+?? crates/forge-cli/src/duration.rs
+?? crates/forge-cli/src/guided.rs
+?? crates/forge-cli/src/issue.rs
+?? crates/forge-cli/src/native.rs
+?? crates/forge-cli/src/operational.rs
+?? crates/forge-cli/src/parallel.rs
+?? crates/forge-cli/src/planning-v1.schema.json
+?? crates/forge-cli/src/planning.rs
+?? crates/forge-cli/src/review.rs
+?? crates/forge-cli/src/templates.rs
+?? crates/forge-cli/src/validation_cache.rs
+?? crates/forge-cli/src/workbench.rs
+?? crates/forge-cli/src/workbench_http.rs
+?? crates/forge-cli/tests/economy.rs
+?? crates/forge-cli/tests/fixtures/
+?? crates/forge-cli/tests/m06.rs
+?? crates/forge-cli/tests/m07.rs
+?? crates/forge-cli/tests/m08.rs
+?? crates/forge-cli/ui-dist/
+?? crates/forge-domain/src/duration.rs
+?? crates/forge-domain/src/usage.rs
+?? crates/forge-domain/src/usage_store.rs
+?? docs/adr/0002-local-workbench-and-planning.md
+?? docs/duration-estimates.md
+?? docs/execution-reliability.md
+?? docs/features/
+?? docs/m06-operating-contracts.md
+?? docs/m07-operating-contracts.md
+?? docs/m08-operating-contracts.md
+?? docs/reports/
+?? docs/roadmap-v1.md
+?? docs/token-economy.md
+?? docs/v1-execution-plan.md
+?? docs/workbench.md
+?? specs/020-duration-estimates/
+?? specs/021-execution-reliability/
+?? specs/022-token-economy/
+?? specs/023-forge-workbench/
+?? specs/024-guided-feature-creation/
+?? specs/025-assisted-planning/
+?? specs/026-versioned-templates/
+?? specs/027-operational-controls/
+?? specs/028-execution-budgets/
+?? specs/029-validation-reuse/
+?? specs/030-parallel-worktrees/
+?? specs/031-independent-review/
+?? specs/032-issue-to-pr/
+?? specs/033-safe-updates/
+?? specs/034-v1-acceptance/
+?? specs/programs/</pre></section>
+      <section><h2>3. Controles executados</h2><p>Validação local: fmt, Clippy sem warnings, 188 testes Rust, docs, CLI build, typecheck/build UI determinístico e 13 testes de navegador passaram. Os 6 testes de distribuição passaram. Registros e hashes: <a href="../implementation/m08-validation.json">m08-validation.json</a>.</p></section>
+      <section><h2>4. Notas do auditor</h2><ul><li>Revisão de segurança focada nas fronteiras de importação e publicação; sem novo pacote de dependência ou scanner de advisories nesta sessão.</li><li>Não há conclusão de ausência global de vulnerabilidades. Checks locais serão registrados em ../implementation/m08-validation.json.</li><li>Fonte selecionada não concede modelos, permissões, instalação ou publicação. Snapshot offline nunca atesta o provedor. Conteúdo sensível/inválido e caminhos de credenciais são recusados.</li><li>Actions off bloqueia escritas remotas; autorizar CI requer contrato separado. Não há garantia de quota ou skip-ci, force push, merge, release automática ou mutação de issue.</li><li>Journal conserva resultado incerto até readback; PR alterado/fechado/mesclado/ambíguo bloqueia sem sobrescrita. Fixtures não equivalem a piloto real.</li></ul></section>
+      <section><h2>5. Logs de valida&ccedil;&atilde;o</h2><p>Regressões: <code>crates/forge-cli/tests/m08.rs</code> e <code>apps/forge-ui/tests/m08.spec.ts</code>. O subprocesso de provedor comprova comportamento de retry/readback em fixture; nenhum resultado é atestado de GitHub real. Não houve scanner de advisories/SAST adicional ou mudança de dependências no M08.</p></section>
+      <section><h2>6. Conclus&atilde;o</h2><p>Fronteiras verificadas localmente: demanda sem autoridade, preservação de conflitos, host fixo, CI off, readback e recusa de PR divergente. SQLite/evaluadores permanecem externos e não foram alterados pelo trabalho de implementação. Piloto GitHub real, aceite nativo e conclusão do ledger externo não são alegados.</p></section>
+
+      <footer>
+        <span>Illumitech Forge M08 - Relat&oacute;rio de Seguran&ccedil;a</span>
+        <span>Documento HTML exportado para controle interno</span>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

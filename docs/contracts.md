@@ -20,7 +20,8 @@ context; never executable instructions or proof of task completion.
 Outputs use `schema_version: 1`; evidence outcome is `passed`, `failed`, `not_run` or `blocked`.
 Operational phases additionally include running, evaluating, paused, cancelled and awaiting_approval.
 Exit 0 means the command succeeded; exit 2 denotes invalid, blocked, cancelled or failed execution.
-Inspect and dry-run only validate and describe; they do not open a state store.
+Inspect and dry-run only validate and describe; existing duration history may be read through a
+read-only store. They never create or migrate operational state.
 
 SQLite schema 1 stores run snapshots, ordered events, control requests and revision-bound approvals.
 State snapshot and event append commit together. Fingerprints include Git HEAD, staged diff and
@@ -30,8 +31,9 @@ invalidate source revision; explicit artifact hashes are checked at evaluation. 
 
 State is operator-owned. Run with permissions that prevent executors from writing state and
 external evaluators; an agent with unrestricted OS access is outside the threat model.
-Each task log is redacted and bounded to 1 MiB per stream; three attempt slots per task are retained.
-Reconciliation replaces attempt logs and preserves event history. Keep state private and rotate
+Each task log is redacted and bounded to 1 MiB per stream. Every attempt is retained under
+`logs/RELEASE/generation-N/TASK-ATTEMPT.json`; reconciliation preserves earlier generations and
+the complete event/usage journal. Legacy log paths remain untouched. Keep state private and rotate
 archived state directories under the operator's retention policy.
 
 `release run` never publishes. `release publish` requires current passing evidence, at least one
@@ -61,7 +63,7 @@ explicit intervention. `resume --reconcile REASON` invalidates previous executio
 Optional `automation.publish` declares `repository`, `branch`, `base_branch`, `remote` (default origin)
 and `draft` (must be true). It requires one initially clean linked worktree, a dedicated current branch
 and a configured human author/committer. The daemon can commit/push/create a draft PR only under this
-contract. `release draft-pr MANIFEST` invokes it explicitly even when the daemon is disabled.
+contract plus the explicit M08 CI side-effect authorization; actions-off blocks remote writes. `release draft-pr MANIFEST` invokes it explicitly even when the daemon is disabled.
 Commit intent is journaled before Git commit; all gates and human approvals are reevaluated afterwards.
 A new commit invalidates human approvals. On interruption after commit, invoke `release draft-pr`
 to reconcile the journal; live/orphan gate processes require operator inspection first. Resume cannot
@@ -86,3 +88,88 @@ Loop task IDs can link other tasks. Unknown references are rejected. Missing met
 priority 100 and no dependencies; prose and `[P]` parallelism tags do not imply dependencies.
 Convert legacy gates to pinned external evaluators and review
 permissions before execution. Old completion marks/state never become current evidence.
+
+## Duration estimates (FORGE-020)
+
+`release inspect`, `release run --dry-run`, execution results, `status` and `report` add
+`duration_estimate` to the schema-version-1 envelope. The estimate has its own `schema_version: 1`,
+`status` (`preliminary`, `estimated`, `unavailable`), `basis`, `confidence`, `remaining_seconds`
+(`{lower,upper}` in seconds or null with `unavailable_reason`), `assumptions`, `counts`,
+`manifest_hash`, `execution_context_hash`, `configuration_observability`, `phase` and
+`generated_at_epoch_ms`. Counts include per-task gate invocations plus final re-evaluation;
+execution defaults to serial; opt-in parallel scheduling is defined in [M07](m07-operating-contracts.md). Timeout is never an expected duration. Native client/model configuration
+and permissions are unchanged; estimation performs no client/network call or API fallback.
+
+`observed_active_ms` is the checkpointed/provisionally observed active subtotal;
+`observed_active_seconds` is null when the total is unknown (legacy/incomplete observation).
+`in_progress_elapsed_seconds` identifies the provisional live interval. `waiting_for`,
+`conditional` and `wall_clock_eta: null` prevent approval/pause/blocking from becoming a calendar ETA.
+Status/report refresh projections without writing. Absent state is not created. Incompatible,
+corrupt or missing history is disclosed; no synthetic samples are substituted.
+
+Run snapshots gain an optional `duration` field (serde default for legacy snapshots). It retains
+the initial/current forecasts, observed total, current/last interval, phase progress and generation.
+SQLite schema 1 gains additive measurement/forecast tables and indexes on writable open only.
+Run snapshot, event, measurement and forecast revision commit atomically. Finalized measurements
+are immutable across retries. Reconciliation archives the previous run in its event and keeps
+old measurement generations. The existing permission, lock, evaluator and reconciliation checks
+remain authoritative. Never use an older binary to manage the new duration records.
+
+Measurement matching hashes the canonical root and task/executor/spec/gate contract, declared
+model and permission, platform/architecture and Forge version. Native effective configuration is
+only partially observable; confidence stays low even with matching declared settings. Queries
+read at most 200 measurements of at most 64 KiB each, 100 forecast revisions, and 1,000 events.
+Legacy/corrupt histories cannot establish timing compatibility or successful completion.
+
+Report adds `duration_revisions` and `duration_comparison`: immutable initial estimate, observed
+active time, operational outcome, signed midpoint error and interval coverage for fully measured
+completed runs. Partial/failed/cancelled runs have no completion coverage; no accuracy target is
+invented. See [the duration guide](duration-estimates.md) for heuristic ranges, retry accounting,
+calibration limits and clock/crash behavior. Duration data is informational and never acceptance evidence.
+
+
+## Native reliability and token context (0.4 local increment)
+
+[Protocol reliability](execution-reliability.md) defines explicit transient retries, permanent
+blocks and complete recovery journals with bounded report projections. Permission/authentication,
+contract and evidence failures never cause blind native retries or transfer approvals.
+Declared command executors preserve their existing bounded gate-failure retry contract.
+
+[Token measurement and bounded context](token-economy.md) defines optional native counters on
+`status`/`report`, durable per-call observations, session/turn deduplication and unknown coverage.
+`report --limit N --offset N` pages events/calls; totals cover the full release journal.
+
+`context plan MANIFEST --task ID --budget-tokens N` is a read-only deterministic preview.
+Manifest and task `context` accept `profile: full|bounded`, optional `budget_tokens` (required
+for bounded) and repo-relative `sources`. Task policy replaces manifest policy; full is default.
+No instruction, acceptance, native model, account or permission is removed to meet a prompt budget.
+Mandatory oversize blocks execution. No inference call is added to optimize context.
+
+## M06 additions
+
+See [M06 operating contracts](m06-operating-contracts.md) for strict manifest/task `budget`,
+opt-in gate `cache`, versioned templates, and authenticated asynchronous workbench controls.
+Existing manifests preserve their behavior through additive defaults; human review remains
+revision-bound and the legacy dashboard stays read-only.
+
+## Parallel worktrees and independent review (FORGE-030/031)
+
+See [M07 operating contracts](m07-operating-contracts.md) for `execution.max_parallel`,
+root ownership, shared budgets, revision-bound review, final gate cancellation and
+verified diagnostic references. These are additive, opt-in execution changes; review
+never grants release acceptance.
+
+## Selected issue and publication safety (FORGE-032)
+
+See [M08 operating contracts](m08-operating-contracts.md) for the additive strict `source`
+schema, selected authenticated gh/offline snapshot import, content-hash binding, traceability
+and publication preview. Import is preview-first and never grants executable authority.
+`budget.actions:off` blocks staging/commit and remote writes that could trigger CI; a separate
+`actions:on` plus `automation.publish.ci_authorized:true` contract permits possible CI side
+effects without attesting provider quota. Tasks cannot enable CI. Readback after every draft
+create and the existing publication journal recover uncertain requests without duplication;
+remote divergence blocks rather than overwrites. Declared human gates remain revision-bound;
+imported candidates include them. The UI can
+inspect a publishing manifest but cannot execute it or publish.
+
+See [M09 safe installation and recovery](m09-operating-contracts.md) for explicit-prefix verified updates, consistent SQLite snapshots, fresh-target restore and platform limits.

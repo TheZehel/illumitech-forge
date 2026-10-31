@@ -741,10 +741,11 @@ dependencies = [
 
 [[package]]
 name = "illumitech-forge-adapters"
-version = "0.3.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "illumitech-forge-domain",
  "libc",
  "reqwest",
  "serde",
@@ -758,7 +759,7 @@ dependencies = [
 
 [[package]]
 name = "illumitech-forge-catalog"
-version = "0.3.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "serde",
@@ -769,14 +770,16 @@ dependencies = [
 
 [[package]]
 name = "illumitech-forge-cli"
-version = "0.3.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "clap",
  "fs2",
+ "getrandom 0.4.3",
  "illumitech-forge-adapters",
  "illumitech-forge-catalog",
  "illumitech-forge-domain",
+ "libc",
  "rusqlite",
  "serde",
  "serde-saphyr",
@@ -790,7 +793,7 @@ dependencies = [
 
 [[package]]
 name = "illumitech-forge-domain"
-version = "0.3.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "fs2",

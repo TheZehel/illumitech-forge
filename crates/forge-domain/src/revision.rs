@@ -110,3 +110,13 @@ impl WorktreeLocks {
         Ok(Self { _files: files })
     }
 }
+
+impl Drop for WorktreeLocks {
+    fn drop(&mut self) {
+        // A concurrent fork can briefly inherit a descriptor before CLOEXEC. Explicit
+        // unlock releases the lease when its owner finishes, regardless of inherited fds.
+        for file in &self._files {
+            let _ = fs2::FileExt::unlock(file);
+        }
+    }
+}

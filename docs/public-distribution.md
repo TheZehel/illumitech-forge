@@ -1,6 +1,6 @@
 # Public distribution preparation
 
-This is preparation, not authorization to publish. Packages use MIT and version 0.3.0;
+This tree prepares an unpublished 1.0.0 candidate, not authorization to publish. Packages use MIT;
 the executable remains `illumitech-forge`. Rust dependency aliases retain the existing
 `forge_domain`, `forge_adapters` and `forge_catalog` imports. Package names are now:
 
@@ -9,11 +9,12 @@ the executable remains `illumitech-forge`. Rust dependency aliases retain the ex
 3. `illumitech-forge-catalog`
 4. `illumitech-forge-cli`
 
-The first three are independent; the CLI depends on their exact versions. Directories
+Domain and catalog are independent; adapters depends on the exact domain version, and the CLI depends on all three exact versions. Publish domain before adapters. Directories
 remain `crates/forge-*`. Recipes now live inside the catalog package at
 `crates/forge-catalog/src/recipes.json`, so compilation never needs a parent checkout.
-Names are deliberately prefixed. Registry API checks on 2026-10-29 returned 404 for all four
-names (not reserved); recheck availability, ownership and authentication immediately before upload.
+The four names already have published version 0.3.0 (public registry readback on 2026-10-31 UTC).
+Check the new version, ownership and authentication before a separately authorized upload.
+Current candidate scope and native/platform limits are in [v1-candidate.md](v1-candidate.md).
 
 ## Local preparation
 
@@ -35,7 +36,8 @@ cargo doc --workspace --no-deps
 `list` checks all four inventories and their allowlists, metadata, dependency versions
 and publication order. `package` creates Cargo archives and builds their extracted source
 in a fresh temporary workspace, using patches to the extracted sibling packages. It
-prints archive hashes and removes temporary artifacts afterwards. Dependency caches may
+prints archive hashes and removes temporary build artifacts afterwards. Pass `--output FRESH_DIR`
+to retain the verified crate archives and checksums. Dependency caches may
 be reused, but extracted builds have their own fresh target directory. Package checks
 allow dirty source for review; actual publication requires a clean approved revision.
 

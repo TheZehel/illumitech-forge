@@ -1,0 +1,235 @@
+{
+  "assets": {
+    "bundle_bytes": 233038,
+    "deterministic_rebuild": true,
+    "node": "24.16.0",
+    "runtime_notices": "React, React DOM, Scheduler MIT included",
+    "schema_version": 1,
+    "sha256": {
+      "THIRD_PARTY_LICENSES.txt": "5c01bb0eeedd4911b58082dad6037112641621bc0694872d5fb2adeafbcd17c3",
+      "assets/index-B7LZBgUV.css": "ec5238b030a83b3ec06372342fdc698882200b63a050cc2bb84503f0a7e04979",
+      "assets/index-O40KkVLs.js": "ef726e849fe6bfb7ffd860dd24b37e7d307ee8ca8db572fafa4d85f0f7fdef6b",
+      "index.html": "e784e5ddde2a0ea540161d187e4fa11615daa3c21312345e3240b4d6963fa5e5",
+      "logo.webp": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555"
+    }
+  },
+  "branch": "feat/v1-program",
+  "checks": [
+    {
+      "command": "cargo fmt --check",
+      "status": "passed"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "status": "passed"
+    },
+    {
+      "command": "cargo test --workspace",
+      "status": "passed",
+      "tests": 199
+    },
+    {
+      "command": "cargo doc --workspace --no-deps",
+      "status": "passed"
+    },
+    {
+      "command": "cargo build -p illumitech-forge-cli",
+      "status": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "node": "24.16.0",
+      "status": "passed"
+    },
+    {
+      "command": "npm run test -- --workers=1",
+      "native_provider": "protocol fixture only; not provider acceptance",
+      "runtime": "Node 24.16.0 / installed Chrome",
+      "status": "passed",
+      "tests": 14
+    },
+    {
+      "command": "npm run build",
+      "deterministic_embedded_asset_files": 5,
+      "status": "passed"
+    },
+    {
+      "command": "cargo test -p illumitech-forge-cli --test m09",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "command": "python3 scripts/test_distribution.py",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "command": "python3 scripts/distribution.py list",
+      "status": "passed"
+    },
+    {
+      "command": "python3 scripts/distribution.py package",
+      "registry_resolution": "local patches only; not registry acceptance",
+      "standalone_extracted_build": true,
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "earlier_failures": [
+    {
+      "cause": "loopback bind denied by OS sandbox",
+      "resolution": "same tests passed with approved temporary loopback access; no product permission change",
+      "scope": "sandboxed full workspace tests"
+    },
+    {
+      "resolution": "unchanged test/policy passed in full serial rerun: 14/14 in 52.7 seconds; timing/contention is an inference, not a proven root cause",
+      "result": "13/14; M06 budget polling reached blocked after its five-second assertion window",
+      "scope": "first browser run during concurrent compilation"
+    }
+  ],
+  "limitations": [
+    "Local artifacts only; caller checksum is integrity input, publisher signing/provenance unknown.",
+    "Stable three-component versions and thin native host artifacts only.",
+    "No incompatible migration is introduced. Engine schema 1 and workbench schema 0 are the only supported snapshot schemas.",
+    "Downgrade opt-in requires operator choice of a matching restored state; updater does not choose or migrate state.",
+    "Parent directories and local metadata must be operator-controlled; no defense is claimed against an OS user with concurrent write access to them.",
+    "No publication, service activation, global install, hooks, model/account/prompt-policy changes or coordinator-state writes."
+  ],
+  "m09_files": [
+    "crates/forge-cli/Cargo.toml",
+    "crates/forge-cli/build.rs",
+    "crates/forge-cli/src/main.rs",
+    "crates/forge-cli/src/installation.rs",
+    "crates/forge-cli/src/snapshots.rs",
+    "crates/forge-cli/src/budget.rs",
+    "crates/forge-cli/src/workbench.rs",
+    "crates/forge-domain/src/state.rs",
+    "crates/forge-cli/tests/m09.rs",
+    "apps/forge-ui/tests/m09.spec.ts",
+    "docs/adr/0003-safe-updates-and-browser-packaging.md",
+    "docs/m09-operating-contracts.md",
+    "README.md",
+    "crates/forge-cli/README.md",
+    "docs/contracts.md",
+    "specs/033-safe-updates/spec.md",
+    "specs/033-safe-updates/plan.md",
+    "specs/033-safe-updates/tasks.md"
+  ],
+  "package": {
+    "archive_sha256": {
+      "illumitech-forge-adapters-0.3.0.crate": "925eaf392ff544de8eb19647fd325636d066aaeb3c4c99493c714b29bee4627d",
+      "illumitech-forge-catalog-0.3.0.crate": "97bbce218af798f8d0ca4ad3ae686668e692200b4a38801efb04b55d96ecd366",
+      "illumitech-forge-cli-0.3.0.crate": "8e474d3f4e65078a4af6ca30f97fb9849ad48d49084e980269db689dd17036ec",
+      "illumitech-forge-domain-0.3.0.crate": "29c4cbf025feb4f1fc521152342711ac8c57f5e2acabfc5b6577bd8ae496fff9"
+    },
+    "cargo_publish_dry_run": "not_requested",
+    "extracted_build": "passed",
+    "registry_ownership_auth": "pending",
+    "resolution": "temporary local patches, not live registry",
+    "upload": "not_performed"
+  },
+  "platforms": {
+    "linux": "implemented; native pilot not run",
+    "macos": "host-local native binary, filesystem, SQLite, CLI and real Chrome checks passed",
+    "native_provider": "No real inference/account acceptance performed in M09. Native protocol fixtures do not prove provider acceptance.",
+    "windows": "experimental; native pilot not run; no 0.2 runtime support"
+  },
+  "schema_version": 1,
+  "scope": "M09 implementation candidate; coordinator acceptance remains external",
+  "source_checkpoint": {
+    "includes": "current code, package configuration, locked frontend source/tests, embedded assets and M09 contracts; excludes this report to avoid circular hashes",
+    "sha256": {
+      "Cargo.lock": "d691d5e486cb727ac6788f556ed09b0ea3cb87a93e33833bc93f2408b8ee2431",
+      "Cargo.toml": "7b6a438cea33b208b68fa246953bee4120a45057356582695b415b19fca27504",
+      "README.md": "f1da7376f73a67c69252c83e0ccc3d0c7e6cc85ed395edb53afca537129620bb",
+      "apps/forge-ui/embed.mjs": "8a7774f43dab6c2ddae43bdf8f7ea7c601c74e11638394afba4405a90bdad09d",
+      "apps/forge-ui/package-lock.json": "25276ade149cb78360062e27537be8e3e41bc5d12428561424a58294b0529b91",
+      "apps/forge-ui/package.json": "d97a1f733160d5d13d93255fd471666dcf3ad9908b17d7171dbb05ea38a05832",
+      "apps/forge-ui/playwright.config.ts": "562c6c84a0c384a37a447cf260d5bcd108ec48884e1ba1e00be313ceff27a189",
+      "apps/forge-ui/src/api.ts": "900b560892dd57cd6ae98b9d13f1a671c968d852f4102847d8e0311470f5dd36",
+      "apps/forge-ui/src/conversation.ts": "0e50443dd090f4ba9eea2ce61b31c204a4d40868366067927c03ca0be1b6e60e",
+      "apps/forge-ui/src/main.tsx": "2d864c1aaba135b5bb407f70274e98f4223469e9920eb0a12c524d7fc05b3d59",
+      "apps/forge-ui/src/manifest-view.tsx": "8e1b88562c0c71d28da176c7318ac35d8a902f8023fc800bf14aca0466207088",
+      "apps/forge-ui/src/style.css": "f59b15c10cd8d2ea07de637b47d9eb032dfe2ee388fb21983c8b85ab28dbba5a",
+      "apps/forge-ui/tests/m06.spec.ts": "a6481e61c91226c30c2f04e5af04f3e1b302256e36b4f01348327c938faffaf5",
+      "apps/forge-ui/tests/m07.spec.ts": "af4633f65396e5a430a706fb44f983df632ef07d0159097f9e02e18f9de56918",
+      "apps/forge-ui/tests/m08.spec.ts": "b8fc180331a82fe731f6e7c5d1cbd8ec130632fa01b4217c07e0aec935f885e0",
+      "apps/forge-ui/tests/m09.spec.ts": "c7cd2f464672291200ab2db004b711f27233694898882cc99f3ae6ee7aa17ad8",
+      "apps/forge-ui/tests/workbench.spec.ts": "298b09a8518fd379c9e87d79a6e5a66d7fbbc08be490c93ee09a78d7725d2cea",
+      "apps/forge-ui/tsconfig.json": "9e6366a40114a05664238ad28434c4a88286cc1a8ca298bdf92e81c6b49bacdc",
+      "crates/forge-adapters/Cargo.toml": "c755fb83dc6415f9e5754c53a492ca95f1e5751b8054f65f68c44c71896f8554",
+      "crates/forge-adapters/src/clients.rs": "6c5714e2ca9e2316078ccdac5072f010256297845bdeae3a754afce64944e00c",
+      "crates/forge-adapters/src/lib.rs": "f3780167526b4e51eb9f3a3f7c97b888ce135a2c88712a5c6b457f6a5d40c2e6",
+      "crates/forge-adapters/src/memory.rs": "8cf64a26b74cfd156e8edeca0c5c66f6fb27ed554a4bb01437f00f33102d523c",
+      "crates/forge-adapters/src/observability.rs": "e6d5dab796ca484070e0f7a09cd8488b939272152ce4545eb889344636211867",
+      "crates/forge-adapters/src/process.rs": "9239aff101bb46f70c7310fd02bc6c5d7536ff4aced8ded12cb07dc09bef4c94",
+      "crates/forge-adapters/src/process/windows.rs": "86fe34ae7807144c6a796ca3e3d04d2c49b4b6d928b8a98be7e4f1ecdfd8df44",
+      "crates/forge-adapters/src/reliability.rs": "4b8be508163b8a1f51c998cb86f341783ac4b35444e4faa60a687e39c90e0300",
+      "crates/forge-adapters/src/usage.rs": "6032f82d27f68209529659b01380eae842ffec0e02db56fffd876956c7e9c3cb",
+      "crates/forge-adapters/tests/windows.rs": "5d438afc17b46a391af5fcacd01bb46b86790ab91aa915fa9e69e188cc3c6605",
+      "crates/forge-catalog/Cargo.toml": "46436e876d001ef4020d70fbf64f2e25a2589796992d6346c1e67d8d952d36c5",
+      "crates/forge-catalog/src/lib.rs": "d4b0ea61f4bd83871a33a46127e72b0025513b16f0a9753a94fb9c9b6b2189e5",
+      "crates/forge-cli/Cargo.toml": "28e71ff21cfb3108caeba3824476f320ceea2c660820b9dc630ffed62f47e7b7",
+      "crates/forge-cli/README.md": "b90b0cc090064614e19678cbcc261939c150387133fdd4408dad3ebc1a8b6d67",
+      "crates/forge-cli/build.rs": "c05cd50527a590ae40124d18e4495e440573ee7c02d174cdd216aa7e85826ca3",
+      "crates/forge-cli/src/budget.rs": "699b77524143007ce23a5f703150cdb1c09709a98a00193b3434da49772776f8",
+      "crates/forge-cli/src/context.rs": "a81184dc05483a59d84bee22891d5de34a3234e29fcd5079a2766db783407b99",
+      "crates/forge-cli/src/daemon.rs": "9a47e854651145b62a7666822f6b7ca12f7b03cf3fc82ce8e0865e39b7c088ac",
+      "crates/forge-cli/src/dashboard.rs": "f3ed1d1be2f8d02423e9ea6614004c51141275baa61957e1618f47f537539945",
+      "crates/forge-cli/src/duration.rs": "0fc1be84fdbf8c625a97b4b4ba6cc3e2eec67b54b754c3e133866f690d3e6aa7",
+      "crates/forge-cli/src/engine.rs": "90ad4052316e75ad69076838394907d2c4f997bb7cfe959624fabf62f63f8177",
+      "crates/forge-cli/src/guided.rs": "a5671808f567c90a4fee8b2b75d51ee8959c532fb709d899af9cb505dd8f07a5",
+      "crates/forge-cli/src/importing.rs": "c0669ef0f71e5fb3468478fdc2151361511a973006fc458ca92369f7b2affe98",
+      "crates/forge-cli/src/installation.rs": "b2aaa9ea9c452a2e868ad9f4f7451bc1ba922bb41b17029fd5e2d698d43d71eb",
+      "crates/forge-cli/src/issue.rs": "64e646e1fc95111566489c05e987a8e8f4bf1a0a7b8e9ba49cce1e723d3e2f44",
+      "crates/forge-cli/src/main.rs": "fa1126314ddc1f3131d38d247bb0ce0578335e094d9c8a8506947e5fc60e53e7",
+      "crates/forge-cli/src/native.rs": "03b571e68aad2d609f40dab65956818f90ba864b818c4557bdae34a58e53a6c5",
+      "crates/forge-cli/src/observability.rs": "86825db5fc7bc6c2f8ead97d38c74492e9d4786ea4c89b0ba0cfc43cf898c5e4",
+      "crates/forge-cli/src/operational.rs": "8aefb524cb6d90345cd48542180109eae6282545170ffec22c1e956894693717",
+      "crates/forge-cli/src/parallel.rs": "0a1595ffc834f0dadef1b0d197d0e6a078f62fc89905f3c4fc7136c3a9caf173",
+      "crates/forge-cli/src/planning.rs": "51e6d891f53496ba500981bb319b90aef908385fb0a63496a69cd4e4d748d8e5",
+      "crates/forge-cli/src/project.rs": "6350ba7e62d058f7833a670324bcbc8396105978782c9cc7eb6747d40f2624ed",
+      "crates/forge-cli/src/publication.rs": "8721036345d98959fb668ba4a80b6989ec2bcf82b361f0d65600ea9cb00e605d",
+      "crates/forge-cli/src/review.rs": "1ef4f968fb4bf94042f9c9fc3e2b8833b4e1c621659947e03a7280fab190a54a",
+      "crates/forge-cli/src/service.rs": "9b9de4db871491982bf4569f282bc6bebda4c5dc657f348c3a97a43c86afcf4b",
+      "crates/forge-cli/src/snapshots.rs": "8c0e1899d959e74625a1af6cac1c42b100ddf111d16662ed116aa2ff8e5be1fd",
+      "crates/forge-cli/src/templates.rs": "e0d46fcaf4598887078a25ffe2ad4c15ee9f5e69525d570a4ce33d68f603a71e",
+      "crates/forge-cli/src/validation_cache.rs": "c75e4ea3ee315d60f448e886ab871a3c640c8ee9993b8850d91a9a0bd9f5b1f1",
+      "crates/forge-cli/src/workbench.rs": "361dfb9a541617c3c645ef05f6a18f7ec2744a09ea112ec1582286f6c6f147a6",
+      "crates/forge-cli/src/workbench_http.rs": "5d5d7b027e3727ce5eb2b1d9fb757a4e204e35ec02f56ba4c272412f8309b170",
+      "crates/forge-cli/tests/common/mod.rs": "29e065cdc81e32b50063b4028b43df1d33b11eb8e430af824e9438eb33781e15",
+      "crates/forge-cli/tests/economy.rs": "3dca3283f5c5274c5921a74700cb982b470a5cb05f61dbf0ee602da02cb77515",
+      "crates/forge-cli/tests/lifecycle.rs": "1199a06da98db9a9fbbd4aef0fecd99e4ecab958edd83039edd9b6314bdad83d",
+      "crates/forge-cli/tests/m06.rs": "a38c0a2d55ff7b6df87fa5acfa47b2f9cff8551f28448e5e3e4c7e3c898806e4",
+      "crates/forge-cli/tests/m07.rs": "08400c366da08180549bd3ee446f0bd5dd68034c101be68b3c309fc788ac2f3c",
+      "crates/forge-cli/tests/m08.rs": "e9ebd8f2037595505f45bd6038553ebca7b951571e2e05e823f3cc6967773fd8",
+      "crates/forge-cli/tests/m09.rs": "32b1a2cad48cd121f1280ebe5331436d85f2a9a7ee0f616eada7ecb72abd4fd8",
+      "crates/forge-cli/tests/parity.rs": "de20962519d13bff71fe30b4acb3a6b8f22b6a947174a5eb1d69139ed69fd79d",
+      "crates/forge-cli/ui-dist/THIRD_PARTY_LICENSES.txt": "5c01bb0eeedd4911b58082dad6037112641621bc0694872d5fb2adeafbcd17c3",
+      "crates/forge-cli/ui-dist/assets/index-B7LZBgUV.css": "ec5238b030a83b3ec06372342fdc698882200b63a050cc2bb84503f0a7e04979",
+      "crates/forge-cli/ui-dist/assets/index-O40KkVLs.js": "ef726e849fe6bfb7ffd860dd24b37e7d307ee8ca8db572fafa4d85f0f7fdef6b",
+      "crates/forge-cli/ui-dist/index.html": "e784e5ddde2a0ea540161d187e4fa11615daa3c21312345e3240b4d6963fa5e5",
+      "crates/forge-cli/ui-dist/logo.webp": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555",
+      "crates/forge-domain/Cargo.toml": "40761d6d2491be6d1b0739242a41306eb959b08df730f8c009896bead8115888",
+      "crates/forge-domain/src/duration.rs": "584f3c2e742706067d72a5afce18ad442d347b454431dc0cbdbc8ca8e745f696",
+      "crates/forge-domain/src/lib.rs": "3520687cf7c20fe3957bcabe5304fa03bd50caa6509cee2850b6e78f125fb1ce",
+      "crates/forge-domain/src/manifest.rs": "c10e4760dbd4058df16c16ee49fc663dcb97c62c654295433fe8ff54ce6a8c80",
+      "crates/forge-domain/src/revision.rs": "38869fdc497d42248f7798bbb7e3e1317494fa3356ce2e3fae8a536431ffd5a0",
+      "crates/forge-domain/src/state.rs": "782bcf9a1f117321ffc3c620cf362c66bc057b2ca310f9ed637a69d1880edf55",
+      "crates/forge-domain/src/usage.rs": "2d859b2bea5f75773ff68e1c101c8385e2e75defb0e842a53366c56bb6587d95",
+      "crates/forge-domain/src/usage_store.rs": "8e2bae7f5335c3a5a4362ad6d5f8b36af5e2a0670d981d1746809f80af317a3f",
+      "docs/adr/0003-safe-updates-and-browser-packaging.md": "360a1cdf4eeafe6ed288bf54276801331e8ea4bceb5c9337d158b9b4c07d91fe",
+      "docs/contracts.md": "8cda1bd0b022f4a7d0158a9c88e8f87e001502b6baa435243a5cfe56652c7a3b",
+      "docs/m09-operating-contracts.md": "f1320fed6e8a8e07b9897355098535dab3d789271a2e1650d12aea52dfbe6bd6",
+      "rust-toolchain.toml": "f2e51a6af181e326180b4ce05bcb0db5f14397edddbb4325d57be1540bc4f24f",
+      "scripts/distribution.py": "2a22e15ba4c0c7a9db7d00385d1cd203d8c58785bcaa2bbe432e00a5cd752165",
+      "scripts/test_distribution.py": "145deb5346bece1d2dfd275bf43216ddf01406de159ca11e49ee3ee2f6c2df71",
+      "specs/033-safe-updates/plan.md": "bcd237cf8b0ac8a7db864c16671671938680e683910ad8753cc2acffaa5f4954",
+      "specs/033-safe-updates/spec.md": "4e66beb17a79f0b9118525628b397896fb7a6d417301a1d556fcf2cac4afacd0",
+      "specs/033-safe-updates/tasks.md": "143720ff6de9a60e0d41324d3edc32285eedcdfd30bfd4066a7f009770ed38ff"
+    }
+  }
+}

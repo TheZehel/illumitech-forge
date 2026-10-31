@@ -29,6 +29,8 @@ fn candidate(
         },
         timeout_seconds: 1800,
         max_attempts: 3,
+        context: None,
+        budget: Budget::default(),
     }
 }
 
@@ -183,7 +185,7 @@ pub fn import_loop(input: &Path, output: Option<&Path>) -> Result<Value> {
             tasks.extend(spec_tasks(&repo.path, id, slug)?);
         }
     }
-    finish(Manifest {schema_version:1,release_id:legacy["release_id"].as_str().context("Loop release_id missing")?.into(),repos,tasks,gates:vec![],memory:Memory::default(),automation:Automation::default()},digest(&bytes),
+    finish(Manifest {schema_version:1,release_id:legacy["release_id"].as_str().context("Loop release_id missing")?.into(),repos,tasks,gates:vec![],memory:Memory::default(),automation:Automation::default(),context:ContextPolicy::default(),budget:Budget::default(),execution:Default::default(),review:Default::default(),source:None},digest(&bytes),
         vec!["Legacy gates require manual conversion into pinned external evaluators. Automation is disabled. Pending Spec Kit tasks were expanded; old states and checked tasks were not imported. Content-derived legacy IDs change when their text changes; assign permanent IDs before editing.".into()],output)
 }
 
@@ -202,5 +204,5 @@ pub fn import_spec(
             root.join("specs").join(slug).join("tasks.md"),
         )?);
     }
-    finish(Manifest {schema_version:1,release_id:release.into(),repos:BTreeMap::from([("app".into(),Repo{path:root,specs:specs.to_vec()})]),tasks,gates:vec![],memory:Memory::default(),automation:Automation::default()},digest(&source),vec!["Review candidate permissions and replace/add executable gates before running. Checked tasks are not execution evidence.".into()],output)
+    finish(Manifest {schema_version:1,release_id:release.into(),repos:BTreeMap::from([("app".into(),Repo{path:root,specs:specs.to_vec()})]),tasks,gates:vec![],memory:Memory::default(),automation:Automation::default(),context:ContextPolicy::default(),budget:Budget::default(),execution:Default::default(),review:Default::default(),source:None},digest(&source),vec!["Review candidate permissions and replace/add executable gates before running. Checked tasks are not execution evidence.".into()],output)
 }

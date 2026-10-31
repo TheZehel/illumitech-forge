@@ -284,6 +284,9 @@ fn crash_never_silently_restarts_orphan() {
         .unwrap();
     child.kill().unwrap();
     child.wait().unwrap();
+    let (_, orphan) = f.call(&["report"]);
+    assert_eq!(orphan["duration_estimate"]["status"], "unavailable");
+    assert!(orphan["duration_estimate"]["observed_active_seconds"].is_null());
     let (ok, v) = f.call(&["resume"]);
     assert!(!ok, "{v}");
     assert!(v["error"].as_str().unwrap().contains("orphan"));
@@ -371,4 +374,408 @@ fn optional_observability_preserves_execution_failure_and_dry_run() {
         // Production binaries never allow HTTP, even on loopback.
         assert!(listener.accept().is_err());
     }
+}
+
+// FORGE-020 regressions exercise the actual CLI and external, temporary stores.
+#[test]
+fn duration_inspect_dry_run_and_missing_status_are_read_only() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    let (_, inspect) = f.call(&["release", "inspect"]);
+    let (_, dry) = f.call(&["release", "run", "--dry-run"]);
+    assert_eq!(
+        inspect["duration_estimate"]["remaining_seconds"],
+        dry["duration_estimate"]["remaining_seconds"]
+    );
+    for args in [vec!["status"], vec!["report"]] {
+        let (ok, v) = f.call(&args);
+        assert!(ok, "{v}");
+        assert_eq!(v["status"], "not_run");
+        assert_eq!(v["duration_estimate"]["counts"]["gate_invocations"], 2);
+        assert_eq!(v["duration_estimate"]["confidence"], "low");
+    }
+    assert!(!f.state.exists());
+    assert!(!f.repo.join("output.txt").exists());
+    let output = Command::new(env!("CARGO_BIN_EXE_illumitech-forge"))
+        .args([
+            "--state-dir",
+            f.state.to_str().unwrap(),
+            "release",
+            "inspect",
+            f.manifest.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    let human = String::from_utf8(output.stdout).unwrap();
+    assert!(human.contains("Estimated active work remaining:"));
+    assert!(human.contains("confidence: low"));
+    assert!(!f.state.exists());
+}
+#[test]
+fn duration_initial_forecast_and_all_final_gates_are_persisted() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    let (ok, v) = f.call(&["release", "run"]);
+    assert!(ok, "{v}");
+    let initial = v["run"]["duration"]["initial_estimate"].clone();
+    assert_eq!(initial["phase"], "planning");
+    assert_eq!(initial["manifest_hash"], v["run"]["manifest_hash"]);
+    let store = forge_domain::Store::open(&f.state.join("state.sqlite"), true).unwrap();
+    let (history, error) = store.duration_history();
+    assert!(error.is_none());
+    assert_eq!(history.len(), 4);
+    assert_eq!(history.iter().filter(|m| m.phase == "gate").count(), 2);
+    assert_eq!(history.iter().filter(|m| m.final_evaluation).count(), 1);
+    assert!(
+        history
+            .iter()
+            .all(|m| m.elapsed_ms.is_some() && m.outcome == "passed")
+    );
+    let bytes_before = std::fs::read(f.state.join("state.sqlite")).unwrap();
+    let (_, report) = f.call(&["report"]);
+    assert_eq!(report["duration_comparison"]["initial_estimate"], initial);
+    assert_eq!(report["duration_comparison"]["status"], "complete");
+    assert!(report["duration_comparison"]["coverage"].is_boolean());
+    assert!(report["duration_comparison"]["error_seconds"].is_number());
+    assert!(report["duration_comparison"]["accuracy_target"].is_null());
+    assert_eq!(
+        report["duration_estimate"]["remaining_seconds"],
+        json!({"lower":0.0,"upper":0.0})
+    );
+    assert!(report["duration_revisions"].as_array().unwrap().len() > 3);
+    assert_eq!(
+        bytes_before,
+        std::fs::read(f.state.join("state.sqlite")).unwrap()
+    );
+}
+#[test]
+fn duration_historical_samples_are_local_and_not_invented() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    for id in ["one", "two", "three"] {
+        let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+        m["release_id"] = json!(id);
+        std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+        let (ok, v) = f.call(&["release", "run"]);
+        assert!(ok, "{v}");
+    }
+    let (_, v) = f.call(&["release", "inspect"]);
+    assert_eq!(v["duration_estimate"]["history"]["successful"], 9);
+    assert_eq!(v["duration_estimate"]["status"], "estimated");
+    assert_eq!(
+        v["duration_estimate"]["basis"],
+        "local_history_and_heuristics"
+    );
+    let conn = rusqlite::Connection::open(f.state.join("state.sqlite")).unwrap();
+    conn.execute("UPDATE duration_measurements SET body='invalid' WHERE rowid=(SELECT max(rowid) FROM duration_measurements)", []).unwrap();
+    let (_, v) = f.call(&["release", "inspect"]);
+    assert_eq!(v["duration_estimate"]["history"]["available"], false);
+    assert_eq!(v["duration_estimate"]["history"]["successful"], 0);
+    assert_eq!(v["duration_estimate"]["basis"], "heuristic");
+    assert!(
+        v["duration_estimate"]["history"]["reason"]
+            .as_str()
+            .unwrap()
+            .contains("corrupt")
+    );
+}
+#[test]
+fn duration_failures_and_retries_preserve_individual_measurements() {
+    let f = Fixture::new("exit 1", false);
+    let (ok, v) = f.call(&["release", "run"]);
+    assert!(!ok);
+    assert_eq!(
+        v["duration_estimate"]["waiting_for"],
+        "operator_intervention"
+    );
+    let store = forge_domain::Store::open(&f.state.join("state.sqlite"), true).unwrap();
+    let (history, reason) = store.duration_history();
+    assert!(reason.is_none());
+    assert_eq!(history.len(), 4);
+    let history: Vec<_> = history.iter().filter(|m| m.phase == "execution").collect();
+    assert_eq!(
+        history.iter().map(|m| m.attempt).collect::<Vec<_>>(),
+        vec![3, 2, 1]
+    );
+    assert!(
+        history
+            .iter()
+            .all(|m| m.outcome == "failed" && m.elapsed_ms.is_some())
+    );
+    let (_, report) = f.call(&["report"]);
+    assert_eq!(report["duration_estimate"]["history"]["failed"], 3);
+    assert_eq!(report["duration_comparison"]["status"], "partial");
+    assert!(report["duration_comparison"]["coverage"].is_null());
+}
+#[test]
+fn duration_human_wait_keeps_initial_and_active_time_until_resume() {
+    let f = Fixture::new("printf verified > output.txt", true);
+    let (_, v) = f.call(&["release", "run"]);
+    assert_eq!(v["run"]["status"], "awaiting_approval");
+    let initial = v["run"]["duration"]["initial_estimate"].clone();
+    let (_, a) = f.call(&["status"]);
+    let (_, b) = f.call(&["report"]);
+    assert_eq!(
+        a["duration_estimate"]["observed_active_seconds"],
+        b["duration_estimate"]["observed_active_seconds"]
+    );
+    assert_eq!(
+        a["duration_estimate"]["remaining_seconds"],
+        b["duration_estimate"]["remaining_seconds"]
+    );
+    assert_eq!(b["duration_estimate"]["waiting_for"], "human_approval");
+    assert_eq!(b["duration_estimate"]["conditional"], true);
+    assert!(b["duration_estimate"]["wall_clock_eta"].is_null());
+    let fingerprint = v["run"]["tasks"]["build"]["revision"]["fingerprint"]
+        .as_str()
+        .unwrap();
+    assert!(
+        f.call(&[
+            "release",
+            "approve",
+            "--task",
+            "build",
+            "--gate",
+            "review",
+            "--reviewer",
+            "Fixture",
+            "--fingerprint",
+            fingerprint
+        ])
+        .0
+    );
+    let (ok, resumed) = f.call(&["resume"]);
+    assert!(ok, "{resumed}");
+    assert_eq!(resumed["run"]["duration"]["initial_estimate"], initial);
+    assert_eq!(resumed["run"]["tasks"]["build"]["attempts"], 1);
+    assert!(
+        resumed["duration_estimate"]["observed_active_seconds"]
+            .as_f64()
+            .unwrap()
+            >= b["duration_estimate"]["observed_active_seconds"]
+                .as_f64()
+                .unwrap()
+    );
+}
+#[test]
+fn duration_live_cancel_and_pause_resume_keep_observations() {
+    let f = Fixture::new("sleep 1; printf verified > output.txt", false);
+    let mut child = f.start();
+    f.wait_running();
+    let (_, live) = f.call(&["status"]);
+    assert_eq!(live["duration_estimate"]["phase"], "execution");
+    assert!(live["duration_estimate"]["in_progress_elapsed_seconds"].is_number());
+    assert!(f.call(&["pause"]).0);
+    child.wait().unwrap();
+    let (_, paused) = f.call(&["report"]);
+    assert_eq!(paused["duration_estimate"]["waiting_for"], "paused");
+    let initial = paused["run"]["duration"]["initial_estimate"].clone();
+    assert!(f.call(&["resume"]).0);
+    let (_, done) = f.call(&["report"]);
+    assert_eq!(done["run"]["duration"]["initial_estimate"], initial);
+    assert_eq!(done["run"]["tasks"]["build"]["attempts"], 1);
+
+    let f = Fixture::new("sleep 10; printf verified > output.txt", false);
+    let mut child = f.start();
+    f.wait_running();
+    assert!(f.call(&["cancel"]).0);
+    assert!(!child.wait().unwrap().success());
+    let (_, v) = f.call(&["report"]);
+    assert_eq!(v["run"]["status"], "cancelled");
+    assert_eq!(v["duration_estimate"]["history"]["cancelled"], 1);
+    assert!(v["duration_estimate"]["observed_active_seconds"].is_number());
+    assert!(v["duration_estimate"]["wall_clock_eta"].is_null());
+}
+#[test]
+fn duration_timeout_and_reconciliation_archive_previous_generation() {
+    let f = Fixture::new("sleep 10; printf verified > output.txt", false);
+    let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    m["tasks"][0]["timeout_seconds"] = json!(1);
+    m["tasks"][0]["max_attempts"] = json!(1);
+    std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+    assert!(!f.call(&["release", "run"]).0);
+    let (_, failed) = f.call(&["report"]);
+    assert_eq!(failed["duration_estimate"]["history"]["timed_out"], 1);
+    let initial = failed["run"]["duration"]["initial_estimate"].clone();
+    m["tasks"][0]["executor"]["argv"] = json!(common::command("printf verified > output.txt"));
+    std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+    let (_, changed) = f.call(&["status"]);
+    assert!(changed["duration_estimate"]["remaining_seconds"].is_null());
+    assert!(!f.call(&["resume"]).0);
+    let (ok, v) = f.call(&["resume", "--reconcile", "reviewed new contract"]);
+    assert!(ok, "{v}");
+    assert_eq!(v["run"]["duration"]["generation"], 1);
+    let (_, report) = f.call(&["report"]);
+    let archived = report["events"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|e| e["kind"] == "reconciled")
+        .unwrap();
+    assert_eq!(
+        archived["body"]["previous_run"]["duration"]["initial_estimate"],
+        initial
+    );
+    let store = forge_domain::Store::open(&f.state.join("state.sqlite"), true).unwrap();
+    assert_eq!(store.duration_history().0.len(), 6);
+}
+#[test]
+fn duration_legacy_and_corrupt_state_remain_read_only() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    assert!(f.call(&["release", "run"]).0);
+    let path = f.state.join("state.sqlite");
+    {
+        let conn = rusqlite::Connection::open(&path).unwrap();
+        conn.execute("UPDATE runs SET body=json_remove(body,'$.duration')", [])
+            .unwrap();
+        conn.execute_batch("DROP TABLE duration_forecasts; DROP TABLE duration_measurements;")
+            .unwrap();
+    }
+    let before = std::fs::read(&path).unwrap();
+    let (_, v) = f.call(&["report"]);
+    assert_eq!(v["duration_estimate"]["status"], "unavailable");
+    assert!(v["duration_estimate"]["observed_active_seconds"].is_null());
+    assert!(v["duration_estimate"]["remaining_seconds"].is_null());
+    assert_eq!(v["duration_comparison"]["status"], "unavailable");
+    assert_eq!(before, std::fs::read(&path).unwrap());
+    let conn = rusqlite::Connection::open(&path).unwrap();
+    let count: i64 = conn
+        .query_row(
+            "SELECT count(*) FROM sqlite_master WHERE name LIKE 'duration_%'",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(count, 0);
+    drop(conn);
+    std::fs::write(&path, b"corrupt database").unwrap();
+    let (_, v) = f.call(&["release", "inspect"]);
+    assert_eq!(v["duration_estimate"]["history"]["available"], false);
+    assert_eq!(std::fs::read(&path).unwrap(), b"corrupt database");
+}
+#[test]
+fn duration_measurement_failure_rolls_back_state_and_event_together() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    assert!(f.call(&["release", "run"]).0);
+    let path = f.state.join("state.sqlite");
+    let conn = rusqlite::Connection::open(&path).unwrap();
+    conn.execute_batch("CREATE TRIGGER reject_forecast BEFORE INSERT ON duration_forecasts BEGIN SELECT RAISE(ABORT,'fixture rejection'); END;").unwrap();
+    let mut store = forge_domain::Store::open(&path, false).unwrap();
+    let mut run = store.load("fixture").unwrap().unwrap();
+    run.status = "must_not_commit".into();
+    assert!(store.save(&run, "must_not_commit", &json!({})).is_err());
+    assert_eq!(store.load("fixture").unwrap().unwrap().status, "passed");
+    let count: i64 = conn
+        .query_row(
+            "SELECT count(*) FROM events WHERE kind='must_not_commit'",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(count, 0);
+}
+
+#[test]
+fn duration_gate_failures_and_shared_final_gates_retain_each_invocation() {
+    let f = Fixture::new("echo 'All done; all gates passed'", false);
+    assert!(!f.call(&["release", "run"]).0);
+    let store = forge_domain::Store::open(&f.state.join("state.sqlite"), true).unwrap();
+    let (history, reason) = store.duration_history();
+    assert!(reason.is_none());
+    assert_eq!(history.iter().filter(|m| m.phase == "execution").count(), 3);
+    assert_eq!(
+        history
+            .iter()
+            .filter(|m| m.phase == "gate" && m.outcome == "failed")
+            .count(),
+        3
+    );
+    let (_, failed) = f.call(&["status"]);
+    assert!(failed["duration_estimate"]["remaining_seconds"].is_null());
+    assert!(
+        failed["duration_estimate"]["unavailable_reason"]
+            .as_str()
+            .unwrap()
+            .contains("exhausted")
+    );
+
+    let f = Fixture::new("printf verified > output.txt", false);
+    let mut m: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    let mut dependent = m["tasks"][0].clone();
+    dependent["id"] = json!("dependent");
+    dependent["dependencies"] = json!(["build"]);
+    m["tasks"].as_array_mut().unwrap().push(dependent);
+    std::fs::write(&f.manifest, serde_json::to_vec(&m).unwrap()).unwrap();
+    let (ok, v) = f.call(&["release", "run"]);
+    assert!(ok, "{v}");
+    assert_eq!(v["duration_estimate"]["counts"]["gates"], 1);
+    assert_eq!(v["duration_estimate"]["counts"]["gate_invocations"], 4);
+    let store = forge_domain::Store::open(&f.state.join("state.sqlite"), true).unwrap();
+    let history = store.duration_history().0;
+    assert_eq!(history.iter().filter(|m| m.phase == "gate").count(), 4);
+    assert_eq!(
+        history
+            .iter()
+            .filter(|m| m.phase == "gate" && m.final_evaluation)
+            .count(),
+        2
+    );
+}
+#[test]
+fn duration_legacy_resume_does_not_fabricate_initial_or_total() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    assert!(f.call(&["release", "run"]).0);
+    let conn = rusqlite::Connection::open(f.state.join("state.sqlite")).unwrap();
+    conn.execute("UPDATE runs SET body=json_remove(body,'$.duration')", [])
+        .unwrap();
+    conn.execute_batch("DROP TABLE duration_forecasts; DROP TABLE duration_measurements;")
+        .unwrap();
+    drop(conn);
+    let (ok, v) = f.call(&["resume"]);
+    assert!(ok, "{v}");
+    assert!(v["run"]["duration"]["initial_estimate"].is_null());
+    assert!(v["duration_estimate"]["observed_active_seconds"].is_null());
+    let (_, report) = f.call(&["report"]);
+    assert_eq!(report["duration_comparison"]["status"], "unavailable");
+}
+#[test]
+fn duration_history_and_revision_queries_are_bounded() {
+    let f = Fixture::new("printf verified > output.txt", false);
+    assert!(f.call(&["release", "run"]).0);
+    let path = f.state.join("state.sqlite");
+    let store = forge_domain::Store::open(&path, true).unwrap();
+    let m = store
+        .duration_history()
+        .0
+        .into_iter()
+        .find(|m| m.phase == "execution")
+        .unwrap();
+    let body = serde_json::to_string(&m).unwrap();
+    let forecast = serde_json::to_string(
+        &store
+            .load("fixture")
+            .unwrap()
+            .unwrap()
+            .duration
+            .unwrap()
+            .current_estimate,
+    )
+    .unwrap();
+    let mut conn = rusqlite::Connection::open(&path).unwrap();
+    let tx = conn.transaction().unwrap();
+    for sequence in 0..205_i64 {
+        tx.execute(
+            "INSERT INTO duration_measurements VALUES('history',0,?1,?2,?3)",
+            rusqlite::params![sequence, m.context, body],
+        )
+        .unwrap();
+        tx.execute("INSERT INTO duration_forecasts(release_id,generation,reason,body) VALUES('fixture',0,'fixture',?1)", [&forecast]).unwrap();
+    }
+    tx.commit().unwrap();
+    assert_eq!(store.duration_history().0.len(), 200);
+    assert_eq!(store.duration_forecasts("fixture").unwrap().len(), 100);
+    // A shared store with no run for the selected release is still a read-only plan query.
+    let mut manifest: Value = serde_json::from_slice(&std::fs::read(&f.manifest).unwrap()).unwrap();
+    manifest["release_id"] = json!("not_started");
+    std::fs::write(&f.manifest, serde_json::to_vec(&manifest).unwrap()).unwrap();
+    let (_, v) = f.call(&["status"]);
+    assert_eq!(v["status"], "not_run");
+    assert!(store.load("not_started").unwrap().is_none());
 }

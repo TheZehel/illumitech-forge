@@ -43,6 +43,19 @@ class DistributionContract(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_files(['src/lib.rs'])
 
+    def test_standalone_ui_allowlist_stays_narrow(self):
+        files = ['Cargo.toml', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'dependencies.json',
+                 'build.rs', 'ui-dist/index.html', 'ui-dist/logo.webp', 'ui-dist/THIRD_PARTY_LICENSES.txt',
+                 'ui-dist/assets/index-abc123.js', 'ui-dist/assets/index-abc123.css']
+        validate_files(files, ui=True)
+        with self.assertRaises(ValueError):
+            validate_files(files)
+        for bad in ['ui-dist/.env', 'ui-dist/assets/private.js.map', 'ui-dist/install.sh', 'ui-dist/assets/../private.js']:
+            with self.assertRaises(ValueError):
+                validate_files(files + [bad], ui=True)
+        with self.assertRaises(ValueError):
+            validate_files([p for p in files if p != 'ui-dist/index.html'], ui=True)
+
     def test_redacted_audit_detection(self):
         self.assertIn('credential_token', scan(b'ghp_' + b'x' * 36))
         self.assertIn('personal_path', scan(b'/Users/' + b'fixture/private/'))

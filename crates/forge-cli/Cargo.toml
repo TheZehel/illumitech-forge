@@ -8,8 +8,9 @@ repository.workspace = true
 authors.workspace = true
 description = "Evidence-backed agent execution CLI"
 readme = "README.md"
-include = ["src/**", "tests/**", "Cargo.toml", "README.md", "LICENSE", "THIRD_PARTY_NOTICES", "THIRD_PARTY_LICENSES/**", "dependencies.json"]
+include = ["src/**", "build.rs", "ui-dist/**", "tests/**", "Cargo.toml", "README.md", "LICENSE", "THIRD_PARTY_NOTICES", "THIRD_PARTY_LICENSES/**", "dependencies.json"]
 [dependencies]
+getrandom = "=0.4.3"
 anyhow.workspace = true
 clap.workspace = true
 serde.workspace = true
@@ -20,10 +21,12 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 sha2.workspace = true
 fs2.workspace = true
-rusqlite = { workspace = true, features = ["hooks"] }
-forge-domain = { package = "illumitech-forge-domain", version = "=0.3.0", path = "../forge-domain" }
-forge-adapters = { package = "illumitech-forge-adapters", version = "=0.3.0", path = "../forge-adapters" }
-forge-catalog = { package = "illumitech-forge-catalog", version = "=0.3.0", path = "../forge-catalog" }
+libc.workspace = true
+rusqlite = { workspace = true, features = ["hooks", "backup"] }
+tempfile.workspace = true
+forge-domain = { package = "illumitech-forge-domain", version = "=1.0.0", path = "../forge-domain" }
+forge-adapters = { package = "illumitech-forge-adapters", version = "=1.0.0", path = "../forge-adapters" }
+forge-catalog = { package = "illumitech-forge-catalog", version = "=1.0.0", path = "../forge-catalog" }
 
 [[bin]]
 name = "illumitech-forge"

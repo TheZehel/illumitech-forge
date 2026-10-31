@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "scope": "M07 local source validation; external coordinator acceptance remains pending",
+  "branch": "feat/v1-program",
+  "source_checkpoint": {
+    "sha256": {
+      "Cargo.lock": "d691d5e486cb727ac6788f556ed09b0ea3cb87a93e33833bc93f2408b8ee2431",
+      "Cargo.toml": "7b6a438cea33b208b68fa246953bee4120a45057356582695b415b19fca27504",
+      "apps/forge-ui/embed.mjs": "8a7774f43dab6c2ddae43bdf8f7ea7c601c74e11638394afba4405a90bdad09d",
+      "apps/forge-ui/package-lock.json": "25276ade149cb78360062e27537be8e3e41bc5d12428561424a58294b0529b91",
+      "apps/forge-ui/package.json": "d97a1f733160d5d13d93255fd471666dcf3ad9908b17d7171dbb05ea38a05832",
+      "apps/forge-ui/playwright.config.ts": "562c6c84a0c384a37a447cf260d5bcd108ec48884e1ba1e00be313ceff27a189",
+      "apps/forge-ui/src/api.ts": "900b560892dd57cd6ae98b9d13f1a671c968d852f4102847d8e0311470f5dd36",
+      "apps/forge-ui/src/conversation.ts": "0e50443dd090f4ba9eea2ce61b31c204a4d40868366067927c03ca0be1b6e60e",
+      "apps/forge-ui/src/main.tsx": "2d864c1aaba135b5bb407f70274e98f4223469e9920eb0a12c524d7fc05b3d59",
+      "apps/forge-ui/src/manifest-view.tsx": "482f230bb7c5f6fbcffe1f1973595a6061251b076920bd659b032113bd0bd02a",
+      "apps/forge-ui/src/style.css": "f59b15c10cd8d2ea07de637b47d9eb032dfe2ee388fb21983c8b85ab28dbba5a",
+      "apps/forge-ui/tests/m06.spec.ts": "a6481e61c91226c30c2f04e5af04f3e1b302256e36b4f01348327c938faffaf5",
+      "apps/forge-ui/tests/m07.spec.ts": "af4633f65396e5a430a706fb44f983df632ef07d0159097f9e02e18f9de56918",
+      "apps/forge-ui/tests/workbench.spec.ts": "298b09a8518fd379c9e87d79a6e5a66d7fbbc08be490c93ee09a78d7725d2cea",
+      "apps/forge-ui/tsconfig.json": "9e6366a40114a05664238ad28434c4a88286cc1a8ca298bdf92e81c6b49bacdc",
+      "crates/forge-adapters/Cargo.toml": "c755fb83dc6415f9e5754c53a492ca95f1e5751b8054f65f68c44c71896f8554",
+      "crates/forge-adapters/src/clients.rs": "6c5714e2ca9e2316078ccdac5072f010256297845bdeae3a754afce64944e00c",
+      "crates/forge-adapters/src/lib.rs": "f3780167526b4e51eb9f3a3f7c97b888ce135a2c88712a5c6b457f6a5d40c2e6",
+      "crates/forge-adapters/src/memory.rs": "8cf64a26b74cfd156e8edeca0c5c66f6fb27ed554a4bb01437f00f33102d523c",
+      "crates/forge-adapters/src/observability.rs": "e6d5dab796ca484070e0f7a09cd8488b939272152ce4545eb889344636211867",
+      "crates/forge-adapters/src/process/windows.rs": "86fe34ae7807144c6a796ca3e3d04d2c49b4b6d928b8a98be7e4f1ecdfd8df44",
+      "crates/forge-adapters/src/process.rs": "aba1e60bc55831ca98198da6257991e8f05103d41efd2e541998c52ec4efc941",
+      "crates/forge-adapters/src/reliability.rs": "4b8be508163b8a1f51c998cb86f341783ac4b35444e4faa60a687e39c90e0300",
+      "crates/forge-adapters/src/usage.rs": "6032f82d27f68209529659b01380eae842ffec0e02db56fffd876956c7e9c3cb",
+      "crates/forge-adapters/tests/windows.rs": "5d438afc17b46a391af5fcacd01bb46b86790ab91aa915fa9e69e188cc3c6605",
+      "crates/forge-catalog/Cargo.toml": "46436e876d001ef4020d70fbf64f2e25a2589796992d6346c1e67d8d952d36c5",
+      "crates/forge-catalog/src/lib.rs": "d4b0ea61f4bd83871a33a46127e72b0025513b16f0a9753a94fb9c9b6b2189e5",
+      "crates/forge-catalog/src/recipes.json": "af6e70fe7ad490f64de41e274669748c3734b8eec04931fadf26f5985374ff8e",
+      "crates/forge-cli/Cargo.toml": "55af0d2c2aed5e9873b2016b0109914b8826c51ec2873a1e9ad5e9b4f998bd68",
+      "crates/forge-cli/build.rs": "0860678bf139c3aaf1db3e79fbce8a90a85e71d4c97faaccd560b9ba309e8b68",
+      "crates/forge-cli/src/budget.rs": "aa6c5d57ea6c16d22f154637d4522664f230f716f963e9582249d18a2076e45c",
+      "crates/forge-cli/src/context.rs": "a81184dc05483a59d84bee22891d5de34a3234e29fcd5079a2766db783407b99",
+      "crates/forge-cli/src/daemon.rs": "9a47e854651145b62a7666822f6b7ca12f7b03cf3fc82ce8e0865e39b7c088ac",
+      "crates/forge-cli/src/dashboard.rs": "f3ed1d1be2f8d02423e9ea6614004c51141275baa61957e1618f47f537539945",
+      "crates/forge-cli/src/duration.rs": "0fc1be84fdbf8c625a97b4b4ba6cc3e2eec67b54b754c3e133866f690d3e6aa7",
+      "crates/forge-cli/src/engine.rs": "47f925a49b0a13818b90e2942e60b3c8583d6186c8b3eacfeb52b47af7ec3e24",
+      "crates/forge-cli/src/guided.rs": "a9bb2227d36d8a7cb82f3de8df00dffdc6265a879fdeb675e867218b3c348af1",
+      "crates/forge-cli/src/importing.rs": "461654c08a31bc0248358a376712e1cb2f7ae787164dd56010e83fde887a14a7",
+      "crates/forge-cli/src/main.rs": "dbf69c73156add53bbe8a41b126d7edc63d0bd187357c1bea8e61557280df6fb",
+      "crates/forge-cli/src/native.rs": "03b571e68aad2d609f40dab65956818f90ba864b818c4557bdae34a58e53a6c5",
+      "crates/forge-cli/src/observability.rs": "86825db5fc7bc6c2f8ead97d38c74492e9d4786ea4c89b0ba0cfc43cf898c5e4",
+      "crates/forge-cli/src/operational.rs": "da2de17951f99697af0472d0eda25f56fe7a83cdafcf4a4c458ef60168c27d03",
+      "crates/forge-cli/src/parallel.rs": "0a1595ffc834f0dadef1b0d197d0e6a078f62fc89905f3c4fc7136c3a9caf173",
+      "crates/forge-cli/src/planning-v1.schema.json": "886a1d042b9767b2fb8e494102ef3d3330d80b553fd6cd8005e09a5b627e777f",
+      "crates/forge-cli/src/planning.rs": "51e6d891f53496ba500981bb319b90aef908385fb0a63496a69cd4e4d748d8e5",
+      "crates/forge-cli/src/project.rs": "6350ba7e62d058f7833a670324bcbc8396105978782c9cc7eb6747d40f2624ed",
+      "crates/forge-cli/src/publication.rs": "d73e35f6bd8afd77656f4e55621bf569c148dcf81ee255c7ad58ef91a1ba0485",
+      "crates/forge-cli/src/review.rs": "1ef4f968fb4bf94042f9c9fc3e2b8833b4e1c621659947e03a7280fab190a54a",
+      "crates/forge-cli/src/service.rs": "9b9de4db871491982bf4569f282bc6bebda4c5dc657f348c3a97a43c86afcf4b",
+      "crates/forge-cli/src/templates.rs": "e0d46fcaf4598887078a25ffe2ad4c15ee9f5e69525d570a4ce33d68f603a71e",
+      "crates/forge-cli/src/validation_cache.rs": "c75e4ea3ee315d60f448e886ab871a3c640c8ee9993b8850d91a9a0bd9f5b1f1",
+      "crates/forge-cli/src/workbench.rs": "1972d00383b969377c9a5a3ffa8ca04222ffa12a5ffb28d12d18d3fdb0252437",
+      "crates/forge-cli/src/workbench_http.rs": "5d5d7b027e3727ce5eb2b1d9fb757a4e204e35ec02f56ba4c272412f8309b170",
+      "crates/forge-cli/tests/common/mod.rs": "29e065cdc81e32b50063b4028b43df1d33b11eb8e430af824e9438eb33781e15",
+      "crates/forge-cli/tests/economy.rs": "3dca3283f5c5274c5921a74700cb982b470a5cb05f61dbf0ee602da02cb77515",
+      "crates/forge-cli/tests/fixtures/review-native.py": "a1f09fd04a7d8c69ec6dbd045315e33b9b3666c29d5f04de39341b375413acd2",
+      "crates/forge-cli/tests/fixtures/workbench-native.py": "67fdb64a6cfc0c18482a6ab42f5fc7f03830af16ccae495be863f92e2d3e047a",
+      "crates/forge-cli/tests/lifecycle.rs": "1199a06da98db9a9fbbd4aef0fecd99e4ecab958edd83039edd9b6314bdad83d",
+      "crates/forge-cli/tests/m06.rs": "a38c0a2d55ff7b6df87fa5acfa47b2f9cff8551f28448e5e3e4c7e3c898806e4",
+      "crates/forge-cli/tests/m07.rs": "08400c366da08180549bd3ee446f0bd5dd68034c101be68b3c309fc788ac2f3c",
+      "crates/forge-cli/tests/parity.rs": "bd54776231c1c92a20334a0eaebce54eea565c4de5613d75eb882fd55ea4f5c9",
+      "crates/forge-domain/Cargo.toml": "40761d6d2491be6d1b0739242a41306eb959b08df730f8c009896bead8115888",
+      "crates/forge-domain/src/duration.rs": "584f3c2e742706067d72a5afce18ad442d347b454431dc0cbdbc8ca8e745f696",
+      "crates/forge-domain/src/lib.rs": "3520687cf7c20fe3957bcabe5304fa03bd50caa6509cee2850b6e78f125fb1ce",
+      "crates/forge-domain/src/manifest.rs": "c337ddc9c7ee8b4fc165d4c618bb60083f3f451a90f24e3522e47bb40a66e67f",
+      "crates/forge-domain/src/revision.rs": "38869fdc497d42248f7798bbb7e3e1317494fa3356ce2e3fae8a536431ffd5a0",
+      "crates/forge-domain/src/state.rs": "3855618925a7172604e83d8f2f8bd8713911092ddcc25df60a3531df6af53ac7",
+      "crates/forge-domain/src/usage.rs": "2d859b2bea5f75773ff68e1c101c8385e2e75defb0e842a53366c56bb6587d95",
+      "crates/forge-domain/src/usage_store.rs": "8e2bae7f5335c3a5a4362ad6d5f8b36af5e2a0670d981d1746809f80af317a3f",
+      "specs/030-parallel-worktrees/plan.md": "7a6ec16d094a3ccf86693fee17c5f8a81546943e1b7826c0484b7e95e7a163dd",
+      "specs/030-parallel-worktrees/spec.md": "d71d27bab2ebee117d6e23fd28d9290a7433863ced40cf356648b60f1f6bde4b",
+      "specs/030-parallel-worktrees/tasks.md": "029d470d5bd51aa757de93f2f202e6507caf013819da854aa98b41bf5059fdee",
+      "specs/031-independent-review/plan.md": "b3da1c90949d09eed96bcfab02986528df99652cb3cb816e54f0c8914f133d13",
+      "specs/031-independent-review/spec.md": "2d29586f1be1b48ed013f4809805abb5b9b756851553981f8952c6f519945b42",
+      "specs/031-independent-review/tasks.md": "9a64695598f21cfc05c13bd563b1c50564321eafc116d3ba51a2e6ded89efd49"
+    },
+    "inventory_sha256": "9e5ff3115ad8b53a400f182731c94c6512cdb5da86e0c6d8d1f1a701278c27dc"
+  },
+  "checks": {
+    "cargo_fmt_check": "passed",
+    "cargo_clippy_workspace_all_targets_D_warnings": "passed",
+    "cargo_test_workspace": {
+      "status": "passed",
+      "tests": 180,
+      "harness": "standard cargo test --workspace passed; an additional complete serial-harness checkpoint also passed; product concurrency/barriers unchanged"
+    },
+    "cargo_doc_workspace_no_deps": "passed",
+    "parallel_inspect_and_dry_run": {
+      "status": "passed",
+      "state_created": false,
+      "native_call": false
+    },
+    "cli_build": "passed",
+    "ui_typecheck": "passed",
+    "ui_nonwatch_browser_tests": {
+      "status": "passed",
+      "tests": 11,
+      "native_client": "trusted local protocol fixture, not provider acceptance"
+    },
+    "ui_locked_build": "passed",
+    "distribution_contract_tests": {
+      "status": "passed",
+      "tests": 6
+    },
+    "git_diff_check": "passed"
+  },
+  "standalone_packages": {
+    "archive_sha256": {
+      "illumitech-forge-domain-0.3.0.crate": "a7e9eb601097e16f7cf8ed8bfd45ed836679eed5bbb9710c957626cf25fbeb42",
+      "illumitech-forge-adapters-0.3.0.crate": "e27eac208e1081be48dacd55e18703aed019103b04ef435a00a3796fd73cdfdf",
+      "illumitech-forge-catalog-0.3.0.crate": "97bbce218af798f8d0ca4ad3ae686668e692200b4a38801efb04b55d96ecd366",
+      "illumitech-forge-cli-0.3.0.crate": "85704980490c18ed69d424509c312f9fca52a2d0169c5b78a2f8b0707af5078e"
+    },
+    "extracted_build": "passed",
+    "resolution": "temporary local patches, not live registry",
+    "upload": "not_performed",
+    "registry_ownership_auth": "pending",
+    "cargo_publish_dry_run": "not_requested"
+  },
+  "standalone_toolchain": "Rust 1.94.0; extracted source and embedded assets; no upload or live registry acceptance",
+  "ui_installed_lock_match": {
+    "status": "passed",
+    "installed_packages_checked": 27
+  },
+  "ui_assets": {
+    "schema_version": 1,
+    "build": "npm run build",
+    "deterministic_rebuild": "passed",
+    "files": {
+      "THIRD_PARTY_LICENSES.txt": "5c01bb0eeedd4911b58082dad6037112641621bc0694872d5fb2adeafbcd17c3",
+      "assets/index-B7LZBgUV.css": "ec5238b030a83b3ec06372342fdc698882200b63a050cc2bb84503f0a7e04979",
+      "assets/index-NosdMdeu.js": "526a67ca231dde13605ea81c0ed99dee02a149e429435a9b676257ef0953bd33",
+      "index.html": "105d5913d0c3f2ef6aa488a4cd186d33d617e64472617451c5d2ec54c9cd1a75",
+      "logo.webp": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555"
+    }
+  },
+  "dependency_audit": {
+    "schema_version": 1,
+    "source": "https://api.osv.dev",
+    "checked_packages": 222,
+    "findings": []
+  },
+  "native_smoke": {
+    "status": "completed",
+    "source_preserved": true,
+    "acceptance": "unchanged",
+    "client": "configured authenticated native ChatGPT account; no model/account/config override or API fallback",
+    "scope": "one disposable single-root happy-path on an earlier checkpoint in this turn; final cancellation and per-root budgets covered by regressions; not final provider acceptance"
+  },
+  "coverage": [
+    "barrier-based parallelism and dependency ordering",
+    "shared attempts, native tokens and per-root review admission",
+    "owned child trees, global cancel, crash/orphan refusal",
+    "SIGINT and SIGTERM during final gates",
+    "native tool interruption during review pause/cancel/SIGTERM",
+    "conflict preview and unrelated file preservation",
+    "serial-quality parity and final source re-evaluation",
+    "revision/file/hash/line attribution and schema rejection",
+    "read-only violation precedence on completed and disconnected clients",
+    "iteration limits and review/implementation acceptance separation",
+    "hashed redacted gate diagnostics and invalid cache provenance",
+    "live-owner duration and DAG/root/concurrency constraints",
+    "pinned multi-root UI scope and emergency controls after invalid manifest"
+  ],
+  "limitations": [
+    "Coordinator-owned evaluators and operational state were read only; external acceptance is pending",
+    "No Windows native pilot or remote publication acceptance",
+    "Parallel native inference was not piloted; real subprocess workers and a separate native review smoke were exercised",
+    "Native missing counters and monetary cost remain unknown; no hard per-inference token ceiling",
+    "Existing dirty changes from previous milestones were preserved; no commits/pushes/merges/Actions/services/global installs/hooks/account changes"
+  ],
+  "validation_notes": [
+    "Initial sandbox socket denials were resolved by authorized local-network test execution",
+    "An old dashboard read deadline failed during concurrent compilation; the standard delivery workspace command also passed once package compilation was separate",
+    "A short-line output flood exposed repeated environment scanning; redaction now snapshots once and preserves JSON/plain-text boundaries"
+  ]
+}

@@ -13,7 +13,7 @@ workspace `illumitech` and this Git repo root. Durable memory writes require an 
 user request. Read `skills/core/SKILL.md` for detailed execution procedures.
 
 Keep source, examples and documentation free of credentials, personal paths and internal data.
-Use MIT, preserve dependency notices. No Windows runtime support in 0.2.
+Use MIT, preserve dependency notices. Windows remains experimental without a native pilot. Linux VM/container regressions do not prove native-account acceptance. Candidate 1.0 publication is a separate authorized action.
 
 Commits and releases use the configured human identity. Never attribute authorship or
 coauthorship to Codex; do not add generated author trailers or agent branding to publication labels.

@@ -2,180 +2,114 @@
 
 # Illumitech Forge
 
-**Do contrato à evidência.** CLI em Rust para coordenar releases com Codex e Claude Code,
-sem confundir a resposta de um agente com trabalho verificado.
-**Candidata v0.3.0: painel local, serviços por usuário, observabilidade opcional e distribuição pública.**
-Codex é o cliente validado; Claude permanece experimental. [Escopo aprovado](docs/adr/0001-first-delivery-scope.md).
+**Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
+nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-[English](README.en.md) · [Contratos](docs/contracts.md) · [Evidências da expansão](docs/expansion-runtime-acceptance.json) · [Specs](specs)
+**Esta árvore é a candidata local 1.0.0, ainda não publicada.** A versão disponível no
+crates.io é a 0.3.0. Compilar esta árvore não altera seu binário instalado. O aceite operacional
+da candidata é registrado separadamente pelos avaliadores externos.
 
-![Uma peça laranja atravessa três checkpoints até uma estrutura verde-petróleo, sobre fundo grafite](docs/assets/cover.webp)
+[English](README.en.md) · [Começar](docs/v1-candidate.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
-Privado inicialmente, licenciado sob **MIT** desde a primeira versão. O código está preparado
-para uma abertura pública futura, por decisão explícita. A [v0.1.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.1.0) foi publicada após aceite humano.
-A [v0.2.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v0.2.0) também foi publicada.
-A expansão atual tem [gates de distribuição separados](docs/public-distribution.md).
+![Uma peça laranja atravessa checkpoints até uma estrutura verde-petróleo sobre fundo grafite](docs/assets/cover.webp)
 
-## Instalação
+## O que está implementado
 
-Use o arquivo da sua plataforma na release privada: o binário não exige Rust.
-O [guia de primeira execução](docs/quickstart.md) inclui verificação de checksums e exemplos
-com e sem Codex. Git e Python 3 são necessários para os exemplos.
+- Estimativas locais de trabalho ativo, com faixa, confiança, histórico e comparação com o realizado.
+- Medição de tokens, contexto seletivo e limites de tempo, tentativas e concorrência.
+- Workbench local: conta gerenciada do Codex, conversas, streaming, decisões, retomada e evidências.
+- Criação guiada, proposta estruturada de specs/DAG, templates versionados e deltas de escopo.
+- Controles de execução e aceite humano por revisão; cache opt-in com invalidação conservadora.
+- Tarefas paralelas em worktrees existentes, um escritor por raiz, e revisão nativa independente.
+- Issue selecionada → candidato revisável → execução → draft PR sob autorização explícita.
+- Diagnóstico de PATH, atualização local verificada, snapshots SQLite consistentes e restauração.
 
-Para compilar do código-fonte, requer macOS ARM64 ou Linux x86_64, Git e Rust 1.94.0.
-O binário Linux da CI requer glibc 2.39 ou superior (Ubuntu 24.04); outras distribuições podem compilar do código-fonte. Windows ainda não tem
-suporte operacional. Codex e Claude Code são instalados e autenticados separadamente.
+Claude permanece experimental e fora do aceite nativo desta candidata. A conversa livre usa
+somente leitura; a implementação usa um manifest revisado. A resposta do chat não aprova gates.
+
+## Experimentar localmente
+
+Requer Rust 1.94.0 e Git para compilar; Git e Python 3 para os exemplos. O Workbench usa o
+Codex CLI autenticado separadamente (protocolo de referência 0.166.0, conta ChatGPT gerenciada).
+Não há fallback automático para API paga ou mudança silenciosa de modelo.
 
 ```sh
 cargo build --release --locked
-./target/release/illumitech-forge --help
-./target/release/illumitech-forge doctor
+./target/release/illumitech-forge --version
+./target/release/illumitech-forge --json contracts
+FORGE_OPS="$(mktemp -d)"
+./target/release/illumitech-forge --state-dir "$FORGE_OPS/state" workbench --root "$PWD" --port 0
 ```
 
-Os pacotes crates.io estão preparados; upload e abertura pública dependem dos gates da revisão.
-Após a publicação, a instalação será `cargo install illumitech-forge-cli --version 0.3.0 --locked`.
-Os arquivos de release incluem binários, `SHA256SUMS`, MIT e avisos de terceiros; o pacote Windows
-permanece identificado como candidato até o piloto autenticado.
+Abra a URL local emitida e mantenha-a privada. O servidor é foreground e atende somente em
+loopback. Os assets da UI vêm no binário; Node não é necessário para usá-lo. Para desenvolver
+a UI, use Node 24 LTS e `npm ci --prefix apps/forge-ui --ignore-scripts`.
 
-## Início rápido
-
-O exemplo cria um repositório descartável, um avaliador externo e um manifest, sem chamar LLMs:
+Para um exemplo sem inferência, crie outro diretório externo e execute:
 
 ```sh
-python3 scripts/demo.py /tmp/forge-demo
-./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release inspect /tmp/forge-demo/release.yaml
-./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release run /tmp/forge-demo/release.yaml --dry-run
-./target/release/illumitech-forge --state-dir /tmp/forge-demo/state release run /tmp/forge-demo/release.yaml
-./target/release/illumitech-forge --state-dir /tmp/forge-demo/state report /tmp/forge-demo/release.yaml
+FORGE_DEMO="$(mktemp -d)/demo"
+python3 scripts/demo.py "$FORGE_DEMO"
+./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release inspect "$FORGE_DEMO/release.yaml"
+./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml" --dry-run
+./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml"
+./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" report "$FORGE_DEMO/release.yaml"
 ```
 
-`--json` produz um envelope com `schema_version: 1`. Erros e bloqueios retornam código 2.
-Sem `--json`, a primeira versão mostra o mesmo contrato com indentação para leitura humana.
-`inspect`, `doctor`, `status`, `report`, `spec check`, `tools list/doctor/plan` e dry-run
-não criam estado de execução. Consultas de memória utilizam apenas ferramentas MCP de leitura.
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-  S[Specs e ADRs: intenção] --> M[Manifest YAML: contrato]
-  M --> F[Forge: execução determinística]
-  F --> C[Codex / Claude / comando]
-  C --> W[Worktree Git]
-  W --> G[Gates externos e artefatos]
-  G --> D[SQLite: estado e eventos]
-  H[Revisão humana da fingerprint] --> D
-  A[ai-memory via MCP: continuidade] --> F
-  D --> P[Publicação explícita]
-```
-
-| Crate | Responsabilidade |
-| --- | --- |
-| `illumitech-forge-domain` | Manifest, DAG, fingerprints, locks, SQLite e aceites |
-| `illumitech-forge-adapters` | Processos, clientes nativos e MCP |
-| `illumitech-forge-catalog` | Receitas seletivas e configuração idempotente |
-| `illumitech-forge-cli` | Comandos, controle de execução e publicação |
-
-SQLite e avaliadores devem ficar **fora dos repositórios graváveis pelos executores**.
-Um lock do sistema operacional por worktree coordena diferentes instâncias. O Forge é um
-orquestrador local confiável; não substitui isolamento do sistema operacional contra um usuário malicioso.
+A instalação da versão publicada continua disponível com
+`cargo install illumitech-forge-cli --version 0.3.0 --locked`.
+Não existe upload 1.0.0 autorizado por este programa.
 
 ## Ciclo de trabalho
 
-1. Escreva `spec.md`, `plan.md` e `tasks.md` com IDs permanentes.
-2. Defina repositórios, tarefas, executores, dependências, limites e aceites no manifest v1.
-3. Revise `release inspect` e `release run --dry-run`, incluindo permissões e comandos.
-4. Execute `release run`. Use `pause`, `resume`, `cancel`, `status` e `report` para controle.
-5. Gates verificam comandos e arquivos; artefatos exigem SHA-256; revisão humana usa `release approve`.
-6. Execute `release publish` separadamente quando todos os requisitos estiverem satisfeitos.
+Pedido → specs → proposta validada → inspect/dry-run → execução → gates → revisão humana,
+quando declarada. Propostas são candidatas sem autorização de executar ou publicar. Mantenha
+manifests, avaliadores fixados por hash e SQLite fora do diretório gravável pelo agente.
 
-Pausa vale na fronteira da execução atual; cancelamento envia TERM ao grupo e KILL após o prazo.
-Defaults: 30 minutos por tarefa, 10 por gate e três tentativas totais de execução. Falhas de
-contrato, spawn, resultado estruturado, permissão e memória obrigatória não recebem retry automático.
-Aprovações exigem a fingerprint avaliada e são invalidadas por mudanças materiais. Após crash
-ou mudança externa, `resume --reconcile 'motivo'` invalida os aceites e reinicia a avaliação;
-processos órfãos vivos precisam ser investigados antes da reconciliação.
-
-## Memória e clientes
-
-Configure `memory.endpoint`, `workspace` e o mapeamento explícito de cada repo para seu projeto.
-O endpoint MCP usa HTTPS, exceto loopback. Tokens são referências a variáveis de ambiente,
-nunca valores no manifest. `memory doctor` verifica a capacidade e o escopo devolvido pelo servidor;
-`memory query` recupera até cinco fontes com trechos limitados.
-
-`required: true` bloqueia execução quando memória ou escopo não podem ser comprovados.
-Sem configuração de memória, o Forge executa e publica normalmente. Modo opcional registra degradação. O Forge não acessa o banco do ai-memory, não escreve páginas
-permanentes e não instala hooks. As integrações nativas existentes continuam responsáveis pela
-captura; procedimentos compartilhados ficam em `skills/core/SKILL.md`.
-No ai-memory 3.2.9, desative o backfill automático no cliente nativo para que ele não
-importe a sessão em andamento junto com os hooks. Veja o [guia](docs/quickstart.md#memória-e-limites--memory-and-limits).
-
-Os adaptadores preservam autenticação, configuração e modelo padrão dos CLIs. Um modelo só
-é passado quando declarado no manifest. Codex usa sandbox explícito; Claude usa `dontAsk`
-e respeita as permissões já concedidas. Para escrita com Claude, conceda regras `Edit` limitadas
-ao projeto antes da execução. Um bloqueio não aciona fallback para uma API paga.
-
-## Toolkit
-
-```sh
-illumitech-forge tools list
-illumitech-forge tools plan rust security
-illumitech-forge tools apply rust security
+```mermaid
+flowchart LR
+  S[Specs e ADRs] --> M[Manifest revisado]
+  M --> F[Forge]
+  F --> C[Cliente nativo ou comando]
+  C --> W[Worktrees]
+  W --> G[Gates e artefatos externos]
+  G --> D[SQLite e eventos]
+  A[ai-memory opcional via MCP] --> F
 ```
 
-A aplicação cria apenas as receitas selecionadas em `.forge-toolkit/`, sem executar instaladores
-remotos. Uma segunda aplicação preserva conteúdo igual; divergências bloqueiam sem sobrescrever.
-O catálogo distingue receita disponível, configuração local instalada, executável descoberto e
-teste funcional. Revisões upstream não verificadas permanecem explícitas. Perfis Rust, Node/TypeScript
-e genérico preservam a stack do projeto. RTK e Graphify são pilotos; estilos como Superpowers,
-Ponytail e Caveman são opcionais. Não existe limite universal de linhas por arquivo.
+Specs/ADRs expressam intenção; manifests são contratos; SQLite guarda o estado operacional;
+Git guarda código. ai-memory oferece continuidade por MCP e **não é obrigatório**. O modo
+`required: true` só deve ser escolhido quando o projeto realmente exigir memória verificável.
+Skills especializadas complementam o motor. O Loop legado continua disponível para migração gradual.
 
-## Qualidade, exemplos e adoção
+## Limites e qualidade
 
-```sh
-cargo fmt --check
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo test --workspace --locked
-cargo doc --workspace --no-deps --locked
-python3 scripts/licenses.py
-```
+As métricas cobrem as chamadas registradas pelo Forge, não toda a conta. Cache de entrada é
+parte da entrada; ausência de uso permanece desconhecida. Uma chamada nativa pode fazer várias
+requisições ao provedor. Hooks, MCPs e outras sessões preservam suas configurações e podem ter
+atividade fora desse registro. Não há promessa de economia percentual, preço ou prazo.
 
-Os testes cobrem falso aceite textual, alteração de revisão, escopo obrigatório indisponível,
-locks, cancelamento, timeout, saída excessiva, pausa/retomada e setup repetido. Consulte o
-[ledger](docs/verification-v0.2.0.md) para separar testes locais, clientes reais e CI.
-`eval run` executa manifests de fixtures com o mesmo motor e os mesmos gates.
+O cache exige observação conservadora dos insumos. Árvores com symlinks em `node_modules` ou
+builds além do limite observado provocam miss e nova validação. Não foi demonstrada economia
+pelo cache na própria execução deste programa. [Medições e limites](docs/v1-candidate.md).
 
-`release import-loop` gera um candidato revisável. Estados antigos nunca viram evidência atual;
-tarefas pendentes do Spec Kit são expandidas com IDs estáveis e gates exigem conversão revisada.
-`release import-spec` gera candidatos diretamente de specs. O Loop Python continua
-operacional e a migração é gradual. [Procedimento de atualização ai-memory](docs/memory-upgrade.md).
+macOS tem pilotos nativos em checkpoints anteriores; o aceite da revisão final fica no ledger
+externo. Linux ARM64 tem baseline local em VM/contêiner; o sandbox nativo da conta foi bloqueado
+nesse laboratório. Windows/PowerShell permanece experimental, sem piloto nativo. Não se presume
+paridade entre mocks, execução em VM e conta nativa. [Matriz](docs/v1-candidate.md#plataformas).
 
-## Roadmap e créditos
+CI, publicação, merge, mudança de visibilidade, instalação global e ativação de serviços são
+operações separadas. `budget.actions: off` bloqueia escritas remotas que possam ativar CI;
+`[skip ci]` não é garantia de ausência de Actions. O programa de implementação usa checks locais.
 
-As [19 specs](specs) rastreiam fundação, contratos, recuperação, execução, evidências, memória,
-catálogo, avaliações, legado, atualização da memória, distribuição e aceitação integrada.
-O daemon opt-in supervisiona a fila em primeiro plano; `daemon-control` pausa e retoma a fila.
-O contrato pode habilitar commit e draft PR, sempre em worktree isolado com identidade humana,
-reavaliação após commit e recuperação sem duplicação. Nenhum merge ou release é automático.
-Veja o [guia de operação e limites de adoção](docs/operational-parity.md).
-Cinco frentes estão implementadas; aceite externo e publicação são rastreados separadamente:
+## Documentação e créditos
 
-- [015 — Dashboard local](specs/015-local-dashboard/spec.md): comando `dashboard` somente leitura; [uso e limites](docs/dashboard.md).
-- [016 — Migração nativa ai-memory](specs/016-native-memory-migration/spec.md): [tooling e runbook de ensaio](docs/native-memory-migration.md); runtime local migrado e validado, memória continua opcional.
-- [017 — Público/crates.io](specs/017-public-release/spec.md): preparação separada de publicação.
-- [018 — Serviços por usuário](specs/018-user-daemon-services/spec.md): preview e ativação explícita.
-- [019 — Observabilidade Loop](specs/019-loop-observability/spec.md): opt-in, sem rede por padrão.
+[Workbench](docs/workbench.md) · [Economia](docs/token-economy.md) · [Duração](docs/duration-estimates.md) ·
+[Templates/orçamentos/cache](docs/m06-operating-contracts.md) · [Paralelismo/revisão](docs/m07-operating-contracts.md) ·
+[Issue/PR](docs/m08-operating-contracts.md) · [Atualização/recuperação](docs/m09-operating-contracts.md) ·
+[Serviços opt-in](docs/user-services.md) · [Distribuição](docs/public-distribution.md)
 
-Cada frente inclui plano, tarefas e aceites. Veja a [reconciliação de evidências](docs/expansion-evidence.md)
-e o [inventário real de tracing](docs/loop-tracing-inventory.md). Claude continua experimental,
-explicitamente adiado, sem login ou validação nesta expansão.
-
-Illumitech · MIT. Créditos e licenças de terceiros em [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
-Inspirado no ciclo determinístico do Loop Engineering e em avaliações controladas de agentes.
-Nenhum benchmark pago ou framework oficial Harness² é incluído. Não há badges de desempenho não medido.
-
-Windows 11 x86_64 / PowerShell 7 tem uma implementação candidata, CI nativa e ZIP preparados para a próxima entrega. A CI nativa passou na revisão de 40917514708; o piloto autenticado e o aceite operacional permanecem pendentes; a v0.2.0 publicada não muda. Consulte o [inventário e gates Windows](docs/windows-portability.md).
-
-A [distribuição pública](docs/public-distribution.md) documenta os pacotes e gates.
-Pacotes locais não comprovam upload; `release publish --expected-visibility PUBLIC|PRIVATE`
-verifica a visibilidade existente, usa PRIVATE como padrão e nunca altera a visibilidade.
+Copyright Illumitech. Licença [MIT](LICENSE). Avisos de dependências em
+[THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES), inventário em [docs/dependencies.json](docs/dependencies.json)
+e origem dos ativos em [provenance.json](docs/assets/provenance.json). Commits e publicações usam
+identidade humana configurada, sem atribuição de autoria a agentes.
