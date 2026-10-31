@@ -5,9 +5,10 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**This tree is an unpublished local 1.0.0 candidate.** The crates.io version is 0.3.0.
-Building this tree does not replace an installed binary. Independent operator evidence owns
-final operational acceptance. [Português](README.md) · [Candidate guide](docs/v1-candidate.md).
+**Illumitech Forge 1.0.0.** This release preserves the approved candidate contracts and evidence.
+Building this tree does not replace an installed binary. See the
+[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0) for artifacts,
+checksums and platform limits. [Português](README.md) · [Validation guide](docs/v1-candidate.md).
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
@@ -42,7 +43,7 @@ Open the private local URL emitted by the foreground server. It binds only to lo
 For a no-inference demo, run `python3 scripts/demo.py EXTERNAL_DEMO_DIR`, then inspect,
 dry-run and run its release with an explicit external `--state-dir`.
 The published version can be installed using
-`cargo install illumitech-forge-cli --version 0.3.0 --locked`; 1.0.0 has not been uploaded.
+`cargo install illumitech-forge-cli --version 1.0.0 --locked`; global installation is explicit.
 
 ## Workflow and boundaries
 

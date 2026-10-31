@@ -5,9 +5,10 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Esta árvore é a candidata local 1.0.0, ainda não publicada.** A versão disponível no
-crates.io é a 0.3.0. Compilar esta árvore não altera seu binário instalado. O aceite operacional
-da candidata é registrado separadamente pelos avaliadores externos.
+**Illumitech Forge 1.0.0.** A release reúne os contratos e evidências da candidata aprovada.
+Compilar esta árvore não altera seu binário instalado. Consulte as
+[notas da release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0)
+para os artefatos, checksums e limites de suporte.
 
 [English](README.en.md) · [Começar](docs/v1-candidate.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
@@ -56,9 +57,9 @@ python3 scripts/demo.py "$FORGE_DEMO"
 ./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" report "$FORGE_DEMO/release.yaml"
 ```
 
-A instalação da versão publicada continua disponível com
-`cargo install illumitech-forge-cli --version 0.3.0 --locked`.
-Não existe upload 1.0.0 autorizado por este programa.
+Instale a versão 1.0.0 com
+`cargo install illumitech-forge-cli --version 1.0.0 --locked`.
+A instalação global é uma ação explícita; o código não troca seu PATH automaticamente.
 
 ## Ciclo de trabalho
 

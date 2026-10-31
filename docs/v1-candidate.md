@@ -1,6 +1,8 @@
-# Candidata local 1.0.0
+# Snapshot de validação da 1.0.0
 
-Esta candidata reúne FORGE-020–034. Não foi publicada e não substitui a instalação 0.3.0.
+Este documento registra a validação anterior à publicação de FORGE-020–034.
+A publicação foi autorizada separadamente; veja as [notas da 1.0.0](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0).
+Ela não substitui automaticamente uma instalação anterior.
 Os resultados históricos abaixo pertencem aos respectivos checkpoints. Aceite da fonte final,
 pilotos e hashes são produzidos pelo operador fora dos worktrees graváveis; não são inferidos
 de checkboxes, deste documento ou de mensagens do agente.

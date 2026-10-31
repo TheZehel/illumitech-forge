@@ -1,6 +1,6 @@
 # Public distribution preparation
 
-This tree prepares an unpublished 1.0.0 candidate, not authorization to publish. Packages use MIT;
+This tree contains release 1.0.0. Publication requires separate owner authorization. Packages use MIT;
 the executable remains `illumitech-forge`. Rust dependency aliases retain the existing
 `forge_domain`, `forge_adapters` and `forge_catalog` imports. Package names are now:
 
@@ -12,7 +12,7 @@ the executable remains `illumitech-forge`. Rust dependency aliases retain the ex
 Domain and catalog are independent; adapters depends on the exact domain version, and the CLI depends on all three exact versions. Publish domain before adapters. Directories
 remain `crates/forge-*`. Recipes now live inside the catalog package at
 `crates/forge-catalog/src/recipes.json`, so compilation never needs a parent checkout.
-The four names already have published version 0.3.0 (public registry readback on 2026-10-31 UTC).
+The four names use version 1.0.0 for this release; earlier version 0.3.0 remains available.
 Check the new version, ownership and authentication before a separately authorized upload.
 Current candidate scope and native/platform limits are in [v1-candidate.md](v1-candidate.md).
 

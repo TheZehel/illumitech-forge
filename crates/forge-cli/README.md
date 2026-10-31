@@ -1,8 +1,9 @@
-# Illumitech Forge CLI — candidata 1.0.0
+# Illumitech Forge CLI — 1.0.0
 
 CLI Rust com Workbench Illumitech local, specs/DAG, execução nativa, gates externos, métricas,
 orçamentos, paralelismo, revisão, importação de issues e atualização/recuperação verificável.
-Esta versão é candidata local; não foi publicada no crates.io. A versão publicada é 0.3.0.
+Instalação: `cargo install illumitech-forge-cli --version 1.0.0 --locked`.
+[Notas e artefatos da release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0).
 
 O binário é `illumitech-forge`. Assets da UI, MIT, inventário e avisos acompanham o pacote.
 Use `--help` e `--json contracts` para consultar interfaces/versões e limites. O cliente nativo
@@ -21,7 +22,8 @@ Texto de agente não prova conclusão. A conversa livre é somente leitura; exec
 contrato revisado. Publicação, CI, serviços, push/merge e instalação global são explícitos.
 Métricas não representam toda a conta; faixas de duração e cache não garantem economia/prazo.
 
-macOS tem pilotos anteriores; a fonte final exige aceite próprio. Linux ARM64 foi exercitado
+macOS ARM64 foi validado com cliente nativo, retomada real, 208 testes Rust e 14 testes browser.
+Linux ARM64 foi exercitado
 em VM/contêiner, com sandbox nativo bloqueado nesse laboratório. Windows/PowerShell e Claude
 continuam experimentais; Claude foi adiado. Mocks não substituem conta/plataforma nativa.
 
