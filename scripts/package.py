@@ -48,18 +48,22 @@ def write_archive(archive, files):
     return digest
 
 
-def package(root, target, binary=None, output=None):
+def package(root, target, binary=None, output=None, forge_binary=None):
     windows = target.endswith('windows-msvc')
     binary = binary or root / 'target' / target / ('release/illumitech-forge.exe' if windows else 'release/illumitech-forge')
+    forge_name = 'forge.exe' if windows else 'forge'
+    forge_binary = forge_binary or binary.with_name(forge_name)
+    if not forge_binary.is_file():
+        raise ValueError('missing native forge executable; build both binary targets')
     out = output or root / 'dist'
     out.mkdir(parents=True, exist_ok=True)
     version = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
     names = ['README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES', 'docs/dependencies.json',
-             'docs/v1-candidate.md', 'docs/workbench.md', 'docs/token-economy.md', 'docs/duration-estimates.md',
+             'docs/v1-candidate.md', 'docs/native-command.md', 'docs/terminal-chat.md', 'docs/workbench.md', 'docs/token-economy.md', 'docs/duration-estimates.md',
              'docs/quickstart.md', 'docs/operational-parity.md', 'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py']
     if windows:
         names += ['scripts/install.ps1', 'scripts/uninstall.ps1', 'scripts/windows-native-pilot.ps1', 'examples/windows', 'docs/windows-portability.md']
-    files = {'illumitech-forge.exe' if windows else 'illumitech-forge': binary}
+    files = {'illumitech-forge.exe' if windows else 'illumitech-forge': binary, forge_name: forge_binary}
     for name in names:
         path = root / name
         for file in sorted(path.rglob('*')) if path.is_dir() else [path]:
@@ -79,5 +83,6 @@ if __name__ == '__main__':
     parser.add_argument('target', choices=TARGETS)
     parser.add_argument('--binary', type=Path, help='Explicit locally built artifact; caller verifies host/target')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--forge-binary', type=Path, help='Native forge binary; defaults to sibling of --binary')
     args = parser.parse_args()
-    package(ROOT, args.target, args.binary, args.output)
+    package(ROOT, args.target, args.binary, args.output, args.forge_binary)

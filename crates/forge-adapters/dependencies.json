@@ -13,6 +13,16 @@
       ]
     },
     {
+      "name": "allocator-api2",
+      "version": "0.2.21",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "allocator-api2-0.2.21/LICENSE-APACHE",
+        "allocator-api2-0.2.21/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "android_system_properties",
       "version": "0.1.6",
       "license": "MIT OR Apache-2.0",
@@ -90,6 +100,15 @@
       "notices": [
         "anyhow-1.0.104/LICENSE-APACHE",
         "anyhow-1.0.104/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "approx",
+      "version": "0.5.1",
+      "license": "Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "approx-0.5.1/LICENSE"
       ]
     },
     {
@@ -173,12 +192,31 @@
       ]
     },
     {
+      "name": "by_address",
+      "version": "1.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "by_address-1.2.1/LICENSE-APACHE",
+        "by_address-1.2.1/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "bytes",
       "version": "1.12.1",
       "license": "MIT",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
         "bytes-1.12.1/LICENSE"
+      ]
+    },
+    {
+      "name": "castaway",
+      "version": "0.2.4",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "castaway-0.2.4/LICENSE"
       ]
     },
     {
@@ -281,6 +319,15 @@
       ]
     },
     {
+      "name": "compact_str",
+      "version": "0.9.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "compact_str-0.9.1/LICENSE"
+      ]
+    },
+    {
       "name": "const-oid",
       "version": "0.10.2",
       "license": "Apache-2.0 OR MIT",
@@ -288,6 +335,15 @@
       "notices": [
         "const-oid-0.10.2/LICENSE-APACHE",
         "const-oid-0.10.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "convert_case",
+      "version": "0.10.0",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "convert_case-0.10.0/LICENSE"
       ]
     },
     {
@@ -321,6 +377,24 @@
       ]
     },
     {
+      "name": "crossterm",
+      "version": "0.29.0",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "crossterm-0.29.0/LICENSE"
+      ]
+    },
+    {
+      "name": "crossterm_winapi",
+      "version": "0.9.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "crossterm_winapi-0.9.1/LICENSE"
+      ]
+    },
+    {
       "name": "crypto-common",
       "version": "0.2.2",
       "license": "MIT OR Apache-2.0",
@@ -328,6 +402,61 @@
       "notices": [
         "crypto-common-0.2.2/LICENSE-APACHE",
         "crypto-common-0.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "darling",
+      "version": "0.24.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "darling-0.24.1/LICENSE"
+      ]
+    },
+    {
+      "name": "darling_core",
+      "version": "0.24.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "darling_core-0.24.1/LICENSE"
+      ]
+    },
+    {
+      "name": "darling_macro",
+      "version": "0.24.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "darling_macro-0.24.1/LICENSE"
+      ]
+    },
+    {
+      "name": "deranged",
+      "version": "0.5.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "deranged-0.5.9/LICENSE-Apache",
+        "deranged-0.5.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "derive_more",
+      "version": "2.1.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "derive_more-2.1.1/LICENSE"
+      ]
+    },
+    {
+      "name": "derive_more-impl",
+      "version": "2.1.1",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "derive_more-impl-2.1.1/LICENSE"
       ]
     },
     {
@@ -351,6 +480,26 @@
       ]
     },
     {
+      "name": "document-features",
+      "version": "0.2.12",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "document-features-0.2.12/LICENSE-APACHE",
+        "document-features-0.2.12/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "either",
+      "version": "1.19.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "either-1.19.0/LICENSE-APACHE",
+        "either-1.19.0/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "encoding_rs",
       "version": "0.8.42",
       "license": "(Apache-2.0 OR MIT) AND BSD-3-Clause",
@@ -370,6 +519,16 @@
         "encoding_rs_io-0.1.8/COPYING",
         "encoding_rs_io-0.1.8/LICENSE-APACHE",
         "encoding_rs_io-0.1.8/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "equivalent",
+      "version": "1.0.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "equivalent-1.0.3/LICENSE-APACHE",
+        "equivalent-1.0.3/LICENSE-MIT"
       ]
     },
     {
@@ -751,6 +910,15 @@
       ]
     },
     {
+      "name": "ident_case",
+      "version": "1.0.1",
+      "license": "MIT/Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "ident_case-1.0.1/LICENSE"
+      ]
+    },
+    {
       "name": "idna",
       "version": "1.1.0",
       "license": "MIT OR Apache-2.0",
@@ -768,6 +936,25 @@
       "notices": [
         "idna_adapter-1.2.2/LICENSE-APACHE",
         "idna_adapter-1.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "indoc",
+      "version": "2.0.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "indoc-2.0.8/LICENSE-APACHE",
+        "indoc-2.0.8/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "instability",
+      "version": "0.3.14",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "instability-0.3.14/LICENSE.md"
       ]
     },
     {
@@ -791,6 +978,16 @@
       ]
     },
     {
+      "name": "itertools",
+      "version": "0.14.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "itertools-0.14.0/LICENSE-APACHE",
+        "itertools-0.14.0/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "itoa",
       "version": "1.0.18",
       "license": "MIT OR Apache-2.0",
@@ -808,6 +1005,16 @@
       "notices": [
         "js-sys-0.3.106/LICENSE-APACHE",
         "js-sys-0.3.106/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "kasuari",
+      "version": "0.4.13",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "kasuari-0.4.13/LICENSE-APACHE",
+        "kasuari-0.4.13/LICENSE-MIT"
       ]
     },
     {
@@ -831,12 +1038,31 @@
       ]
     },
     {
+      "name": "libm",
+      "version": "0.2.16",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "libm-0.2.16/LICENSE.txt"
+      ]
+    },
+    {
       "name": "libsqlite3-sys",
       "version": "0.38.2",
       "license": "MIT",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
         "libsqlite3-sys-0.38.2/LICENSE"
+      ]
+    },
+    {
+      "name": "line-clipping",
+      "version": "0.3.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "line-clipping-0.3.8/LICENSE-APACHE",
+        "line-clipping-0.3.8/LICENSE-MIT"
       ]
     },
     {
@@ -860,6 +1086,16 @@
       ]
     },
     {
+      "name": "litrs",
+      "version": "1.0.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "litrs-1.0.1/LICENSE-APACHE",
+        "litrs-1.0.1/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "lock_api",
       "version": "0.4.14",
       "license": "MIT OR Apache-2.0",
@@ -877,6 +1113,15 @@
       "notices": [
         "log-0.4.34/LICENSE-APACHE",
         "log-0.4.34/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "lru",
+      "version": "0.18.5",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "lru-0.18.5/LICENSE"
       ]
     },
     {
@@ -949,6 +1194,16 @@
       ]
     },
     {
+      "name": "num-conv",
+      "version": "0.2.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "num-conv-0.2.2/LICENSE-Apache",
+        "num-conv-0.2.2/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "num-traits",
       "version": "0.2.19",
       "license": "MIT OR Apache-2.0",
@@ -956,6 +1211,16 @@
       "notices": [
         "num-traits-0.2.19/LICENSE-APACHE",
         "num-traits-0.2.19/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "num_threads",
+      "version": "0.1.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "num_threads-0.1.8/LICENSE-Apache",
+        "num_threads-0.1.8/LICENSE-MIT"
       ]
     },
     {
@@ -976,6 +1241,36 @@
       "notices": [
         "once_cell_polyfill-1.70.2/LICENSE-APACHE",
         "once_cell_polyfill-1.70.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "palette",
+      "version": "0.7.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "palette-0.7.7/LICENSE-APACHE",
+        "palette-0.7.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "palette_derive",
+      "version": "0.7.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "palette_derive-0.7.7/LICENSE-APACHE",
+        "palette_derive-0.7.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "palette_math",
+      "version": "0.7.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "palette_math-0.7.7/LICENSE-APACHE",
+        "palette_math-0.7.7/LICENSE_MIT"
       ]
     },
     {
@@ -1029,12 +1324,32 @@
       ]
     },
     {
+      "name": "portable-atomic",
+      "version": "1.15.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "portable-atomic-1.15.0/LICENSE-APACHE",
+        "portable-atomic-1.15.0/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "potential_utf",
       "version": "0.1.6",
       "license": "Unicode-3.0",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
         "potential_utf-0.1.6/LICENSE"
+      ]
+    },
+    {
+      "name": "powerfmt",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "powerfmt-0.2.1/LICENSE-Apache",
+        "powerfmt-0.2.1/LICENSE-MIT"
       ]
     },
     {
@@ -1045,6 +1360,15 @@
       "notices": [
         "proc-macro2-1.0.107/LICENSE-APACHE",
         "proc-macro2-1.0.107/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "pulldown-cmark",
+      "version": "0.13.6",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "pulldown-cmark-0.13.6/LICENSE"
       ]
     },
     {
@@ -1128,6 +1452,42 @@
       ]
     },
     {
+      "name": "ratatui",
+      "version": "0.30.2",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "ratatui-0.30.2/LICENSE"
+      ]
+    },
+    {
+      "name": "ratatui-core",
+      "version": "0.1.2",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "ratatui-core-0.1.2/LICENSE"
+      ]
+    },
+    {
+      "name": "ratatui-crossterm",
+      "version": "0.1.2",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "ratatui-crossterm-0.1.2/LICENSE"
+      ]
+    },
+    {
+      "name": "ratatui-widgets",
+      "version": "0.3.2",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "ratatui-widgets-0.3.2/LICENSE"
+      ]
+    },
+    {
       "name": "redox_syscall",
       "version": "0.5.18",
       "license": "MIT",
@@ -1207,6 +1567,16 @@
       ]
     },
     {
+      "name": "rustc_version",
+      "version": "0.4.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "rustc_version-0.4.1/LICENSE-APACHE",
+        "rustc_version-0.4.1/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "rustix",
       "version": "1.1.6",
       "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
@@ -1275,6 +1645,16 @@
       "notices": [
         "scopeguard-1.2.0/LICENSE-APACHE",
         "scopeguard-1.2.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "semver",
+      "version": "1.0.28",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "semver-1.0.28/LICENSE-APACHE",
+        "semver-1.0.28/LICENSE-MIT"
       ]
     },
     {
@@ -1367,6 +1747,26 @@
       ]
     },
     {
+      "name": "signal-hook",
+      "version": "0.3.18",
+      "license": "Apache-2.0/MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "signal-hook-0.3.18/LICENSE-APACHE",
+        "signal-hook-0.3.18/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "signal-hook-mio",
+      "version": "0.2.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "signal-hook-mio-0.2.5/LICENSE-APACHE",
+        "signal-hook-mio-0.2.5/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "signal-hook-registry",
       "version": "1.4.8",
       "license": "MIT OR Apache-2.0",
@@ -1435,12 +1835,40 @@
       ]
     },
     {
+      "name": "static_assertions",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "static_assertions-1.1.0/LICENSE-APACHE",
+        "static_assertions-1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "strsim",
       "version": "0.11.1",
       "license": "MIT",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
         "strsim-0.11.1/LICENSE"
+      ]
+    },
+    {
+      "name": "strum",
+      "version": "0.28.0",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "strum-0.28.0/LICENSE"
+      ]
+    },
+    {
+      "name": "strum_macros",
+      "version": "0.28.0",
+      "license": "MIT",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "strum_macros-0.28.0/LICENSE"
       ]
     },
     {
@@ -1528,6 +1956,26 @@
       "notices": [
         "thread_local-1.1.10/LICENSE-APACHE",
         "thread_local-1.1.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "time",
+      "version": "0.3.55",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "time-0.3.55/LICENSE-Apache",
+        "time-0.3.55/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "time-core",
+      "version": "0.1.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "time-core-0.1.9/LICENSE-Apache",
+        "time-core-0.1.9/LICENSE-MIT"
       ]
     },
     {
@@ -1689,6 +2137,16 @@
       ]
     },
     {
+      "name": "unicase",
+      "version": "2.10.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "unicase-2.10.0/LICENSE-APACHE",
+        "unicase-2.10.0/LICENSE-MIT"
+      ]
+    },
+    {
       "name": "unicode-ident",
       "version": "1.0.27",
       "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
@@ -1697,6 +2155,26 @@
         "unicode-ident-1.0.27/LICENSE-APACHE",
         "unicode-ident-1.0.27/LICENSE-MIT",
         "unicode-ident-1.0.27/LICENSE-UNICODE"
+      ]
+    },
+    {
+      "name": "unicode-segmentation",
+      "version": "1.13.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "unicode-segmentation-1.13.3/LICENSE-APACHE",
+        "unicode-segmentation-1.13.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "unicode-truncate",
+      "version": "2.0.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "notices": [
+        "unicode-truncate-2.0.1/LICENSE-APACHE",
+        "unicode-truncate-2.0.1/LICENSE-MIT"
       ]
     },
     {
@@ -2183,7 +2661,7 @@
   ],
   "missing_notices": [],
   "frontend": {
-    "lock_sha256": "96db3f8a8fc4c51c2be51ee8de14c5b93828a16c90d47185c04370a60f172f1f",
+    "lock_sha256": "01ccb4ae44892972ab3cfba7f10a47c782a8ed31ffc9fba71dff1db25ba87a91",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",
@@ -2927,17 +3405,87 @@
         ]
       },
       {
+        "name": "@types/debug",
+        "version": "4.1.13",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/debug/-/debug-4.1.13.tgz",
+        "integrity": "sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__debug-4.1.13/LICENSE"
+        ]
+      },
+      {
         "name": "@types/estree",
         "version": "1.0.9",
         "license": "MIT",
         "source": "https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz",
         "integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==",
-        "scope": "build/test",
+        "scope": "runtime",
         "optional": false,
         "installed": true,
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-@types__estree-1.0.9/LICENSE"
+        ]
+      },
+      {
+        "name": "@types/estree-jsx",
+        "version": "1.0.5",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/estree-jsx/-/estree-jsx-1.0.5.tgz",
+        "integrity": "sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__estree-jsx-1.0.5/LICENSE"
+        ]
+      },
+      {
+        "name": "@types/hast",
+        "version": "3.0.5",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/hast/-/hast-3.0.5.tgz",
+        "integrity": "sha512-rp/ezSWaD1m44dPKICGhiskI13nVr7qTloFwDa/IYkhhf5nzwP+zIQcIJh3WIFSBOy/H1PzB40jPjMDksN4F+g==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__hast-3.0.5/LICENSE"
+        ]
+      },
+      {
+        "name": "@types/mdast",
+        "version": "4.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/mdast/-/mdast-4.0.4.tgz",
+        "integrity": "sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__mdast-4.0.4/LICENSE"
+        ]
+      },
+      {
+        "name": "@types/ms",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/ms/-/ms-2.1.0.tgz",
+        "integrity": "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__ms-2.1.0/LICENSE"
         ]
       },
       {
@@ -2960,7 +3508,7 @@
         "license": "MIT",
         "source": "https://registry.npmjs.org/@types/react/-/react-19.2.14.tgz",
         "integrity": "sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==",
-        "scope": "build/test",
+        "scope": "runtime",
         "optional": false,
         "installed": true,
         "notice_basis": "installed package notice",
@@ -2983,17 +3531,199 @@
         ]
       },
       {
+        "name": "@types/unist",
+        "version": "3.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/unist/-/unist-3.0.3.tgz",
+        "integrity": "sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__unist-3.0.3/LICENSE"
+        ]
+      },
+      {
+        "name": "@ungap/structured-clone",
+        "version": "1.4.0",
+        "license": "ISC",
+        "source": "https://registry.npmjs.org/@ungap/structured-clone/-/structured-clone-1.4.0.tgz",
+        "integrity": "sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@ungap__structured-clone-1.4.0/LICENSE"
+        ]
+      },
+      {
+        "name": "bail",
+        "version": "2.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/bail/-/bail-2.0.2.tgz",
+        "integrity": "sha512-0xO6mYd7JB2YesxDKplafRpsiOzPt9V02ddPCLbY1xYGPOX24NTyN50qnUxgCPcSoYMhKpAuBTjQoRZCAkUDRw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-bail-2.0.2/license"
+        ]
+      },
+      {
+        "name": "ccount",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/ccount/-/ccount-2.0.1.tgz",
+        "integrity": "sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-ccount-2.0.1/license"
+        ]
+      },
+      {
+        "name": "character-entities",
+        "version": "2.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/character-entities/-/character-entities-2.0.2.tgz",
+        "integrity": "sha512-shx7oQ0Awen/BRIdkjkvz54PnEEI/EjwXDSIZp86/KKdbafHh1Df/RYGBhn4hbe2+uKC9FnT5UCEdyPz3ai9hQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-character-entities-2.0.2/license"
+        ]
+      },
+      {
+        "name": "character-entities-html4",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/character-entities-html4/-/character-entities-html4-2.1.0.tgz",
+        "integrity": "sha512-1v7fgQRj6hnSwFpq1Eu0ynr/CDEw0rXo2B61qXrLNdHZmPKgb7fqS1a2JwF0rISo9q77jDI8VMEHoApn8qDoZA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-character-entities-html4-2.1.0/license"
+        ]
+      },
+      {
+        "name": "character-entities-legacy",
+        "version": "3.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/character-entities-legacy/-/character-entities-legacy-3.0.0.tgz",
+        "integrity": "sha512-RpPp0asT/6ufRm//AJVwpViZbGM/MkjQFxJccQRHmISF/22NBtsHqAWmL+/pmkPWoIUJdWyeVleTl1wydHATVQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-character-entities-legacy-3.0.0/license"
+        ]
+      },
+      {
+        "name": "character-reference-invalid",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/character-reference-invalid/-/character-reference-invalid-2.0.1.tgz",
+        "integrity": "sha512-iBZ4F4wRbyORVsu0jPV7gXkOsGYjGHPmAyv+HiHG8gi5PtC9KI2j1+v8/tlibRvjoWX027ypmG/n0HtO5t7unw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-character-reference-invalid-2.0.1/license"
+        ]
+      },
+      {
+        "name": "comma-separated-tokens",
+        "version": "2.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/comma-separated-tokens/-/comma-separated-tokens-2.0.3.tgz",
+        "integrity": "sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-comma-separated-tokens-2.0.3/license"
+        ]
+      },
+      {
         "name": "csstype",
         "version": "3.2.3",
         "license": "MIT",
         "source": "https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz",
         "integrity": "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==",
-        "scope": "build/test",
+        "scope": "runtime",
         "optional": false,
         "installed": true,
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-csstype-3.2.3/LICENSE"
+        ]
+      },
+      {
+        "name": "debug",
+        "version": "4.4.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/debug/-/debug-4.4.3.tgz",
+        "integrity": "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-debug-4.4.3/LICENSE"
+        ]
+      },
+      {
+        "name": "decode-named-character-reference",
+        "version": "1.3.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/decode-named-character-reference/-/decode-named-character-reference-1.3.0.tgz",
+        "integrity": "sha512-GtpQYB283KrPp6nRw50q3U9/VfOutZOe103qlN7BPP6Ad27xYnOIWv4lPzo8HCAL+mMZofJ9KEy30fq6MfaK6Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-decode-named-character-reference-1.3.0/license"
+        ]
+      },
+      {
+        "name": "dequal",
+        "version": "2.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/dequal/-/dequal-2.0.3.tgz",
+        "integrity": "sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-dequal-2.0.3/license"
+        ]
+      },
+      {
+        "name": "devlop",
+        "version": "1.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/devlop/-/devlop-1.1.0.tgz",
+        "integrity": "sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-devlop-1.1.0/license"
         ]
       },
       {
@@ -3008,6 +3738,48 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-esbuild-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "escape-string-regexp",
+        "version": "5.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-5.0.0.tgz",
+        "integrity": "sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-escape-string-regexp-5.0.0/license"
+        ]
+      },
+      {
+        "name": "estree-util-is-identifier-name",
+        "version": "3.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/estree-util-is-identifier-name/-/estree-util-is-identifier-name-3.0.0.tgz",
+        "integrity": "sha512-hFtqIDZTIUZ9BXLb8y4pYGyk6+wekIivNVTcmvk8NoOh+VeRn5y6cEHzbURrWbfp1fIqdVipilzj+lfaadNZmg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-estree-util-is-identifier-name-3.0.0/license"
+        ]
+      },
+      {
+        "name": "extend",
+        "version": "3.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/extend/-/extend-3.0.2.tgz",
+        "integrity": "sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-extend-3.0.2/LICENSE"
         ]
       },
       {
@@ -3039,6 +3811,790 @@
         ]
       },
       {
+        "name": "hast-util-to-jsx-runtime",
+        "version": "2.3.7",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/hast-util-to-jsx-runtime/-/hast-util-to-jsx-runtime-2.3.7.tgz",
+        "integrity": "sha512-F7DNV2NMcTxA4GqPVHnXzX+mpoPHAIY9rJAVH3CZ1FdBZOcBUEjUuvMkMpHVs/sicEtznh9tMGj5WUR9S4E2rg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-hast-util-to-jsx-runtime-2.3.7/license"
+        ]
+      },
+      {
+        "name": "hast-util-whitespace",
+        "version": "3.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/hast-util-whitespace/-/hast-util-whitespace-3.0.0.tgz",
+        "integrity": "sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-hast-util-whitespace-3.0.0/license"
+        ]
+      },
+      {
+        "name": "html-url-attributes",
+        "version": "3.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/html-url-attributes/-/html-url-attributes-3.0.1.tgz",
+        "integrity": "sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-html-url-attributes-3.0.1/license"
+        ]
+      },
+      {
+        "name": "inline-style-parser",
+        "version": "0.2.9",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/inline-style-parser/-/inline-style-parser-0.2.9.tgz",
+        "integrity": "sha512-IttN8BqKLxzUrnTqHI+/hwAJQItBAUjdoHERCDv+oOuX48VP6bzW8+QjOXSfoevzq3YrYAwX1uLHp8TqO9yIeg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-inline-style-parser-0.2.9/LICENSE"
+        ]
+      },
+      {
+        "name": "is-alphabetical",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/is-alphabetical/-/is-alphabetical-2.0.1.tgz",
+        "integrity": "sha512-FWyyY60MeTNyeSRpkM2Iry0G9hpr7/9kD40mD/cGQEuilcZYS4okz8SN2Q6rLCJ8gbCt6fN+rC+6tMGS99LaxQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-is-alphabetical-2.0.1/license"
+        ]
+      },
+      {
+        "name": "is-alphanumerical",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/is-alphanumerical/-/is-alphanumerical-2.0.1.tgz",
+        "integrity": "sha512-hmbYhX/9MUMF5uh7tOXyK/n0ZvWpad5caBA17GsC6vyuCqaWliRG5K1qS9inmUhEMaOBIW7/whAnSwveW/LtZw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-is-alphanumerical-2.0.1/license"
+        ]
+      },
+      {
+        "name": "is-decimal",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/is-decimal/-/is-decimal-2.0.1.tgz",
+        "integrity": "sha512-AAB9hiomQs5DXWcRB1rqsxGUstbRroFOPPVAomNk/3XHR5JyEZChOyTWe2oayKnsSsr/kcGqF+z6yuH6HHpN0A==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-is-decimal-2.0.1/license"
+        ]
+      },
+      {
+        "name": "is-hexadecimal",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/is-hexadecimal/-/is-hexadecimal-2.0.1.tgz",
+        "integrity": "sha512-DgZQp241c8oO6cA1SbTEWiXeoxV42vlcJxgH+B3hi1AiqqKruZR3ZGF8In3fj4+/y/7rHvlOZLZtgJ/4ttYGZg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-is-hexadecimal-2.0.1/license"
+        ]
+      },
+      {
+        "name": "is-plain-obj",
+        "version": "4.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-4.1.0.tgz",
+        "integrity": "sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-is-plain-obj-4.1.0/license"
+        ]
+      },
+      {
+        "name": "longest-streak",
+        "version": "3.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/longest-streak/-/longest-streak-3.1.0.tgz",
+        "integrity": "sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-longest-streak-3.1.0/license"
+        ]
+      },
+      {
+        "name": "markdown-table",
+        "version": "3.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/markdown-table/-/markdown-table-3.0.4.tgz",
+        "integrity": "sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-markdown-table-3.0.4/license"
+        ]
+      },
+      {
+        "name": "mdast-util-find-and-replace",
+        "version": "3.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-find-and-replace/-/mdast-util-find-and-replace-3.0.4.tgz",
+        "integrity": "sha512-z4B5c6jrnJ1ltOQemhWYPBSAo6y42Z8Gt2yEgfgNTMcLSU59B8bfj8Z8AnAlJrBGLnqkdAUZ7jdDEqQw3KuipQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-find-and-replace-3.0.4/license"
+        ]
+      },
+      {
+        "name": "mdast-util-from-markdown",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-from-markdown/-/mdast-util-from-markdown-2.1.0.tgz",
+        "integrity": "sha512-KRLgmPaP2H1ul2bpoJkOS+9pAcDAAj9Nu1mqLnh8NLeJG5tlvj42TH80PIGBpROWlRXLk0lDrWNuZCFy/tsB4A==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-from-markdown-2.1.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm",
+        "version": "3.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm/-/mdast-util-gfm-3.1.0.tgz",
+        "integrity": "sha512-0ulfdQOM3ysHhCJ1p06l0b0VKlhU0wuQs3thxZQagjcjPrlFRqY215uZGHHJan9GEAXd9MbfPjFJz+qMkVR6zQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-3.1.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm-autolink-literal",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm-autolink-literal/-/mdast-util-gfm-autolink-literal-2.0.1.tgz",
+        "integrity": "sha512-5HVP2MKaP6L+G6YaxPNjuL0BPrq9orG3TsrZ9YXbA3vDw/ACI4MEsnoDpn6ZNm7GnZgtAcONJyPhOP8tNJQavQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-autolink-literal-2.0.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm-footnote",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm-footnote/-/mdast-util-gfm-footnote-2.1.0.tgz",
+        "integrity": "sha512-sqpDWlsHn7Ac9GNZQMeUzPQSMzR6Wv0WKRNvQRg0KqHh02fpTz69Qc1QSseNX29bhz1ROIyNyxExfawVKTm1GQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-footnote-2.1.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm-strikethrough",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm-strikethrough/-/mdast-util-gfm-strikethrough-2.0.1.tgz",
+        "integrity": "sha512-OuJHqvr455pwu2OaOrir7dbzqs4jlWKOtlu9L6GjcIjjQwNyw02VntQsr/Ek6/A13vgnXfUhBekWRUP1OkNivw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-strikethrough-2.0.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm-table",
+        "version": "2.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm-table/-/mdast-util-gfm-table-2.0.0.tgz",
+        "integrity": "sha512-78UEvebzz/rJIxLvE7ZtDd/vIQ0RHv+3Mh5DR96p7cS7HsBhYIICDBCu8csTNWNO6tBWfqXPWekRuj2FNOGOZg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-table-2.0.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-gfm-task-list-item",
+        "version": "2.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-gfm-task-list-item/-/mdast-util-gfm-task-list-item-2.0.0.tgz",
+        "integrity": "sha512-IrtvNvjxC1o06taBAVJznEnkiHxLFTzgonUdy8hzFVeDun0uTjxxrRGVaNFqkU1wJR3RBPEfsxmU6jDWPofrTQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-gfm-task-list-item-2.0.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-mdx-expression",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-mdx-expression/-/mdast-util-mdx-expression-2.0.1.tgz",
+        "integrity": "sha512-J6f+9hUp+ldTZqKRSg7Vw5V6MqjATc+3E4gf3CFNcuZNWD8XdyI6zQ8GqH7f8169MM6P7hMBRDVGnn7oHB9kXQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-mdx-expression-2.0.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-mdx-jsx",
+        "version": "3.2.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-mdx-jsx/-/mdast-util-mdx-jsx-3.2.0.tgz",
+        "integrity": "sha512-lj/z8v0r6ZtsN/cGNNtemmmfoLAFZnjMbNyLzBafjzikOM+glrjNHPlf6lQDOTccj9n5b0PPihEBbhneMyGs1Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-mdx-jsx-3.2.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-mdxjs-esm",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-mdxjs-esm/-/mdast-util-mdxjs-esm-2.0.1.tgz",
+        "integrity": "sha512-EcmOpxsZ96CvlP03NghtH1EsLtr0n9Tm4lPUJUBccV9RwUOneqSycg19n5HGzCf+10LozMRSObtVr3ee1WoHtg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-mdxjs-esm-2.0.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-phrasing",
+        "version": "4.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-phrasing/-/mdast-util-phrasing-4.1.0.tgz",
+        "integrity": "sha512-TqICwyvJJpBwvGAMZjj4J2n0X8QWp21b9l0o7eXyVJ25YNWYbJDVIyD1bZXE6WtV6RmKJVYmQAKWa0zWOABz2w==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-phrasing-4.1.0/license"
+        ]
+      },
+      {
+        "name": "mdast-util-to-hast",
+        "version": "13.2.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-to-hast/-/mdast-util-to-hast-13.2.1.tgz",
+        "integrity": "sha512-cctsq2wp5vTsLIcaymblUriiTcZd0CwWtCbLvrOzYCDZoWyMNV8sZ7krj09FSnsiJi3WVsHLM4k6Dq/yaPyCXA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-to-hast-13.2.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-to-markdown",
+        "version": "2.2.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-to-markdown/-/mdast-util-to-markdown-2.2.1.tgz",
+        "integrity": "sha512-ThatlCBxG2GE+mljhNSfZPv56d3QrGiRh97jjYgIk80IzS4uU6d7cHAaexCYSAmUCCcOs3grJ07kX3oTGsFUOw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-to-markdown-2.2.1/license"
+        ]
+      },
+      {
+        "name": "mdast-util-to-string",
+        "version": "4.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/mdast-util-to-string/-/mdast-util-to-string-4.0.0.tgz",
+        "integrity": "sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-mdast-util-to-string-4.0.0/license"
+        ]
+      },
+      {
+        "name": "micromark",
+        "version": "4.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark/-/micromark-4.0.3.tgz",
+        "integrity": "sha512-oGYfQzHSG5dOMovQcJ3fyTmZlWAWpi0XA0sJwJs+i6OT88o1+Jtw/8z0CmdowSLxGhhFK89rQ/oXph/wN02PNw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-4.0.3/license"
+        ]
+      },
+      {
+        "name": "micromark-core-commonmark",
+        "version": "2.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-core-commonmark/-/micromark-core-commonmark-2.0.4.tgz",
+        "integrity": "sha512-wxEeE8v8XVvOrxn1TZj74qYhAtTQsSqufHVS3uNVyT1MupXxhyaHk8/9xDNPh9BmL77QNDgWTkZ3RsYHB2ry7w==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-core-commonmark-2.0.4/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm",
+        "version": "3.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm/-/micromark-extension-gfm-3.0.0.tgz",
+        "integrity": "sha512-vsKArQsicm7t0z2GugkCKtZehqUm31oeGBV/KVSorWSy8ZlNAv7ytjFhvaryUiCUJYqs+NoE6AFhpQvBTM6Q4w==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-3.0.0/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-autolink-literal",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-autolink-literal/-/micromark-extension-gfm-autolink-literal-2.1.0.tgz",
+        "integrity": "sha512-oOg7knzhicgQ3t4QCjCWgTmfNhvQbDDnJeVu9v81r7NltNCVmhPy1fJRX27pISafdjL+SVc4d3l48Gb6pbRypw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-autolink-literal-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-footnote",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-footnote/-/micromark-extension-gfm-footnote-2.1.0.tgz",
+        "integrity": "sha512-/yPhxI1ntnDNsiHtzLKYnE3vf9JZ6cAisqVDauhp4CEHxlb4uoOTxOCJ+9s51bIB8U1N1FJ1RXOKTIlD5B/gqw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-footnote-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-strikethrough",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-strikethrough/-/micromark-extension-gfm-strikethrough-2.1.0.tgz",
+        "integrity": "sha512-ADVjpOOkjz1hhkZLlBiYA9cR2Anf8F4HqZUO6e5eDcPQd0Txw5fxLzzxnEkSkfnD0wziSGiv7sYhk/ktvbf1uw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-strikethrough-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-table",
+        "version": "2.1.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-table/-/micromark-extension-gfm-table-2.1.2.tgz",
+        "integrity": "sha512-pRzm4kDTu0MjlmBkxmS9yYhw60nncfcEwu9NNdPFSQEFXS95ZKyIIyTSHu/o3ReBUrLKYEq+7YaXCRn/bPB4MA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-table-2.1.2/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-tagfilter",
+        "version": "2.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-tagfilter/-/micromark-extension-gfm-tagfilter-2.0.0.tgz",
+        "integrity": "sha512-xHlTOmuCSotIA8TW1mDIM6X2O1SiX5P9IuDtqGonFhEK0qgRI4yeC6vMxEV2dgyr2TiD+2PQ10o+cOhdVAcwfg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-tagfilter-2.0.0/license"
+        ]
+      },
+      {
+        "name": "micromark-extension-gfm-task-list-item",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-extension-gfm-task-list-item/-/micromark-extension-gfm-task-list-item-2.1.0.tgz",
+        "integrity": "sha512-qIBZhqxqI6fjLDYFTBIa4eivDMnP+OZqsNwmQ3xNLE4Cxwc+zfQEfbs6tzAo2Hjq+bh6q5F+Z8/cksrLFYWQQw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-extension-gfm-task-list-item-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-factory-destination",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-factory-destination/-/micromark-factory-destination-2.0.1.tgz",
+        "integrity": "sha512-Xe6rDdJlkmbFRExpTOmRj9N3MaWmbAgdpSrBQvCFqhezUn4AHqJHbaEnfbVYYiexVSs//tqOdY/DxhjdCiJnIA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-factory-destination-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-factory-label",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-factory-label/-/micromark-factory-label-2.0.1.tgz",
+        "integrity": "sha512-VFMekyQExqIW7xIChcXn4ok29YE3rnuyveW3wZQWWqF4Nv9Wk5rgJ99KzPvHjkmPXF93FXIbBp6YdW3t71/7Vg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-factory-label-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-factory-space",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-factory-space/-/micromark-factory-space-2.1.0.tgz",
+        "integrity": "sha512-fS8hnLIjnjvdQIj39Geug8wWsR0HrYZ43KShKxNfwT7t2LOHo/LbWZEzEaSOjwtjdCsjoE6syHhonEzW0zv0+Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-factory-space-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-factory-title",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-factory-title/-/micromark-factory-title-2.0.1.tgz",
+        "integrity": "sha512-5bZ+3CjhAd9eChYTHsjy6TGxpOFSKgKKJPJxr293jTbfry2KDoWkhBb6TcPVB4NmzaPhMs1Frm9AZH7OD4Cjzw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-factory-title-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-factory-whitespace",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-factory-whitespace/-/micromark-factory-whitespace-2.0.1.tgz",
+        "integrity": "sha512-Ob0nuZ3PKt/n0hORHyvoD9uZhr+Za8sFoP+OnMcnWK5lngSzALgQYKMr9RJVOWLqQYuyn6ulqGWSXdwf6F80lQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-factory-whitespace-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-character",
+        "version": "2.1.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-character/-/micromark-util-character-2.1.1.tgz",
+        "integrity": "sha512-wv8tdUTJ3thSFFFJKtpYKOYiGP2+v96Hvk4Tu8KpCAsTMs6yi+nVmGh1syvSCsaxz45J6Jbw+9DD6g97+NV67Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-character-2.1.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-chunked",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-chunked/-/micromark-util-chunked-2.0.1.tgz",
+        "integrity": "sha512-QUNFEOPELfmvv+4xiNg2sRYeS/P84pTW0TCgP5zc9FpXetHY0ab7SxKyAQCNCc1eK0459uoLI1y5oO5Vc1dbhA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-chunked-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-classify-character",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-classify-character/-/micromark-util-classify-character-2.0.1.tgz",
+        "integrity": "sha512-K0kHzM6afW/MbeWYWLjoHQv1sgg2Q9EccHEDzSkxiP/EaagNzCm7T/WMKZ3rjMbvIpvBiZgwR3dKMygtA4mG1Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-classify-character-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-combine-extensions",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-combine-extensions/-/micromark-util-combine-extensions-2.0.1.tgz",
+        "integrity": "sha512-OnAnH8Ujmy59JcyZw8JSbK9cGpdVY44NKgSM7E9Eh7DiLS2E9RNQf0dONaGDzEG9yjEl5hcqeIsj4hfRkLH/Bg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-combine-extensions-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-decode-numeric-character-reference",
+        "version": "2.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-decode-numeric-character-reference/-/micromark-util-decode-numeric-character-reference-2.0.2.tgz",
+        "integrity": "sha512-ccUbYk6CwVdkmCQMyr64dXz42EfHGkPQlBj5p7YVGzq8I7CtjXZJrubAYezf7Rp+bjPseiROqe7G6foFd+lEuw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-decode-numeric-character-reference-2.0.2/license"
+        ]
+      },
+      {
+        "name": "micromark-util-decode-string",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-decode-string/-/micromark-util-decode-string-2.0.1.tgz",
+        "integrity": "sha512-nDV/77Fj6eH1ynwscYTOsbK7rR//Uj0bZXBwJZRfaLEJ1iGBR6kIfNmlNqaqJf649EP0F3NWNdeJi03elllNUQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-decode-string-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-edit-map",
+        "version": "1.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-edit-map/-/micromark-util-edit-map-1.0.0.tgz",
+        "integrity": "sha512-Pa2ljlsEL6sVwFaYeyrOLSYbQt73JvGbPOYFq+9AElXiSnfI5Q4465RRZ1sHv7lDjDOnGRDDaqPXqClqWK/q1Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-edit-map-1.0.0/license"
+        ]
+      },
+      {
+        "name": "micromark-util-encode",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-encode/-/micromark-util-encode-2.0.1.tgz",
+        "integrity": "sha512-c3cVx2y4KqUnwopcO9b/SCdo2O67LwJJ/UyqGfbigahfegL9myoEFoDYZgkT7f36T0bLrM9hZTAaAyH+PCAXjw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-encode-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-html-tag-name",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-html-tag-name/-/micromark-util-html-tag-name-2.0.1.tgz",
+        "integrity": "sha512-2cNEiYDhCWKI+Gs9T0Tiysk136SnR13hhO8yW6BGNyhOC4qYFnwF1nKfD3HFAIXA5c45RrIG1ub11GiXeYd1xA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-html-tag-name-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-normalize-identifier",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-normalize-identifier/-/micromark-util-normalize-identifier-2.0.1.tgz",
+        "integrity": "sha512-sxPqmo70LyARJs0w2UclACPUUEqltCkJ6PhKdMIDuJ3gSf/Q+/GIe3WKl0Ijb/GyH9lOpUkRAO2wp0GVkLvS9Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-normalize-identifier-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-resolve-all",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-resolve-all/-/micromark-util-resolve-all-2.0.1.tgz",
+        "integrity": "sha512-VdQyxFWFT2/FGJgwQnJYbe1jjQoNTS4RjglmSjTUlpUMa95Htx9NHeYW4rGDJzbjvCsl9eLjMQwGeElsqmzcHg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-resolve-all-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-sanitize-uri",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-sanitize-uri/-/micromark-util-sanitize-uri-2.0.1.tgz",
+        "integrity": "sha512-9N9IomZ/YuGGZZmQec1MbgxtlgougxTodVwDzzEouPKo3qFWvymFHWcnDi2vzV1ff6kas9ucW+o3yzJK9YB1AQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-sanitize-uri-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-subtokenize",
+        "version": "2.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-subtokenize/-/micromark-util-subtokenize-2.1.0.tgz",
+        "integrity": "sha512-XQLu552iSctvnEcgXw6+Sx75GflAPNED1qx7eBJ+wydBb2KCbRZe+NwvIEEMM83uml1+2WSXpBAcp9IUCgCYWA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-subtokenize-2.1.0/license"
+        ]
+      },
+      {
+        "name": "micromark-util-symbol",
+        "version": "2.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-symbol/-/micromark-util-symbol-2.0.1.tgz",
+        "integrity": "sha512-vs5t8Apaud9N28kgCrRUdEed4UJ+wWNvicHLPxCa9ENlYuAY31M0ETy5y1vA33YoNPDFTghEbnh6efaE8h4x0Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-symbol-2.0.1/license"
+        ]
+      },
+      {
+        "name": "micromark-util-types",
+        "version": "2.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/micromark-util-types/-/micromark-util-types-2.0.3.tgz",
+        "integrity": "sha512-oxB2Ik03hI0gv+VNn9tnh1t1YEe9MDPptViAEgfdf3YQHsn0pzGTgCdlSCJXcwhqm8phaEuM7zeEu3QQzVBrPg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-micromark-util-types-2.0.3/license"
+        ]
+      },
+      {
+        "name": "ms",
+        "version": "2.1.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
+        "integrity": "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-ms-2.1.3/license.md"
+        ]
+      },
+      {
         "name": "nanoid",
         "version": "3.3.20",
         "license": "MIT",
@@ -3050,6 +4606,34 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-nanoid-3.3.20/LICENSE"
+        ]
+      },
+      {
+        "name": "parse-entities",
+        "version": "4.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/parse-entities/-/parse-entities-4.0.2.tgz",
+        "integrity": "sha512-GG2AQYWoLgL877gQIKeRPGO1xF9+eG1ujIb5soS5gPvLQ1y2o8FL90w2QWNdf9I361Mpp7726c+lj3U0qK1uGw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-parse-entities-4.0.2/license"
+        ]
+      },
+      {
+        "name": "@types/unist",
+        "version": "2.0.11",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/unist/-/unist-2.0.11.tgz",
+        "integrity": "sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__unist-2.0.11/LICENSE"
         ]
       },
       {
@@ -3127,6 +4711,20 @@
         ]
       },
       {
+        "name": "property-information",
+        "version": "7.2.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/property-information/-/property-information-7.2.0.tgz",
+        "integrity": "sha512-IAtzIB6sUiWaJYrX9smp3V46pBGbBeLFRGdh25kg1334VcBlD8HzhPeNIWQH9zhGmo2itIe25EHt9dQP7G5hmg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-property-information-7.2.0/license"
+        ]
+      },
+      {
         "name": "react",
         "version": "19.2.4",
         "license": "MIT",
@@ -3152,6 +4750,76 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-react-dom-19.2.4/LICENSE"
+        ]
+      },
+      {
+        "name": "react-markdown",
+        "version": "10.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/react-markdown/-/react-markdown-10.1.0.tgz",
+        "integrity": "sha512-qKxVopLT/TyA6BX3Ue5NwabOsAzm0Q7kAPwq6L+wWDwisYs7R8vZ0nRXqq6rkueboxpkjvLGU9fWifiX/ZZFxQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-react-markdown-10.1.0/license"
+        ]
+      },
+      {
+        "name": "remark-gfm",
+        "version": "4.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/remark-gfm/-/remark-gfm-4.0.1.tgz",
+        "integrity": "sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-remark-gfm-4.0.1/license"
+        ]
+      },
+      {
+        "name": "remark-parse",
+        "version": "11.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/remark-parse/-/remark-parse-11.0.0.tgz",
+        "integrity": "sha512-FCxlKLNGknS5ba/1lmpYijMUzX2esxW5xQqjWxw2eHFfS2MSdaHVINFmhjo+qN1WhZhNimq0dZATN9pH0IDrpA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-remark-parse-11.0.0/license"
+        ]
+      },
+      {
+        "name": "remark-rehype",
+        "version": "11.1.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/remark-rehype/-/remark-rehype-11.1.2.tgz",
+        "integrity": "sha512-Dh7l57ianaEoIpzbp0PC9UKAdCSVklD8E5Rpw7ETfbTl3FqcOOgq5q2LVDhgGCkaBv7p24JXikPdvhhmHvKMsw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-remark-rehype-11.1.2/license"
+        ]
+      },
+      {
+        "name": "remark-stringify",
+        "version": "11.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/remark-stringify/-/remark-stringify-11.0.0.tgz",
+        "integrity": "sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-remark-stringify-11.0.0/license"
         ]
       },
       {
@@ -3197,6 +4865,48 @@
         ]
       },
       {
+        "name": "space-separated-tokens",
+        "version": "2.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/space-separated-tokens/-/space-separated-tokens-2.0.2.tgz",
+        "integrity": "sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-space-separated-tokens-2.0.2/license"
+        ]
+      },
+      {
+        "name": "stringify-entities",
+        "version": "4.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/stringify-entities/-/stringify-entities-4.0.4.tgz",
+        "integrity": "sha512-IwfBptatlO+QCJUo19AqvrPNqlVMpW9YEL2LIVY+Rpv2qsjCGxaDLNRgeGsQWJhfItebuJhsGSLjaBbNSQ+ieg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-stringify-entities-4.0.4/license"
+        ]
+      },
+      {
+        "name": "style-to-object",
+        "version": "2.0.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/style-to-object/-/style-to-object-2.0.2.tgz",
+        "integrity": "sha512-QmbXPUylqU80HAgTOJeEOdbA40W9KtxmjMhQy+tq+b8F2aoh3aQLuy82hh2jm2qsC9hR9eI0+eQidTMydKcqRA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-style-to-object-2.0.2/LICENSE"
+        ]
+      },
+      {
         "name": "tinyglobby",
         "version": "0.2.17",
         "license": "MIT",
@@ -3208,6 +4918,34 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-tinyglobby-0.2.17/LICENSE"
+        ]
+      },
+      {
+        "name": "trim-lines",
+        "version": "3.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/trim-lines/-/trim-lines-3.0.1.tgz",
+        "integrity": "sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-trim-lines-3.0.1/license"
+        ]
+      },
+      {
+        "name": "trough",
+        "version": "2.2.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/trough/-/trough-2.2.0.tgz",
+        "integrity": "sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-trough-2.2.0/license"
         ]
       },
       {
@@ -3240,6 +4978,118 @@
         ]
       },
       {
+        "name": "unified",
+        "version": "11.0.5",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unified/-/unified-11.0.5.tgz",
+        "integrity": "sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unified-11.0.5/license"
+        ]
+      },
+      {
+        "name": "unist-util-is",
+        "version": "6.0.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unist-util-is/-/unist-util-is-6.0.1.tgz",
+        "integrity": "sha512-LsiILbtBETkDz8I9p1dQ0uyRUWuaQzd/cuEeS1hoRSyW5E5XGmTzlwY1OrNzzakGowI9Dr/I8HVaw4hTtnxy8g==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unist-util-is-6.0.1/license"
+        ]
+      },
+      {
+        "name": "unist-util-position",
+        "version": "5.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unist-util-position/-/unist-util-position-5.0.0.tgz",
+        "integrity": "sha512-fucsC7HjXvkB5R3kTCO7kUjRdrS0BJt3M/FPxmHMBOm8JQi2BsHAHFsy27E0EolP8rp0NzXsJ+jNPyDWvOJZPA==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unist-util-position-5.0.0/license"
+        ]
+      },
+      {
+        "name": "unist-util-stringify-position",
+        "version": "4.0.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unist-util-stringify-position/-/unist-util-stringify-position-4.0.0.tgz",
+        "integrity": "sha512-0ASV06AAoKCDkS2+xw5RXJywruurpbC4JZSm7nr7MOt1ojAzvyyaO+UxZf18j8FCF6kmzCZKcAgN/yu2gm2XgQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unist-util-stringify-position-4.0.0/license"
+        ]
+      },
+      {
+        "name": "unist-util-visit",
+        "version": "5.2.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unist-util-visit/-/unist-util-visit-5.2.0.tgz",
+        "integrity": "sha512-fpsYs/VVoZxfGY9/j3FQpZmN8wdLJaV1Pt38AaJNZu9uKIHcFU3halCdBveEq1HGKO1OEfJY65w1zvoFV1b3qQ==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unist-util-visit-5.2.0/license"
+        ]
+      },
+      {
+        "name": "unist-util-visit-parents",
+        "version": "6.1.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/unist-util-visit-parents/-/unist-util-visit-parents-6.1.0.tgz",
+        "integrity": "sha512-vKXxz6O38sKDj1mtx/k2cWvkkFBuYGx6uGrlzBkVeWCRF/F8sdI0j3Wbkz/5rVNRRuVc8UrgRdbCxNhmYXgP3w==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-unist-util-visit-parents-6.1.0/license"
+        ]
+      },
+      {
+        "name": "vfile",
+        "version": "6.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/vfile/-/vfile-6.0.3.tgz",
+        "integrity": "sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-vfile-6.0.3/license"
+        ]
+      },
+      {
+        "name": "vfile-message",
+        "version": "4.0.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/vfile-message/-/vfile-message-4.0.3.tgz",
+        "integrity": "sha512-QTHzsGd1EhbZs4AsQ20JX1rC3cOlt/IWJruk893DfLRr57lcnOeMaWG4K0JrRta4mIJZKth2Au3mM3u03/JWKw==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-vfile-message-4.0.3/license"
+        ]
+      },
+      {
         "name": "vite",
         "version": "7.3.7",
         "license": "MIT",
@@ -3265,6 +5115,20 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-fsevents-2.3.3/LICENSE"
+        ]
+      },
+      {
+        "name": "zwitch",
+        "version": "2.0.4",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/zwitch/-/zwitch-2.0.4.tgz",
+        "integrity": "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==",
+        "scope": "runtime",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-zwitch-2.0.4/license"
         ]
       }
     ],

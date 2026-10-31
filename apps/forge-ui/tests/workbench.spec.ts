@@ -38,7 +38,7 @@ test('streamed chat, real denial, interruption, reload and isolated session cont
     await page.getByTestId('chat-input').fill('Hello fixture');
     await page.getByTestId('send-message').click();
     await expect(page.getByTestId('conversation').getByText('Native fixture reply', { exact: true })).toBeVisible();
-    await expect(page.getByTestId('conversation').getByText('Turno completed', { exact: true })).toBeVisible();
+    await expect(page.getByTestId('conversation').getByText('Resposta concluída', { exact: true })).toBeVisible();
     await page.getByRole('tab', { name: 'Consumo', exact: true }).click();
     await expect(page.getByText('18', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Permitir uma vez' })).toHaveCount(0);
@@ -46,15 +46,15 @@ test('streamed chat, real denial, interruption, reload and isolated session cont
     await page.getByTestId('send-message').click();
     await expect(page.getByText('Permission fixture request')).toBeVisible();
     await page.getByRole('button', { name: 'Recusar', exact: true }).click();
-    await expect(page.getByTestId('conversation').getByText('Turno failed', { exact: true })).toBeVisible();
-    await expect(page.getByText('decline', { exact: true })).toBeVisible();
+    await expect(page.getByTestId('conversation').getByText('Não foi possível concluir a resposta', { exact: true })).toBeVisible();
+    await expect(page.getByText('Decisão enviada: Recusar.', { exact: true })).toBeVisible();
     await page.getByTestId('chat-input').fill('wait');
     await page.getByTestId('send-message').click();
     await expect(page.getByTestId('interrupt-turn')).toBeVisible();
     await page.getByTestId('interrupt-turn').click();
-    await expect(page.getByText('Turno interrupted', { exact: true })).toBeVisible();
+    await expect(page.getByText('Resposta interrompida', { exact: true })).toBeVisible();
     await page.reload();
-    await expect(page.getByText('Turno interrupted', { exact: true })).toBeVisible();
+    await expect(page.getByText('Resposta interrompida', { exact: true })).toBeVisible();
     await page.getByTestId('new-session').click();
     await expect(page.getByTestId('session-list').getByRole('button')).toHaveCount(2);
     await expect(page.getByTestId('conversation').getByText('Native fixture reply', { exact: true })).toHaveCount(0);

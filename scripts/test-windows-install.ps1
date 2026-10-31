@@ -13,6 +13,8 @@ try {
     & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 $hash -InstallDir $install -NoPath
     & (Join-Path $install 'illumitech-forge.exe') --version
     if ($LASTEXITCODE -ne 0) { throw 'Installed executable failed' }
+    & (Join-Path $install 'forge.exe') --version
+    if ($LASTEXITCODE -ne 0) { throw 'Installed native forge executable failed' }
     & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 $hash -InstallDir $install
     & "$PSScriptRoot/install.ps1" -Archive $archive -Sha256 $hash -InstallDir $install
     if (@([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $install }).Count -ne 1) { throw 'PATH is not idempotent' }
@@ -26,6 +28,7 @@ try {
     & "$PSScriptRoot/uninstall.ps1" -InstallDir $install
     & "$PSScriptRoot/uninstall.ps1" -InstallDir $install
     if ((Get-Content -LiteralPath (Join-Path $install 'unrelated.txt')) -ne 'preserve') { throw 'Lost unrelated file' }
+    if (Test-Path (Join-Path $install 'forge.exe')) { throw 'Uninstall left native forge executable' }
     if (Test-Path (Join-Path $install 'illumitech-forge.exe')) { throw 'Uninstall left managed executable' }
     if ([Environment]::GetEnvironmentVariable('Path', 'User') -ne $originalPath) { throw 'PATH not restored' }
 } finally { [Environment]::SetEnvironmentVariable('Path', $originalPath, 'User'); if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force } }

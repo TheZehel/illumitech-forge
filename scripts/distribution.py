@@ -129,7 +129,11 @@ def run(mode, output=None):
         contracts = json.loads(subprocess.check_output([executable, '--json', 'contracts'], cwd=extracted))
         if contracts['contracts']['manifest'] != 1:
             raise ValueError('extracted CLI contract mismatch')
-        cargo(extracted, 'test', '-p', ORDER[-1], '--bin', 'illumitech-forge',
+        short = executable.with_name('forge.exe' if __import__('os').name == 'nt' else 'forge')
+        short_contracts = json.loads(subprocess.check_output([short, '--json', 'contracts'], cwd=extracted))
+        if short_contracts != contracts or not subprocess.check_output([short, '--version'], text=True).startswith('forge '):
+            raise ValueError('extracted native forge contract mismatch')
+        cargo(extracted, 'test', '-p', ORDER[-1], '--lib',
               'standalone_package_embeds_all_referenced_ui_assets', '--offline',
               '--target-dir', str(temp / 'build'))
         if output is not None:
