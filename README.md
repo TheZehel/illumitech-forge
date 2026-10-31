@@ -5,14 +5,17 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.0.0.** A release reúne os contratos e evidências da candidata aprovada.
+**Illumitech Forge 1.1.0.** Comando nativo `forge`, conversa formatada e experiência de terminal.
 Compilar esta árvore não altera seu binário instalado. Consulte as
-[notas da release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0)
-para os artefatos, checksums e limites de suporte.
+[notas da entrega](docs/release-v1.1.0.md) para artefatos, validação e limites de suporte.
 
 [English](README.en.md) · [Começar](docs/v1-candidate.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
 ![Uma peça laranja atravessa checkpoints até uma estrutura verde-petróleo sobre fundo grafite](docs/assets/cover.webp)
+
+A entrega **1.1.0** acrescenta o comando Rust nativo `forge` e uma experiência de terminal
+com identidade ASCII, Markdown, ajuda, menu de comandos e histórico pesquisável.
+As notas e a cobertura ficam em [release 1.1.0](docs/release-v1.1.0.md).
 
 ## O que está implementado
 
@@ -42,6 +45,10 @@ FORGE_OPS="$(mktemp -d)"
 ./target/release/illumitech-forge --state-dir "$FORGE_OPS/state" workbench --root "$PWD" --port 0
 ```
 
+A conversa também possui uma [interface interativa no terminal](docs/terminal-chat.md),
+disponível neste candidato com `chat --root CAMINHO_DO_PROJETO` e `--state-dir` externo.
+
+
 Abra a URL local emitida e mantenha-a privada. O servidor é foreground e atende somente em
 loopback. Os assets da UI vêm no binário; Node não é necessário para usá-lo. Para desenvolver
 a UI, use Node 24 LTS e `npm ci --prefix apps/forge-ui --ignore-scripts`.
@@ -57,8 +64,12 @@ python3 scripts/demo.py "$FORGE_DEMO"
 ./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" report "$FORGE_DEMO/release.yaml"
 ```
 
-Instale a versão 1.0.0 com
-`cargo install illumitech-forge-cli --version 1.0.0 --locked`.
+A instalação da versão 1.1.0, após sua publicação, será feita com
+`cargo install illumitech-forge-cli --version 1.1.0 --locked`.
+
+O candidato também fornece o executável Rust nativo **`forge`**. Basta executar `forge`
+para abrir a conversa no projeto atual; fora de um projeto, escolha uma pasta na interface.
+Veja [entrada nativa e instalação](docs/native-command.md).
 A instalação global é uma ação explícita; o código não troca seu PATH automaticamente.
 
 ## Ciclo de trabalho

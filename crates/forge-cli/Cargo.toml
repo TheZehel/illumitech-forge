@@ -7,6 +7,7 @@ rust-version.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Evidence-backed agent execution CLI"
+default-run = "forge"
 readme = "README.md"
 include = ["src/**", "build.rs", "ui-dist/**", "tests/**", "Cargo.toml", "README.md", "LICENSE", "THIRD_PARTY_NOTICES", "THIRD_PARTY_LICENSES/**", "dependencies.json"]
 [dependencies]
@@ -24,13 +25,22 @@ fs2.workspace = true
 libc.workspace = true
 rusqlite = { workspace = true, features = ["hooks", "backup"] }
 tempfile.workspace = true
-forge-domain = { package = "illumitech-forge-domain", version = "=1.0.0", path = "../forge-domain" }
-forge-adapters = { package = "illumitech-forge-adapters", version = "=1.0.0", path = "../forge-adapters" }
-forge-catalog = { package = "illumitech-forge-catalog", version = "=1.0.0", path = "../forge-catalog" }
+forge-domain = { package = "illumitech-forge-domain", version = "=1.1.0", path = "../forge-domain" }
+forge-adapters = { package = "illumitech-forge-adapters", version = "=1.1.0", path = "../forge-adapters" }
+forge-catalog = { package = "illumitech-forge-catalog", version = "=1.1.0", path = "../forge-catalog" }
+ratatui = { version = "=0.30.2", default-features = false, features = ["crossterm", "unstable-rendered-line-info"] }
+crossterm = "=0.29.0"
+pulldown-cmark = { version = "=0.13.6", default-features = false }
 
 [[bin]]
 name = "illumitech-forge"
 path = "src/main.rs"
+test = false
+
+[[bin]]
+name = "forge"
+path = "src/bin/forge.rs"
+test = false
 
 [dev-dependencies]
 tempfile.workspace = true

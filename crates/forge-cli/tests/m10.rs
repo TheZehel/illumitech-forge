@@ -163,7 +163,7 @@ fn v1_distribution_inventory_and_support_matrix() {
         contract["candidate"]
             .as_str()
             .unwrap()
-            .contains("unpublished")
+            .contains("not a publication")
     );
     assert!(
         contract["publication"]

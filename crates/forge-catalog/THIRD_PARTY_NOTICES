@@ -8,3 +8,10 @@ ai-memory and agent CLIs are external programs, not vendored or relicensed by Fo
 Optional catalog recipes retain their upstream licensing and installation requirements.
 The Illumitech logo is an existing Illumitech asset. Generated illustrations are recorded
 in docs/assets/provenance.json. Tool references do not imply endorsement.
+
+Web runtime notices include React, react-markdown, remark-gfm and their locked transitive
+dependencies; embedded UI assets include their license texts. The terminal frontend uses
+Ratatui and Crossterm; their notices are included in THIRD_PARTY_LICENSES.
+
+Terminal Markdown parsing uses pulldown-cmark and unicase; their original notices
+are preserved in THIRD_PARTY_LICENSES and the dependency inventory.

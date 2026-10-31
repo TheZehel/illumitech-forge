@@ -5,12 +5,16 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.0.0.** This release preserves the approved candidate contracts and evidence.
+**Illumitech Forge 1.1.0.** Native `forge`, formatted conversations and a dedicated terminal experience.
 Building this tree does not replace an installed binary. See the
-[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.0.0) for artifacts,
+[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.0) for artifacts,
 checksums and platform limits. [Português](README.md) · [Validation guide](docs/v1-candidate.md).
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
+
+The **1.1.0** delivery adds the native Rust `forge` command and a terminal experience with
+ASCII identity, Markdown, command menu, visual help and searchable session history.
+See [1.1.0 release notes](docs/release-v1.1.0.md) for validation and operational limits.
 
 ## Features
 
@@ -39,11 +43,19 @@ FORGE_OPS="$(mktemp -d)"
 ./target/release/illumitech-forge --state-dir "$FORGE_OPS/state" workbench --root "$PWD" --port 0
 ```
 
+This local candidate also includes an [interactive terminal interface](docs/terminal-chat.md):
+`chat --root PROJECT_PATH` with an external `--state-dir`.
+
+
 Open the private local URL emitted by the foreground server. It binds only to loopback.
 For a no-inference demo, run `python3 scripts/demo.py EXTERNAL_DEMO_DIR`, then inspect,
 dry-run and run its release with an explicit external `--state-dir`.
-The published version can be installed using
-`cargo install illumitech-forge-cli --version 1.0.0 --locked`; global installation is explicit.
+After publication, version 1.1.0 can be installed using
+`cargo install illumitech-forge-cli --version 1.1.0 --locked`; global installation is explicit.
+
+This candidate also provides the native Rust **`forge`** executable. Run `forge` to open
+the terminal conversation in the current project, or select a project from the interface.
+See [native entrypoint and installation](docs/native-command.md).
 
 ## Workflow and boundaries
 

@@ -7,12 +7,16 @@ export interface Message {
 }
 export function messages(events: Event[]): Message[] {
     const result = new Map<string, Message>();
+    let echo: Message | undefined;
+    const aliases = new Map<string, string>();
     events.forEach((e, index) => {
         const p = e.params;
         const item = object(p.item);
         const id = string(item.id) || string(p.itemId) || `event-${index}`;
-        if (e.method === 'bridge/user')
-            result.set(id, { id, kind: 'userMessage', text: string(p.text), status: '' });
+        if (e.method === 'bridge/user') {
+            echo = { id, kind: 'userMessage', text: string(p.text), status: '' };
+            result.set(id, echo);
+        }
         else if (e.method === 'item/agentMessage/delta') {
             const old = result.get(id);
             result.set(id, { id, kind: 'agentMessage', text: (old?.text ?? '') + string(p.delta), status: 'streaming' });
@@ -20,7 +24,14 @@ export function messages(events: Event[]): Message[] {
         else if (e.method === 'item/started' || e.method === 'item/completed') {
             const kind = string(item.type);
             const text = string(item.text) || string(item.aggregatedOutput) || string(item.command) || list(item.content).map(v => string(object(v).text)).join('\n') || (kind === 'fileChange' ? JSON.stringify(item.changes, null, 2) : '');
-            if (kind)
+            if (kind === 'userMessage' && aliases.has(id)) return;
+            if (kind === 'userMessage' && echo?.text === text) {
+                aliases.set(id, echo.id);
+                result.delete(id);
+                echo = undefined;
+                return;
+            }
+            if (kind && (kind !== 'userMessage' || text))
                 result.set(id, { id, kind, text, status: string(item.status) });
         }
         else if (e.method === 'turn/diff/updated')
@@ -31,8 +42,10 @@ export function messages(events: Event[]): Message[] {
             result.set(id, { id, kind: 'error', text: string(object(p.error).message) || string(p.reason), status: 'blocked' });
         else if (e.method === 'turn/plan/updated')
             result.set(id, { id, kind: 'plan', text: JSON.stringify(p.plan, null, 2), status: 'proposed' });
-        else if (e.method === 'turn/completed')
+        else if (e.method === 'turn/completed') {
+            echo = undefined;
             result.set(id, { id, kind: 'turn', text: `Turno ${string(object(p.turn).status)}${object(p.turn).error ? `: ${JSON.stringify(object(p.turn).error)}` : ''}`, status: string(object(p.turn).status) });
+        }
     });
     return [...result.values()];
 }

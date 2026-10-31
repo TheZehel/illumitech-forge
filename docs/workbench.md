@@ -157,3 +157,16 @@ HTTP/session ownership is project scoped. Native filesystem and MCP read visibil
 the inherited client configuration; it is not a universal repo-only OS read sandbox.
 Session labels persist as short generic names, without copying full prompts into ownership
 tables. Final-source native acceptance belongs to the operator ledger.
+
+## Conversation presentation (FORGE-035)
+
+The web conversation renders safe Markdown: headings, lists, tables and copyable code blocks.
+Raw HTML is skipped, executable links are rejected by the renderer, and model-suggested images
+are links requiring a user click. No extra inference rewrites the native response or changes its instructions.
+Initial connection and explicit resume use skeletons; sending and waiting have separate accessible
+statuses. Disconnection, interruption and failed writes stop the waiting indicator without replay.
+Selecting an already loaded conversation does not resume it again. Updates follow output only
+while the reader is near the bottom; a button returns to the latest response. Reduced motion disables
+animations. Operational details remain collapsible and native approvals remain explicit.
+
+A separate [terminal interface](terminal-chat.md) is available in this local candidate as `chat`.

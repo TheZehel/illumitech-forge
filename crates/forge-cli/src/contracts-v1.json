@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "described",
-  "candidate": "unpublished; local checks do not grant operational acceptance",
+  "candidate": "source metadata only; not a publication or operational acceptance attestation",
   "contracts": {
     "cli_json": 1,
     "http_api": 1,
@@ -33,5 +33,5 @@
     "windows": "experimental; native pilot unavailable",
     "claude": "deferred; no v1 native acceptance claim"
   },
-  "publication": "GitHub release, crates.io upload, visibility, push and merge require separate explicit authorization; none is triggered by version 1.0.0."
+  "publication": "GitHub release, crates.io upload, visibility, push and merge require separate explicit authorization; none is triggered by a version number."
 }
