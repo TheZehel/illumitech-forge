@@ -1,5 +1,33 @@
 # Contract v1
 
+## First-run additions (FORGE-040, 1.1.1)
+
+`demo create DIRECTORY` prepares a NEW disposable directory; it does not execute a release.
+Its schema-1 response includes `manifest`, `repo`, `state_dir`, `executed: false`,
+`native_inference_calls: 0` and explicit `commands` argv arrays for inspect/dry-run/run/report.
+Only Git is required. The manifest pins the external running binary as evaluator input;
+replacement of that binary invalidates the example. Existing destinations and symlinks are
+refused. Ambient Git routing overrides are rejected before creating files. Synthetic Git
+hooks/templates are empty, signing/fsmonitor disabled locally; no global configuration changes.
+
+`init PATH` now preserves existing memory routing and creates none by default. Explicit
+`--memory-workspace ID` creates routing only if absent, or reuses exactly matching content;
+different existing configuration is preserved and rejected. `memory_config` is an additive
+status string: `not_requested`, `created`, or `preserved`. Workspace IDs follow `valid_id`.
+
+`installation doctor` retains legacy fields and adds `path_diagnostics` with its own
+`schema_version: 1`. Both executable names report candidates and the first eligible PATH
+entry. Candidate versions remain null; only the running binary's version is known. No
+candidate is executed. At most 128 PATH directories are inspected; truncation is disclosed.
+Shell aliases/functions, command caches and ACLs are outside this diagnostic.
+
+These additions are included in 1.1.1 and are not available in 1.1.0.
+Status/report exit codes now prefer `effective_status`: stale evidence returns 2 even when
+the historical `run.status` snapshot says `passed`. The JSON snapshot and read-only behavior
+remain unchanged; automation must inspect current evidence, not only historical outcome.
+
+## Manifest and operational contracts
+
 Manifest YAML (JSON is accepted as a YAML subset) rejects unknown fields. Task, gate, repo and
 release IDs use letters, digits, `_` and `-`. No cyclic or dangling dependencies; one repo entry
 per distinct canonical Git worktree root. Specs resolve to three nonempty Markdown documents.

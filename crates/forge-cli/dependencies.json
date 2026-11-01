@@ -2661,7 +2661,7 @@
   ],
   "missing_notices": [],
   "frontend": {
-    "lock_sha256": "01ccb4ae44892972ab3cfba7f10a47c782a8ed31ffc9fba71dff1db25ba87a91",
+    "lock_sha256": "f01f3ad9860e17cb9fbfd3515215638bff741511fb1337b56db9ee816127eaba",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",

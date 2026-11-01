@@ -10,7 +10,9 @@
     "workbench_sqlite": 0,
     "planning": 1,
     "snapshot": 1,
-    "installation_receipt": 1
+    "installation_receipt": 1,
+    "native_demo": 1,
+    "installation_path_diagnostics": 1
   },
   "compatibility": {
     "readers": "Ignore unknown output fields; reject unsupported schema versions. Input contracts reject unknown fields.",
@@ -20,16 +22,27 @@
     "snapshot_reader_caveat": "Container compatibility floor only; historical state may contain later additive features. Use the matching tool version for operational recovery.",
     "native": "App Server stdio JSONL, initialize/initialized, experimentalApi:false; unsupported requests remain blocked; no automatic replay. Reference schema: 0.166.0; capability handshake is not a support guarantee."
   },
-  "exit_codes": {"success": 0, "blocked_failed_cancelled_or_awaiting_approval": 2},
+  "exit_codes": {
+    "success": 0,
+    "blocked_failed_cancelled_or_awaiting_approval": 2
+  },
   "errors": {
-    "cli": {"status": "blocked", "error_code": "operation_blocked", "error": "redacted diagnostic"},
-    "http": {"403": "request_denied", "404": "not_found", "409": "operation_conflict"},
+    "cli": {
+      "status": "blocked",
+      "error_code": "operation_blocked",
+      "error": "redacted diagnostic"
+    },
+    "http": {
+      "403": "request_denied",
+      "404": "not_found",
+      "409": "operation_conflict"
+    },
     "argument_parsing": "Clap diagnostics on stderr; help/version/parse failures are outside the command JSON envelope.",
     "retry": "Error codes never authorize retry; inspect unknown outcomes and submit a fresh explicit operation."
   },
   "platforms": {
-    "macos": "native account exploratory pilots on earlier checkpoints; final candidate acceptance pending",
-    "linux": "deterministic ARM64 VM/container baseline on earlier checkpoint; native account sandbox preflights blocked; final candidate pending",
+    "macos": "Published 1.1.0 has a macOS ARM64 native-account pilot; acceptance of unpublished source changes requires its own evidence.",
+    "linux": "Earlier deterministic ARM64 VM/container baseline; native-account sandbox preflight was blocked. No new native acceptance is implied.",
     "windows": "experimental; native pilot unavailable",
     "claude": "deferred; no v1 native acceptance claim"
   },

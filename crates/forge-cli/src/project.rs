@@ -21,20 +21,69 @@ fn create(path: &Path, content: &str) -> Result<()> {
     f.write_all(content.as_bytes())?;
     Ok(())
 }
-pub fn init(root: &Path) -> Result<Value> {
+pub fn init(root: &Path, memory_workspace: Option<&str>) -> Result<Value> {
     ensure!(
         root.join(".git").exists(),
         "initialize a Git repository first"
     );
-    create(
-        &root.join(".ai-memory.toml"),
-        "workspace = \"illumitech\"\nproject_strategy = \"repo-root\"\n",
-    )?;
-    create(
-        &root.join(".forge/README.md"),
-        "# Forge\n\nKeep manifests and evaluator code outside agent-writable repositories.\nUse `release inspect` and `release run --dry-run` before execution.\n",
-    )?;
-    Ok(json!({"schema_version":1,"initialized":true,"root":root}))
+    let root = root.canonicalize()?;
+    let readme = "# Forge\n\nKeep manifests and evaluator code outside agent-writable repositories.\nUse `release inspect` and `release run --dry-run` before execution.\n";
+    let readme_path = root.join(".forge/README.md");
+    // Preflight every destination before creating optional routing or scaffolding.
+    if let Ok(meta) = root.join(".forge").symlink_metadata() {
+        ensure!(
+            meta.is_dir() && !meta.file_type().is_symlink(),
+            "existing .forge is not a regular directory; preserving it"
+        );
+    }
+    check_existing(&readme_path, readme)?;
+    let memory_path = root.join(".ai-memory.toml");
+    let mut selected = None;
+    let memory_status = if let Some(workspace) = memory_workspace {
+        ensure!(
+            valid_id(workspace),
+            "memory workspace must use letters, digits, hyphens or underscores"
+        );
+        let content = format!("workspace = \"{workspace}\"\nproject_strategy = \"repo-root\"\n");
+        // Explicit selection never changes an existing project's routing.
+        check_existing(&memory_path, &content)?;
+        if memory_path.symlink_metadata().is_ok() {
+            "preserved"
+        } else {
+            selected = Some(content);
+            "created"
+        }
+    } else if memory_path.symlink_metadata().is_ok() {
+        "preserved"
+    } else {
+        "not_requested"
+    };
+    if let Some(content) = selected {
+        create(&memory_path, &content)?;
+    }
+    create(&readme_path, readme)?;
+    Ok(json!({"schema_version":1,"initialized":true,"root":root,"memory_config":memory_status}))
+}
+fn check_existing(path: &Path, expected: &str) -> Result<()> {
+    match std::fs::symlink_metadata(path) {
+        Ok(meta) => {
+            ensure!(
+                meta.is_file()
+                    && !meta.file_type().is_symlink()
+                    && meta.len() == expected.len() as u64,
+                "existing file differs or is not regular; preserving {}",
+                path.display()
+            );
+            ensure!(
+                std::fs::read(path)? == expected.as_bytes(),
+                "existing file differs; preserving {}",
+                path.display()
+            );
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+        Err(e) => return Err(e.into()),
+    }
+    Ok(())
 }
 pub fn spec_init(root: &Path, id: &str, title: &str) -> Result<Value> {
     ensure!(

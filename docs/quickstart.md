@@ -1,84 +1,109 @@
 # Primeira execução / First run
 
-O binário extraído roda sem Rust. Requer Git e Python 3 para os exemplos.
-macOS ARM64 e Linux x86_64 com glibc 2.39+ são os alvos desta entrega.
-Use um diretório novo para cada exemplo; os scripts preservam diretórios existentes.
+A versão publicada é **1.1.1**. O pacote binário fornecido é macOS ARM64; não há binário
+Linux x86_64 nesta release. Windows/PowerShell e Claude continuam experimentais. Os testes
+em VM Linux não equivalem a um aceite de conta nativa. Veja a [matriz de evidências](v1-candidate.md).
 
-The extracted binary needs no Rust toolchain. The examples require Git and Python 3.
-Use a new example directory each time. Linux requires glibc 2.39 or newer.
+## Instalação publicada
 
-## Verificar o download / Verify the download
-
-Baixe o arquivo da sua plataforma e `SHA256SUMS` da release privada no GitHub.
-Na pasta dos downloads, confira a linha correspondente antes de extrair:
-
-Download your platform archive and `SHA256SUMS` from the private GitHub release.
-Verify the matching line before extracting:
+Cargo é público e requer Rust 1.94.0. Git é necessário para os projetos e o motor.
 
 ```sh
-# macOS ARM64
-grep 'aarch64-apple-darwin.tar.gz$' SHA256SUMS | shasum -a 256 -c -
-tar -xzf illumitech-forge-v0.2.0-aarch64-apple-darwin.tar.gz
-
-# Linux x86_64: use these two commands instead
-grep 'x86_64-unknown-linux-gnu.tar.gz$' SHA256SUMS | sha256sum -c -
-tar -xzf illumitech-forge-v0.2.0-x86_64-unknown-linux-gnu.tar.gz
+cargo install illumitech-forge-cli --version 1.1.1 --locked
+forge --version
+# Se outra cópia preceder o Cargo no PATH:
+"${CARGO_HOME:-$HOME/.cargo}/bin/forge" --version
 ```
 
-Os comandos seguintes partem da pasta onde você extraiu o arquivo.
-Run the following commands from the extraction directory.
+Os dois comandos nativos, `forge` e `illumitech-forge`, são instalados. Se já utiliza outro
+produto chamado `forge`, preserve-o: `cargo install illumitech-forge-cli --version 1.1.1 --locked --bin illumitech-forge`.
+Confirme o executável selecionado com `command -v forge` (PowerShell: `Get-Command forge -All`).
+Uma cópia em outro diretório pode continuar precedendo o Cargo no PATH. Não remova arquivos
+desconhecidos para corrigir isso; verifique origem e versão da instalação desejada.
 
-## Sem agente / Without an agent
+O [arquivo macOS ARM64](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1) dispensa
+Rust. Como o GitHub é privado, o download exige acesso autorizado. Baixe o `.tar.gz` e
+`SHA256SUMS` da mesma release e verifique antes de extrair:
 
 ```sh
-./illumitech-forge --version
-./illumitech-forge doctor
-python3 scripts/demo.py /tmp/forge-first-run
-./illumitech-forge --state-dir /tmp/forge-first-run/state release inspect /tmp/forge-first-run/release.yaml
-./illumitech-forge --state-dir /tmp/forge-first-run/state release run /tmp/forge-first-run/release.yaml --dry-run
-./illumitech-forge --state-dir /tmp/forge-first-run/state release run /tmp/forge-first-run/release.yaml
-./illumitech-forge --state-dir /tmp/forge-first-run/state report /tmp/forge-first-run/release.yaml
+grep ' illumitech-forge-v1.1.1-aarch64-apple-darwin.tar.gz$' SHA256SUMS | shasum -a 256 -c -
+tar -xzf illumitech-forge-v1.1.1-aarch64-apple-darwin.tar.gz
+./forge --version
 ```
 
-Resultado esperado: `passed`, com `hello.txt` validado por um avaliador externo.
-Expected result: `passed`, with `hello.txt` checked by an external evaluator.
+## Conversa e Workbench
 
-## Com Codex real / With native Codex
-
-Instale e autentique o Codex CLI previamente. O Forge usa sua configuração, modelo e
-permissões nativas. Esta execução usa sua conta; não há troca automática para outra API.
-O script prepara fixtures de ambos os clientes, mas os comandos abaixo executam somente Codex.
-
-Install and authenticate Codex CLI first. Forge preserves its configured model, account and
-permissions. The fixture script prepares both clients; the commands below run only Codex.
+Dentro de um projeto Git existente, com o cliente Codex instalado e autenticado:
 
 ```sh
-python3 scripts/agent-fixtures.py /tmp/forge-native-demo
-./illumitech-forge --state-dir /tmp/forge-native-demo/state release inspect /tmp/forge-native-demo/forge-eval-codex-baseline.yaml
-./illumitech-forge --state-dir /tmp/forge-native-demo/state release run /tmp/forge-native-demo/forge-eval-codex-baseline.yaml --dry-run
-./illumitech-forge --state-dir /tmp/forge-native-demo/state release run /tmp/forge-native-demo/forge-eval-codex-baseline.yaml
-./illumitech-forge --state-dir /tmp/forge-native-demo/state report /tmp/forge-native-demo/forge-eval-codex-baseline.yaml
+forge
+# Ou interface web local:
+forge workbench --root . --port 0
 ```
 
-O agente implementa uma soma, preserva arquivos existentes e faz revisão somente leitura.
-O avaliador verifica inteiros e números fracionários. Um handoff falso não satisfaz o aceite.
-A memória é opcional neste exemplo; configure MCP e `memory.required: true` para exigi-la.
+O Forge preserva conta, modelo e permissões do cliente. O endereço web emitido contém uma
+capacidade local: mantenha-o privado. O servidor fica em primeiro plano e atende loopback.
+O estado é externo e isolado por raiz do projeto. Python, Node e ai-memory não são necessários
+para abrir essas interfaces. Não é necessário executar `init` antes de conversar.
 
-The agent implements addition, preserves existing files and performs a read-only review.
-An independent evaluator checks behavior. Memory is optional in this example.
+Conversa livre é somente leitura. Uma implementação exige manifest revisado e permissões
+declaradas; uma mensagem ou aprovação de ferramenta não aprova gates Forge.
 
-## Memória e limites / Memory and limits
+## Demonstracao sem agente
 
-- No ai-memory 3.2.9, use `backfill_on_start = false` no `config.toml` do cliente nativo
-  para evitar que a importação automática de histórico concorra com a captura da primeira
-  sessão. O importador manual continua disponível para uso deliberado. Os hooks ficam ativos.
-- Revise os hooks do ai-memory em `/hooks` no Codex. Não use bypass de confiança.
-- Configure workspace e projeto explicitamente; `memory doctor` deve confirmar o mesmo escopo
-  usado pelos hooks. Um projeto novo precisa de uma sessão nativa antes de exigir memória.
-- Claude permanece experimental e sem aceitação real nesta versão. Não é requisito para usar Codex.
-- Publicação exige uma ação separada e um aceite humano vinculado à revisão. Não ocorre ao terminar tarefas. Draft PR automático é uma opção separada, desativada por padrão.
-- O binário macOS não é notarizado; esta entrega não inclui instalação automática nem serviço em background.
+A demonstração nativa da 1.1.1 usa o próprio executável instalado como comando e avaliador.
+Verifique antes se está executando a versão correta. Os comandos abaixo usam a instalação
+padrão do Cargo; para o pacote extraído, ajuste `FORGE_BIN` para o caminho de `forge`.
 
-For ai-memory 3.2.9, disable automatic startup backfill in the native client's configuration,
-review hook trust in Codex and verify the exact project scope. Live hooks remain enabled.
-Claude is experimental. Publishing is explicit and revision-approved. The macOS archive is not notarized.
+```sh
+FORGE_BIN="${CARGO_HOME:-$HOME/.cargo}/bin/forge"
+"$FORGE_BIN" --version
+FORGE_DEMO="$(mktemp -d)/example"
+"$FORGE_BIN" demo create "$FORGE_DEMO"
+"$FORGE_BIN" --state-dir "$FORGE_DEMO/state" release inspect "$FORGE_DEMO/release.yaml"
+"$FORGE_BIN" --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml" --dry-run
+"$FORGE_BIN" --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml"
+"$FORGE_BIN" --state-dir "$FORGE_DEMO/state" report "$FORGE_DEMO/release.yaml"
+```
+
+A demonstração precisa somente de Git,
+sem Python, agente, conta ou memória. Criar prepara um diretório novo; não executa a release.
+Inspect/dry-run não criam estado. O resultado da execução deve ser `passed`: `app/hello.txt`
+contém `Hello Forge` e `app/preserved.txt` mantém seu conteúdo original.
+
+O manifest, o avaliador nativo e o SQLite ficam fora de `app/`. O hash do executável é fixado
+como entrada do gate. Depois de trocar o binário, crie outro exemplo em um diretório novo;
+não retire a verificação de hash. Diretórios existentes e artefatos modificados são preservados.
+Uma falha de preparação deixa o novo diretório para inspeção, sem apagá-lo automaticamente.
+
+Na 1.1.1, `forge installation doctor` inspeciona os dois nomes sem executar
+candidatos; informa ordem, seleção divergente e limites da inspeção. Veja [detalhes](native-command.md).
+
+## Memória opcional
+
+Na 1.1.1, `init` prepara apenas `.forge/README.md` por padrão e preserva qualquer
+`.ai-memory.toml` existente. Para criar roteamento deliberadamente:
+
+```sh
+forge init . --memory-workspace my-team
+```
+
+O parâmetro não instala hooks, não migra memória e não sobrescreve roteamento diferente.
+Use letras, números, `_` e `-` no workspace. Na versão anterior 1.1.0, `init` criava
+roteamento para `illumitech`; a 1.1.1 corrige esse comportamento. Configurações existentes
+continuam preservadas. Para conversar, execute `forge` diretamente, sem inicialização obrigatória.
+
+Memória requerida só bloqueia releases que declarem `memory.required: true`. Publicação,
+serviços e instalação global são ações explícitas; não acontecem ao terminar uma tarefa.
+
+## English
+
+Release 1.1.1: install with Cargo, verify which executable PATH selects, and run `forge`
+inside an existing Git project with the native client authenticated separately. No `init`,
+Python, Node or ai-memory setup is required for chat. The private macOS ARM64 download needs
+repository access; the public Cargo package does not. Windows and Claude remain experimental.
+
+Native `demo create`, both-name PATH diagnostics and opt-in memory initialization are included
+in 1.1.1. The demo uses the real engine and a hash-pinned external native evaluator, makes
+no model calls and never overwrites an existing demo directory. Status/report return 2
+when evidence is stale; the historical JSON snapshot remains available for diagnosis.

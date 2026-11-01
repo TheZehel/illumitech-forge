@@ -5,16 +5,16 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.1.0.** Native `forge`, formatted conversations and a dedicated terminal experience.
+**Illumitech Forge 1.1.1.** Native `forge`, formatted conversations and a dedicated terminal experience.
 Building this tree does not replace an installed binary. See the
-[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.0) for artifacts,
+[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1) for artifacts,
 checksums and platform limits. [Português](README.md) · [Validation guide](docs/v1-candidate.md).
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
-The **1.1.0** delivery adds the native Rust `forge` command and a terminal experience with
+The **1.1** series provides the native Rust `forge` command and a terminal experience with
 ASCII identity, Markdown, command menu, visual help and searchable session history.
-See [1.1.0 release notes](docs/release-v1.1.0.md) for validation and operational limits.
+See [1.1.1 release notes](docs/release-v1.1.1.md) for validation and operational limits.
 
 ## Features
 
@@ -29,33 +29,34 @@ is the reference for Workbench. Claude is experimental/deferred. Free chat is re
 implementation runs under a reviewed manifest. Agent messages never satisfy acceptance gates.
 No paid API fallback or permission bypass is introduced.
 
-## Local build
-
-Rust 1.94.0 and Git are required to build. Git/Python 3 support the examples; the Codex CLI
-is authenticated separately. UI assets are embedded; using the binary needs no Node runtime.
-Frontend development uses Node 24 LTS and the committed npm lockfile.
+## Start with the published release
 
 ```sh
-cargo build --release --locked
-./target/release/illumitech-forge --version
-./target/release/illumitech-forge --json contracts
-FORGE_OPS="$(mktemp -d)"
-./target/release/illumitech-forge --state-dir "$FORGE_OPS/state" workbench --root "$PWD" --port 0
+cargo install illumitech-forge-cli --version 1.1.1 --locked
+forge --version
+forge
 ```
 
-This local candidate also includes an [interactive terminal interface](docs/terminal-chat.md):
-`chat --root PROJECT_PATH` with an external `--state-dir`.
+Run `forge` inside an existing Git project. Install and authenticate the native Codex CLI
+separately for conversations; its account, model and permissions are preserved. Opening the
+interface needs no `init`, ai-memory, Python or Node. Free chat is read-only; implementation
+execution requires a reviewed manifest.
 
+Cargo needs Rust 1.94.0. The [private macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1)
+needs no Rust compiler and requires authorized repository access. Crate source is public under MIT.
+See the [quickstart](docs/quickstart.md) for installation, version/PATH checks and Workbench.
 
-Open the private local URL emitted by the foreground server. It binds only to loopback.
-For a no-inference demo, run `python3 scripts/demo.py EXTERNAL_DEMO_DIR`, then inspect,
-dry-run and run its release with an explicit external `--state-dir`.
-After publication, version 1.1.0 can be installed using
-`cargo install illumitech-forge-cli --version 1.1.0 --locked`; global installation is explicit.
+## New in 1.1.1
 
-This candidate also provides the native Rust **`forge`** executable. Run `forge` to open
-the terminal conversation in the current project, or select a project from the interface.
-See [native entrypoint and installation](docs/native-command.md).
+- `forge demo create DIRECTORY`: native command/gate/state example without an agent, account
+  or Python. See the [walkthrough](docs/quickstart.md#demonstracao-sem-agente).
+- `init` creates optional routing only with `--memory-workspace ID`, preserving existing files.
+- `installation doctor` inspects both executable names without running unknown candidates.
+- `status` and `report` return 2 for stale evidence, preserving historical JSON snapshots.
+
+Build with `cargo build --locked -p illumitech-forge-cli --bins`. UI assets are embedded;
+frontend development uses Node 24 LTS and `npm ci --prefix apps/forge-ui --ignore-scripts`.
+Building source never replaces installed executables or changes PATH.
 
 ## Workflow and boundaries
 

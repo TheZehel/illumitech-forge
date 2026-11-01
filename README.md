@@ -5,17 +5,17 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.1.0.** Comando nativo `forge`, conversa formatada e experiência de terminal.
+**Illumitech Forge 1.1.1.** Comando nativo `forge`, conversa formatada e experiência de terminal.
 Compilar esta árvore não altera seu binário instalado. Consulte as
-[notas da entrega](docs/release-v1.1.0.md) para artefatos, validação e limites de suporte.
+[notas da entrega](docs/release-v1.1.1.md) para artefatos, validação e limites de suporte.
 
-[English](README.en.md) · [Começar](docs/v1-candidate.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
+[English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
 ![Uma peça laranja atravessa checkpoints até uma estrutura verde-petróleo sobre fundo grafite](docs/assets/cover.webp)
 
-A entrega **1.1.0** acrescenta o comando Rust nativo `forge` e uma experiência de terminal
+A série **1.1** oferece o comando Rust nativo `forge` e uma experiência de terminal
 com identidade ASCII, Markdown, ajuda, menu de comandos e histórico pesquisável.
-As notas e a cobertura ficam em [release 1.1.0](docs/release-v1.1.0.md).
+As notas e a cobertura ficam em [release 1.1.1](docs/release-v1.1.1.md).
 
 ## O que está implementado
 
@@ -28,49 +28,39 @@ As notas e a cobertura ficam em [release 1.1.0](docs/release-v1.1.0.md).
 - Issue selecionada → candidato revisável → execução → draft PR sob autorização explícita.
 - Diagnóstico de PATH, atualização local verificada, snapshots SQLite consistentes e restauração.
 
-Claude permanece experimental e fora do aceite nativo desta candidata. A conversa livre usa
+Claude permanece experimental e fora do aceite nativo desta entrega. A conversa livre usa
 somente leitura; a implementação usa um manifest revisado. A resposta do chat não aprova gates.
 
-## Experimentar localmente
-
-Requer Rust 1.94.0 e Git para compilar; Git e Python 3 para os exemplos. O Workbench usa o
-Codex CLI autenticado separadamente (protocolo de referência 0.166.0, conta ChatGPT gerenciada).
-Não há fallback automático para API paga ou mudança silenciosa de modelo.
+## Começar com a versão publicada
 
 ```sh
-cargo build --release --locked
-./target/release/illumitech-forge --version
-./target/release/illumitech-forge --json contracts
-FORGE_OPS="$(mktemp -d)"
-./target/release/illumitech-forge --state-dir "$FORGE_OPS/state" workbench --root "$PWD" --port 0
+cargo install illumitech-forge-cli --version 1.1.1 --locked
+forge --version
+forge
 ```
 
-A conversa também possui uma [interface interativa no terminal](docs/terminal-chat.md),
-disponível neste candidato com `chat --root CAMINHO_DO_PROJETO` e `--state-dir` externo.
+Execute `forge` dentro de um projeto Git existente. Instale e autentique o Codex CLI
+separadamente para conversar; conta, modelo e permissões continuam nativos. Não é necessário
+rodar `init`, configurar memória, instalar Python ou Node para abrir a interface. A conversa
+livre é somente leitura; executar uma implementação exige um manifest revisado.
 
+Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release privada](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1)
+dispensa Rust e exige acesso autorizado ao repositório. O código dos crates é público sob MIT.
+[Início rápido](docs/quickstart.md): instalação, verificação de versão, PATH e Workbench.
 
-Abra a URL local emitida e mantenha-a privada. O servidor é foreground e atende somente em
-loopback. Os assets da UI vêm no binário; Node não é necessário para usá-lo. Para desenvolver
-a UI, use Node 24 LTS e `npm ci --prefix apps/forge-ui --ignore-scripts`.
+## Novidades da 1.1.1
 
-Para um exemplo sem inferência, crie outro diretório externo e execute:
+- `forge demo create DIRECTORY`: demonstração nativa com comando, gate externo e estado,
+  sem agente, conta ou Python. Veja o [passo a passo](docs/quickstart.md#demonstracao-sem-agente).
+- `init` cria roteamento de memória somente com `--memory-workspace ID`; configurações
+  existentes são preservadas. Não é necessário executar `init` para conversar.
+- `installation doctor` inspeciona os dois nomes no PATH sem executar candidatos desconhecidos.
+- `status` e `report` retornam 2 quando evidências ficam obsoletas, mesmo com snapshot histórico
+  `passed`. A documentação de instalação e suporte foi alinhada à distribuição real.
 
-```sh
-FORGE_DEMO="$(mktemp -d)/demo"
-python3 scripts/demo.py "$FORGE_DEMO"
-./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release inspect "$FORGE_DEMO/release.yaml"
-./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml" --dry-run
-./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" release run "$FORGE_DEMO/release.yaml"
-./target/release/illumitech-forge --state-dir "$FORGE_DEMO/state" report "$FORGE_DEMO/release.yaml"
-```
-
-A instalação da versão 1.1.0, após sua publicação, será feita com
-`cargo install illumitech-forge-cli --version 1.1.0 --locked`.
-
-O candidato também fornece o executável Rust nativo **`forge`**. Basta executar `forge`
-para abrir a conversa no projeto atual; fora de um projeto, escolha uma pasta na interface.
-Veja [entrada nativa e instalação](docs/native-command.md).
-A instalação global é uma ação explícita; o código não troca seu PATH automaticamente.
+Para desenvolver: `cargo build --locked -p illumitech-forge-cli --bins`. Os assets web vêm
+embutidos; desenvolvimento da UI usa Node 24 LTS e `npm ci --prefix apps/forge-ui --ignore-scripts`.
+Compilar não substitui executáveis instalados nem altera seu PATH.
 
 ## Ciclo de trabalho
 

@@ -14,6 +14,7 @@ use std::{
 const PRODUCT: &str = "illumitech-forge";
 const CURRENT: &str = ".forge-current.json";
 const PENDING: &str = ".forge-update.json";
+mod paths;
 #[derive(Subcommand)]
 pub enum Command {
     Doctor,
@@ -508,7 +509,7 @@ fn doctor() -> Result<Value> {
     let mut candidates = Vec::new();
     let mut order = Vec::new();
     if let Some(path) = std::env::var_os("PATH") {
-        for (index, dir) in std::env::split_paths(&path).enumerate() {
+        for (index, dir) in std::env::split_paths(&path).take(paths::LIMIT).enumerate() {
             let candidate = dir.join(binary_name());
             order.push(json!({"index":index,"directory":dir}));
             if let Ok(m) = fs::symlink_metadata(&candidate) {
@@ -517,7 +518,7 @@ fn doctor() -> Result<Value> {
         }
     }
     Ok(
-        json!({"schema_version":1,"status":"diagnosed","current_executable":executable,"version":env!("CARGO_PKG_VERSION"),"platform":host(),"path_order":order,"competing_binaries":candidates,"provenance":"running binary; publisher unknown","mutation":false,"platform_capability":{"macos":"native host checks only; see validation report","linux":"implemented; native pilot required","windows":"experimental; native pilot required"}}),
+        json!({"schema_version":1,"status":"diagnosed","current_executable":executable,"version":env!("CARGO_PKG_VERSION"),"platform":host(),"path_order":order,"competing_binaries":candidates,"path_diagnostics":paths::inspect(&executable, std::env::var_os("PATH").as_deref(), &std::env::current_dir()?),"provenance":"running binary; publisher unknown","mutation":false,"platform_capability":{"macos":"native host checks only; see validation report","linux":"implemented; native pilot required","windows":"experimental; native pilot required"}}),
     )
 }
 #[cfg(test)]

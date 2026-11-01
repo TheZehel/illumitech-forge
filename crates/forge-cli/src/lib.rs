@@ -3,6 +3,7 @@ mod compatibility;
 mod context;
 mod daemon;
 mod dashboard;
+mod demo;
 mod duration;
 mod engine;
 mod guided;
@@ -56,6 +57,11 @@ enum Command {
     Installation {
         #[command(subcommand)]
         command: installation::Command,
+    },
+    /// Prepare a disposable native example; no agent or Python required.
+    Demo {
+        #[command(subcommand)]
+        command: demo::Command,
     },
     /// Consistent, verified state snapshots and fresh-target recovery.
     State {
@@ -136,6 +142,9 @@ enum Command {
     Init {
         #[arg(default_value = ".")]
         path: PathBuf,
+        /// Explicitly create optional ai-memory routing for this workspace.
+        #[arg(long)]
+        memory_workspace: Option<String>,
     },
     Doctor,
     Spec {
@@ -424,7 +433,10 @@ pub async fn run() {
     };
     let (value, code) = match result {
         Ok(v) => {
-            let status = v["run"]["status"].as_str().or_else(|| v["status"].as_str());
+            let status = v["effective_status"]
+                .as_str()
+                .or_else(|| v["run"]["status"].as_str())
+                .or_else(|| v["status"].as_str());
             let code = if matches!(
                 status,
                 Some("failed" | "blocked" | "awaiting_approval" | "cancelled" | "degraded")
@@ -463,6 +475,7 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
     match &cli.command {
         Command::Contracts => Ok(compatibility::contracts()),
         Command::Installation { command } => installation::dispatch(command).await,
+        Command::Demo { command } => demo::dispatch(command).await,
         Command::State { command } => snapshots::dispatch(command, &cli.state_dir),
         Command::Issue { command } => issue::dispatch(command).await,
         Command::Review { command } => match command {
@@ -576,7 +589,10 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
                 daemon::retry(&cli.state_dir, release, reason)
             }
         },
-        Command::Init { path } => project::init(path),
+        Command::Init {
+            path,
+            memory_workspace,
+        } => project::init(path, memory_workspace.as_deref()),
         Command::Doctor => doctor().await,
         Command::Spec { command } => match command {
             SpecCommand::Init { id, title, root } => project::spec_init(root, id, title),

@@ -1,9 +1,8 @@
 # Entrada nativa `forge`
 
-Este candidato inclui dois executáveis Rust no mesmo pacote: `forge` e `illumitech-forge`.
+A versão 1.1.1 inclui dois executáveis Rust no mesmo pacote: `forge` e `illumitech-forge`.
 Compartilham a implementação e os contratos de execução. Não há alias, script intermediário,
-Python ou caminhos da máquina do desenvolvedor no comando. A entrega 1.1.0 inclui esta alteração; sua publicação é uma etapa explícita
-separada da validação local.
+Python ou caminhos da máquina do desenvolvedor no comando. A entrega publicada 1.1.1 inclui esta alteração; a entrega 1.1.1 acrescenta a demonstração e diagnósticos abaixo.
 
 ```sh
 forge                         # Abre o chat do projeto atual
@@ -30,10 +29,10 @@ sem argumentos continua mostrando ajuda. Autenticação e modelo continuam nativ
 ## Instalação e distribuição
 
 [Cargo instala os binários do pacote](https://doc.rust-lang.org/cargo/commands/cargo-install.html).
-A partir de uma cópia deste candidato:
+Para instalar a versão publicada:
 
 ```sh
-cargo install --path crates/forge-cli --locked
+cargo install illumitech-forge-cli --version 1.1.1 --locked
 ```
 
 Os arquivos de release incluem `forge`/`forge.exe`, `illumitech-forge`/`illumitech-forge.exe`
@@ -42,3 +41,17 @@ e checksums de ambos. Não sobrescreva um comando `forge` de outro produto; veri
 `--bin illumitech-forge`. O atualizador legado de artefato único continua gerenciando o
 executável de nome longo; atualizações dos dois executáveis são feitas via Cargo ou pelo
 pacote de release completo.
+
+## Diagnóstico desde 1.1.1
+
+`forge installation doctor` agora inspeciona os nomes `forge` e `illumitech-forge`, aponta a
+primeira opção elegível no PATH e informa quando é um caminho diferente do executável em
+execução. `path_diagnostics` é um campo aditivo do JSON schema 1; os campos legados permanecem.
+
+O diagnóstico nunca executa candidatos nem presume suas versões. A versão informada no topo
+é apenas a do processo atual. Inspeciona no máximo 128 entradas; declara truncamento, e não
+inspeciona aliases, funções, cache do shell ou ACLs. Não altera perfis nem remove concorrentes.
+
+Se atualizar pelo Cargo e continuar abrindo outra cópia, compare `command -v forge` com
+`~/.cargo/bin/forge installation doctor` (em PowerShell: `Get-Command forge -All`). Confira
+a origem antes de executar outros candidatos. Preserve produtos diferentes que usem o mesmo nome.

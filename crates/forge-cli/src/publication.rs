@@ -34,12 +34,12 @@ impl ExpectedVisibility {
     }
 }
 
-struct Signals {
-    receiver: watch::Receiver<bool>,
+pub(crate) struct Signals {
+    pub(crate) receiver: watch::Receiver<bool>,
     task: tokio::task::JoinHandle<()>,
 }
 impl Signals {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let (tx, receiver) = watch::channel(false);
         let task = tokio::spawn(async move {
             #[cfg(unix)]
