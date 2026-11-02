@@ -201,3 +201,29 @@ imported candidates include them. The UI can
 inspect a publishing manifest but cannot execute it or publish.
 
 See [M09 safe installation and recovery](m09-operating-contracts.md) for explicit-prefix verified updates, consistent SQLite snapshots, fresh-target restore and platform limits.
+
+## Workflow, comparison and SARIF contracts (candidate 1.2.0)
+
+New contracts each use schema 1; manifest/envelope schema 1 and existing commands are unchanged.
+Workflow prepare is preview-first; --apply saves external candidates/check sources only. Start requires
+an exact scope digest, materializes create-only specs and invokes the same engine inspection/dry-run
+checks before execution. A transactional metadata/event journal records consent and checkpoints.
+The initial execution revision is checked under the engine worktree lock. Neither consent nor a
+native tool approval grants external gate or human acceptance. Requests cannot enable publication.
+
+Successful planning receipts from the owning native server are linked into the execution token journal; failed or unlinked planning remains outside it and is disclosed.
+Checks bind exact argv, optional task_ids, frozen external files and optional nonzero before_exit.
+Bug recipes require a frozen failing regression. Dependency recipes require a SARIF rescan plus
+project tests; Semgrep rescan requires --error. Native configuration is preserved. Context defaults
+to bounded/16384 only for new workflows; mandatory oversize blocks instead of dropping instructions.
+
+Candidates are immutable. A changed source/contract before start requires a fresh reviewed workflow
+ID; existing task IDs/evidence are preserved rather than rewritten. Interrupted preparation/baselines
+are diagnosed without replay. Explicit resume/reconciliation retains the existing engine controls.
+Scope metadata and events are extensions of SQLite schema 1, not transferable human approvals.
+
+Comparison is read-only and uses complete counters plus operator-declared evaluation_context.
+Missing/mismatched experiment context or incomplete/nonaccepted samples cannot produce a savings
+figure. It never authenticates a native model/account from caller-provided JSON, converts tokens to
+currency, or claims generalized savings. SARIF imports accept 2.1.0, reject remote/traversal locations
+and unresolved bases, preserve scanner errors and never execute findings/fixes or mark them resolved.

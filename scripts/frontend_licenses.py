@@ -9,8 +9,8 @@ import shutil
 from pathlib import Path
 
 
-def inventory(root, destination):
-    ui = root / 'apps/forge-ui'
+def inventory(root, destination, relative="apps/forge-ui"):
+    ui = root / relative
     lock = json.loads((ui / 'package-lock.json').read_text())
     rows, missing = [], []
     for location, package in sorted(lock['packages'].items()):

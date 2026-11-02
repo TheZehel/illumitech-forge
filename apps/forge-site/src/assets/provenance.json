@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-11-02",
+  "figma_file": "0ZlWBq8G8bFOSwKnlmJpYY",
+  "references": {
+    "direction": "135:12",
+    "desktop": "136:13",
+    "mobile": "136:540",
+    "dark": "136:983",
+    "logo_light": "75:7",
+    "logo_dark": "75:73",
+    "type_display": "135:14",
+    "type_body": "135:16",
+    "mark": "75:84"
+  },
+  "font_source": "Existing licensed Instrument Sans exports, verified against current Figma family/weights; upstream github.com/Instrument/instrument-sans",
+  "assets": [
+    {
+      "path": "instrument-sans-medium.ttf",
+      "sha256": "a7bcb84cb01f6e33eecdd2cbff3f97ff1674c0e8e37c6921b6cd717b8c854d98",
+      "owner": "The Instrument Sans Project Authors",
+      "license": "OFL-1.1"
+    },
+    {
+      "path": "logo-dark.png",
+      "sha256": "9259c5ceca6071cb88995a9ec8a7353701b4c1ae62944213b897029f235e90b5",
+      "owner": "Illumitech",
+      "license": "Illumitech brand asset"
+    },
+    {
+      "path": "OFL.txt",
+      "sha256": "9e27a72ed30eb49a08678f6a5d6ed98ec7ba5368f541637ee0683ec9134ef966",
+      "owner": "The Instrument Sans Project Authors",
+      "license": "OFL-1.1"
+    },
+    {
+      "path": "instrument-sans-bold.ttf",
+      "sha256": "d25efe5b0dcf3b36607d9a0fb046932547a5dfec407ea17162ca126d63b33d42",
+      "owner": "The Instrument Sans Project Authors",
+      "license": "OFL-1.1"
+    },
+    {
+      "path": "logo-light.png",
+      "sha256": "9f2c3a382ebb75f56a531ab0cd3da0918ab23076fb868ab58d3477e2871c922a",
+      "owner": "Illumitech",
+      "license": "Illumitech brand asset"
+    },
+    {
+      "path": "instrument-sans-regular.ttf",
+      "sha256": "01689ad055025ff1891607b077513c9389f73360d471dcffa036e326af179b00",
+      "owner": "The Instrument Sans Project Authors",
+      "license": "OFL-1.1"
+    },
+    {
+      "path": "mark.png",
+      "sha256": "261818a2a8363ccc8760e988286fdf05c777f3e640594b6d55e4d2bfc47e4ab0",
+      "owner": "Illumitech",
+      "license": "Illumitech brand asset"
+    }
+  ],
+  "logo_export": "Unmodified isolated Figma render with transparent background; contextual matte exports retained only in external review references"
+}

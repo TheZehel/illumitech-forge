@@ -1,4 +1,4 @@
-# Workbench, guided creation and planning — candidate 1.0
+# Workbench, guided creation and planning
 
 Implementation documentation; milestone acceptance is owned by external evaluators.
 The existing dashboard, manifest v1, FORGE-020 duration and M04 execution/economy APIs remain
@@ -170,3 +170,16 @@ while the reader is near the bottom; a button returns to the latest response. Re
 animations. Operational details remain collapsible and native approvals remain explicit.
 
 A separate [terminal interface](terminal-chat.md) is available in this local candidate as `chat`.
+
+## Integrated workflows (1.2.0 candidate)
+
+The Execute tab and terminal /plan /run /tasks /report share the workflow service. A server-owned
+registry resolves workflow IDs under the selected external state root. Browsers never supply manifest
+paths, model overrides or native executables. Scope digest consent grants execution authority only;
+external gates and explicitly declared final human acceptance remain independent.
+
+Authenticated POST workflow routes: workflow-preview, workflow-prepare, workflow-start, workflow-status,
+workflow-list, workflow-open, workflow-resume, workflow-pause, workflow-cancel, workflow-approve,
+workflow-recipes, workflow-findings and workflow-compare. They retain the same Origin, capability,
+CSRF, framing and operation replay protections. Read projections do not create engine state.
+See [workflow guide](guides/workflows.en.md). Website preview has no Workbench bridge.

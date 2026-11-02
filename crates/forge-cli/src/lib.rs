@@ -1,4 +1,5 @@
 mod budget;
+mod comparison;
 mod compatibility;
 mod context;
 mod daemon;
@@ -6,6 +7,7 @@ mod dashboard;
 mod demo;
 mod duration;
 mod engine;
+mod findings;
 mod guided;
 mod importing;
 mod installation;
@@ -26,6 +28,7 @@ mod terminal_chat;
 mod validation_cache;
 mod workbench;
 mod workbench_http;
+mod workflow;
 use anyhow::Result;
 use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use forge_adapters::process;
@@ -51,6 +54,11 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    /// Prepare and execute a reviewed scope; acceptance stays with external gates.
+    Workflow {
+        #[command(subcommand)]
+        command: workflow::Command,
+    },
     /// Describe versioned public contracts without opening state or a native client.
     Contracts,
     /// Diagnose or explicitly update a task-local installation (preview by default).
@@ -373,6 +381,11 @@ enum ToolsCommand {
 }
 #[derive(Subcommand)]
 enum EvalCommand {
+    /// Compare observed consumption and delivery outcomes; never invokes a model.
+    Compare {
+        baseline: PathBuf,
+        candidate: PathBuf,
+    },
     Run {
         manifest: PathBuf,
         #[arg(long)]
@@ -473,6 +486,7 @@ pub async fn run() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::Workflow { command } => workflow::dispatch(command).await,
         Command::Contracts => Ok(compatibility::contracts()),
         Command::Installation { command } => installation::dispatch(command).await,
         Command::Demo { command } => demo::dispatch(command).await,
@@ -693,6 +707,13 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
                 Ok(json!({"schema_version":1,"tools":results}))
             }
         },
+        Command::Eval {
+            command:
+                EvalCommand::Compare {
+                    baseline,
+                    candidate,
+                },
+        } => comparison::files(baseline, candidate),
         Command::Eval {
             command: EvalCommand::Run { manifest, dry_run },
         } => {

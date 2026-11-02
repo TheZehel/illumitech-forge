@@ -274,12 +274,19 @@ impl App {
             {
                 let _ = store.set_control(id, "cancel");
             }
+            if let Some((path, id)) = self.workflow_active.lock().await.take()
+                && path.exists()
+                && let Ok(mut store) = Store::open(&path, false)
+            {
+                let _ = store.set_control(&id, "cancel");
+            }
             let mut handle = handle;
             if tokio::time::timeout(std::time::Duration::from_secs(5), &mut handle)
                 .await
                 .is_err()
             {
                 handle.abort();
+                let _ = handle.await;
             }
         }
     }

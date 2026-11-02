@@ -256,7 +256,7 @@ pub async fn execute(c: Context, resume: bool, reconcile: Option<String>) -> Res
         &c,
         false,
         Phase::Release,
-        Box::pin(execute_inner(&c, resume, reconcile)),
+        Box::pin(execute_inner(&c, resume, reconcile, None)),
     )
     .await
 }
@@ -265,13 +265,32 @@ pub async fn execute_in_scope(
     resume: bool,
     reconcile: Option<String>,
 ) -> Result<Value> {
-    Box::pin(execute_inner(&c, resume, reconcile)).await
+    Box::pin(execute_inner(&c, resume, reconcile, None)).await
 }
-async fn execute_inner(c: &Context, resume: bool, reconcile: Option<String>) -> Result<Value> {
+/// Verify a newly approved workflow's preparation checkpoint under the execution lock.
+pub async fn execute_approved(c: Context, expected: BTreeMap<String, Revision>) -> Result<Value> {
+    crate::observability::phase(
+        &c,
+        false,
+        Phase::Release,
+        Box::pin(execute_inner(&c, false, None, Some(&expected))),
+    )
+    .await
+}
+async fn execute_inner(
+    c: &Context,
+    resume: bool,
+    reconcile: Option<String>,
+    expected: Option<&BTreeMap<String, Revision>>,
+) -> Result<Value> {
     let active_started = std::time::Instant::now();
     let _locks = WorktreeLocks::acquire(&c.roots)?;
     let mut store = Store::open(&c.db, false)?;
     let current = revisions(&c.roots)?;
+    ensure!(
+        expected.is_none_or(|r| r == &current),
+        "approved preparation revision changed before execution; review a new scope"
+    );
     let old = store.load(&c.manifest.release_id)?;
     let mut run = match old {
         Some(mut old) => {

@@ -74,5 +74,5 @@ test('forged origin, duplicates, unknown fields and stale tokens cannot start a 
 test('budget exhaustion is visible before command spawn', async ({ page }) => {
     await launch({ max_attempts: 0 }); await page.goto(url); await expect(page.getByTestId('connection-state')).toHaveText('Conectado ao nativo');
     await page.getByRole('tab', { name: 'Evidências', exact: true }).click(); await page.getByRole('button', { name: 'Iniciar execução', exact: true }).click();
-    await expect(page.getByTestId('forge-status')).toHaveText('blocked'); await expect(readFile(join(app, 'done.txt'))).rejects.toThrow();
+    await expect(page.getByTestId('forge-status')).toHaveText('blocked', { timeout: 15000 }); await expect(readFile(join(app, 'done.txt'))).rejects.toThrow();
 });

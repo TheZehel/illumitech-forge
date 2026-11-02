@@ -2661,7 +2661,7 @@
   ],
   "missing_notices": [],
   "frontend": {
-    "lock_sha256": "f01f3ad9860e17cb9fbfd3515215638bff741511fb1337b56db9ee816127eaba",
+    "lock_sha256": "de95119ca8f2dd1ba487619be9a7d8c6a90375d24dee881e612a4bee65c57891",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",
@@ -5129,6 +5129,983 @@
         "notice_basis": "installed package notice",
         "notices": [
           "frontend-zwitch-2.0.4/license"
+        ]
+      }
+    ],
+    "missing_required_notices": [],
+    "assets": [
+      {
+        "path": "docs/assets/logo.webp",
+        "sha256": "7d580481b138f3f0194489b4fdd29ddec77b01d1562af0ff708bf86425401555",
+        "provenance": "docs/assets/provenance.json",
+        "owner": "Illumitech"
+      },
+      {
+        "path": "docs/assets/cover.webp",
+        "sha256": "10c9ed306855830aebc1697727d1f17bb6637f587c77089e5de9c8d3be64a31b",
+        "provenance": "docs/assets/provenance.json",
+        "owner": "Illumitech"
+      },
+      {
+        "path": "docs/assets/memory.webp",
+        "sha256": "f6cc313050436c6cfa486ff0c7cec176e26af940a11e2fb3b28d17d6b338cd28",
+        "provenance": "docs/assets/provenance.json",
+        "owner": "Illumitech"
+      }
+    ]
+  },
+  "site_frontend": {
+    "lock_sha256": "acf1a4460fbd28171dfce665cda007152f2806a247192920c06227867ab960c1",
+    "dependencies": [
+      {
+        "name": "@esbuild/aix-ppc64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.28.1.tgz",
+        "integrity": "sha512-Svl7tq8k/08+p6CXPpRjQ1fKX+1odH/BQbb48fV6fj3CWHhsoIOoY87w1oHXm0qEpkIK3ZfVgp0hed3XBXzXMQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__aix-ppc64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/android-arm",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.28.1.tgz",
+        "integrity": "sha512-0k2F129Xdio1TdJfzJ8sy1Q47vUD2NnwdhiAf7drUN1EBTfPf4hsFCtmMgu/6m8JSzsBrlmVjudMBQqOfG8usQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__android-arm-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/android-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.28.1.tgz",
+        "integrity": "sha512-34EGEbCIAgosYz6goLcopX6Mo7NyGv9tfwEM2/7Ce2VcVRk568iSvniGWcUXIy7wEDR1wzolcxcriFVrWYcwBg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__android-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/android-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.28.1.tgz",
+        "integrity": "sha512-dbwY7ltSMDWsRatcRpCnES4F+im88OCUgGZjy52shC7GqHRE/cYlxNbB4Z4UpJswpcc4Qxd2oE/ufM0p61IKng==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__android-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/darwin-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.28.1.tgz",
+        "integrity": "sha512-TZbWkQY7kvTAXbXUT7uVACR5cMHsDiSz9z7ZKAX/RTq/WJEk3QyRr0wZpNhBDX+/0CtdqUIJlOiodQcta6tY3Q==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": true,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__darwin-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/darwin-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.28.1.tgz",
+        "integrity": "sha512-zfdzgK9ACBNZLI/CyHTOx81SyNbM6YXn7rxSgX97VjyiPl9W1i4Ka4fgKECEoFCKGpvBj5qArWIGgQjOwkgskQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__darwin-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/freebsd-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.28.1.tgz",
+        "integrity": "sha512-wG2EA8ENdEI0qhkSZMjfqrdY+ziCYCPMmtZjjIwOmXFjmyzEHn+UUxk5of+SYsjtfs3VpnlC7QLzSI5hY/rOAw==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__freebsd-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/freebsd-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.28.1.tgz",
+        "integrity": "sha512-i7dZ9vQgnvSCzi/rYCXNgtF/U+eKZNJBzu3eTQbRgHnM7tNSizLOkRFAl3qzVc/Op/u5YkHHa4pf/3DOYHthLQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__freebsd-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-arm",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.28.1.tgz",
+        "integrity": "sha512-qVXBOHQS+d5Y722GwJzJUtOLlX7km3CraOaGormF1pDtPd2C/l1SHRPgjLunLGe51Sh5YYWKMFDyV4SxgMQYTQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-arm-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.28.1.tgz",
+        "integrity": "sha512-yHs+0uc8+nvEAfAfxrWQKK5peSNzBc4PegcMO0EJ2hT71uA7vB8Ihg2e77R2P7SG5uYjPbHlLLmve4LLLRCf0g==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-ia32",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.28.1.tgz",
+        "integrity": "sha512-d1z4ZuP0ajrfz/FhGT4vv278rX8KnPPJx8i5+AtK7TYbx9Le9F1hyzurZpkEyjkGa9dUGhQow4C1NmeGvqxN2w==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-ia32-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-loong64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.28.1.tgz",
+        "integrity": "sha512-M5sRjUVZrkm1OAPR3dlOYzNmN+loZKGVi1VUQGrwuqLcbR6qeAz+famMhjASeH3YVKvZz+zT1jlh/keC3Rj/lg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-loong64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-mips64el",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.28.1.tgz",
+        "integrity": "sha512-mRObBZeHh2OxcBFPWE/FjylkRgZdYuiTR3vaTozquCGOH14iP9oN4x4Ge81CoIDYQrXmIxpFumJBu5MtZpnQJQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-mips64el-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-ppc64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.28.1.tgz",
+        "integrity": "sha512-slScBsMAb3GFDcdrCgLwZtPYRoH2H/youv10QiZyRjmsP48fznoveWytSgCI/R0ZcUgpc0ZhIUEx6LHts8yrfQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-ppc64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-riscv64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.28.1.tgz",
+        "integrity": "sha512-kw0owk1o0GFETUJyW0jc0G4Yzs0BHZn0JDZ8JRT088vjJYX777BAs1fDGxAC+q831qOs2DTC96mNsG2opdfyyQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-riscv64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-s390x",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.28.1.tgz",
+        "integrity": "sha512-/lAIjX8aYFRByhh6L5rYtPEDRqa9de/4V/juOXcta5frjvzXO4/sqEtyytse0g3zZFuWu5cDN0MkLz2qRDD2Ag==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-s390x-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/linux-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.28.1.tgz",
+        "integrity": "sha512-u/anNYF2mmVOEDwLtnQ1wOr3EZ9sTNGLWrsYGYwHWzGA3Si84IOkHXlbWTD1NB+9/1lcnweYKO54uhxZydNzfA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__linux-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/netbsd-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.28.1.tgz",
+        "integrity": "sha512-oks0DYbLwWMmaakTsCb+zL4E+aHRVLom9IJZOAthMQEPiQmydXHkziYEsGYRx0uNV/IjEKGAV941JzH02pflqw==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__netbsd-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/netbsd-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.28.1.tgz",
+        "integrity": "sha512-aeL6lAnN89Hz43Mlh1G8ARasbuoYvSITDEx0tHh5b7jJnHcssqgjy9Yx430GDpmCa6OyrKoS0aNRjKundRizGg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__netbsd-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/openbsd-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.28.1.tgz",
+        "integrity": "sha512-MEFJe5C3R8pwXdZ5Y21oo6m7ePiS0d9pWucn99O/wvyJZChoIQKrQDxKrGeW8F5+T0okTHesAmDeiHDTIq0V/Q==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__openbsd-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/openbsd-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.28.1.tgz",
+        "integrity": "sha512-i/ZLIOafE0Z8cI/XANJAixoJL/uRAoS2xOA3rb0xN+KK0K177cMAsQYkzHtBrtMXAKuAc7HGgcWiZ/sRC1Nxgw==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__openbsd-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/openharmony-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.28.1.tgz",
+        "integrity": "sha512-ge+Z7EXFNt2BO1oAMsVpiQ8EwndV9i1xXerAeTIK7AtPs3bKFXQM7nlRxDSIUIMeueR1CNXxqztLzdNeReKBJg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__openharmony-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/sunos-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.28.1.tgz",
+        "integrity": "sha512-BEjgtECkL3vY+SaSQ6nzVfiALUeFxpawyp8Jmf5PtYhf1Ug40N1h/hxlhts+f1FvSvarEigdxS3BlSMI2PJLcQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__sunos-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/win32-arm64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.28.1.tgz",
+        "integrity": "sha512-lCv9eK/H6ZJWbE7bh2nw54CZ9M2nupBxJcTsdk/QQnWkdSjKGuxmmH8/GWrlT1eMmZfn4dGcCjRte397WqfQXA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__win32-arm64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/win32-ia32",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.28.1.tgz",
+        "integrity": "sha512-zvb/mB2bSCoJOpoCBgYKKpX6YM6mJBlBUVUtVj41DlZJVEB6/0CKlRYxP5wWl1C1ILiCoAU5wZZ4q1P3qeS6Eg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__win32-ia32-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@esbuild/win32-x64",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.28.1.tgz",
+        "integrity": "sha512-bm4Mowrv+GXMlpWX++EcXw/iLyd1o3+bJkC2DkWXYVvgZCqD/bSj9ctZeAMC3cIxgjRVR2Dufaiu4YPxr5gW1A==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed esbuild",
+        "notices": [
+          "frontend-@esbuild__win32-x64-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@napi-rs/lzma-linux-x64-gnu",
+        "version": "1.5.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@napi-rs/lzma-linux-x64-gnu/-/lzma-linux-x64-gnu-1.5.1.tgz",
+        "integrity": "sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "not installed or distributed; lock metadata only",
+        "notices": []
+      },
+      {
+        "name": "@rollup/rollup-android-arm-eabi",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.66.0.tgz",
+        "integrity": "sha512-7y4XeoUHPecjfUDRmap8U0q6bjfLAPn7uOGT8BKyqy8uNDOjsGS8rlBhOx6sZLVwwjN6hapvGl2mW9/IS6UNww==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-android-arm-eabi-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-android-arm64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.66.0.tgz",
+        "integrity": "sha512-e8WugYZXpgqrlMXLCudYVRAxAcK7AIY36JxRDwFRD38L9q62G1VsEUW6ijXxzjxYjNB8i1zo3B/ycIQ/qjLC/Q==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-android-arm64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-darwin-arm64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.66.0.tgz",
+        "integrity": "sha512-6vkDCfyDjNLokh+Rt1D2KtNgFFMEPdkWha/mbtP4cSjh9xiN8T/JBS/A7nDYKjmMAXHrvR9J3AzUk2LtFbIBLg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": true,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-darwin-arm64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-darwin-x64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.66.0.tgz",
+        "integrity": "sha512-/mzZAX0+Q6eXxvkR0HB0RZCCrsbmFD8DpsvCQoMYABDfq/DjqkbfytuJ7GvZ4AhR/Mgis2fXbZrGqfbcK2Z5fA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-darwin-x64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-freebsd-arm64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.66.0.tgz",
+        "integrity": "sha512-JQJx9E8tUjGqed1RevDmoHaS3V30ODdV8uyvGxlwd4K5se6bkPrMeltSybqAtpJ+ltDRfo7FORQaJG2Hd5nGog==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-freebsd-arm64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-freebsd-x64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.66.0.tgz",
+        "integrity": "sha512-GEaUQQjMaG7X1304qMgqLjzCKv6CdDirzJSS+UqUs3xhJ9X2Kjzu0JDbLoUU42FWxwmZqz+SsgU1SlQv9GNRVA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-freebsd-x64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-arm-gnueabihf",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.66.0.tgz",
+        "integrity": "sha512-DgmAU9N0NhDQDzHgFUocDio7zRO8jR/nY/obDGvCR8zbJ6J77Fg6X49yPuExJUpYPbC82EOaRhG969pWzUSnHQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-arm-gnueabihf-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-arm-musleabihf",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.66.0.tgz",
+        "integrity": "sha512-zG09YZ+sk/HoHq+P9gYB0EseQ3M20RbDuKGWey6fbiMDV1LxfXvhgSW9jDaCcvFPMgfLXpimzXY+UYvA8R2mLQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-arm-musleabihf-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-arm64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.66.0.tgz",
+        "integrity": "sha512-vlArhgyXbcVc1D4WZPoiYuqJIaMiSHBj6etRXua0KlfjlZeuiQyVAPYi0/N49O4mSp3u1iGUBLEjNa8ec81XZg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-arm64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-arm64-musl",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.66.0.tgz",
+        "integrity": "sha512-RxJZtk0G87YPotDaRDvRqStV8cbqLSC5TroHvQHHKsqBg0ok64RxKgtXeFsa7FBcy7mb4crBrG3xK8USWIqWNA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-arm64-musl-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-loong64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.66.0.tgz",
+        "integrity": "sha512-qlGcw959PrLLkZhiBxF3OZ6SQvj+OKY85mCqGNgSRs4LZlDJ6ICqmz6UdxtINdhcXYwNIbZoapQVBAmZlD2hUQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-loong64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-loong64-musl",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.66.0.tgz",
+        "integrity": "sha512-TvTI/7Cy0WvRA1SXgwzu6bwXBnMpmeT/ln5q7WvSpqmXy1VbmEnY8HVIDQNBiaHJvoWqRr0M4FNo7qiqtyMaFw==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-loong64-musl-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-ppc64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.66.0.tgz",
+        "integrity": "sha512-UZEDkSoDRZ50NyLj70nO6mpIK3dvs2cPTTvQb1bA/PBDmr9fvn5KiESuGfh6srd7Zi6Lt9Sv2sVrFr1QoHLvPQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-ppc64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-ppc64-musl",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.66.0.tgz",
+        "integrity": "sha512-VRbxTvagLh3HRcysx1CNq+HHcvJbSebNI6fCbk7jwmmWHkXjrSIV3igXBpRHUTFdg0pagWGu50xoSZXnrZHjVQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-ppc64-musl-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-riscv64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.66.0.tgz",
+        "integrity": "sha512-uWdJpvYqh0LE/i+YBL3sMX0a2kUkICENjmrPmyBmMOFc3jMrs6MSQH/pMD+VIpGEoUcr3XkHGLLfymzIqPSRRg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-riscv64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-riscv64-musl",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.66.0.tgz",
+        "integrity": "sha512-3FUd88pxgWAjK60OgCrika1AcNG+u8zaCdWjg4TlcZTDkt5TGyci8ZU64l3OJ9ax0MEjw3P80B/3PoSQDCLwJQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-riscv64-musl-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-s390x-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.66.0.tgz",
+        "integrity": "sha512-qT2rMmgyej62g5AdwktK+Bt2lBu497pzWZe12TTQ5JmZjOYPnEwcPEAOSLTBxBV+6gIES75rXm219v/QkT397A==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-s390x-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-x64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.66.0.tgz",
+        "integrity": "sha512-E46rnZgp7J84Qwe8RMlF+rgimnDo/9fuiGbUArGB0ZkMWf97O7yeSCfKls5x/YJOF0RcuSe9RctuKe1hlxICiA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-x64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-linux-x64-musl",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.66.0.tgz",
+        "integrity": "sha512-Uz1HiZe+qBzqgdPsON+z0wRx3WdATuyzwvGT6cr2VZVrqqko0ZJVfkrQJtwDMuDcAfXYdo7XucaxJ7lTLjEcgg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-linux-x64-musl-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-openbsd-x64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.66.0.tgz",
+        "integrity": "sha512-Ph7TX3Ex5qdfcb7Tc6eEPugVkRfJ501eTovO4T5029YObfpZ7dzn3RiwpFvGp50nk2QUhvBMZ0PFGlEj6pOYTg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-openbsd-x64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-openharmony-arm64",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.66.0.tgz",
+        "integrity": "sha512-nZYPEya7ZkeNxUEiF7qmNZbyLTyRN3MK5cO22KqsaoneUzXJuzBIQRw+7BEQy9LGj2O5vrCE9V3EpK06FYo1tQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-openharmony-arm64-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-win32-arm64-msvc",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.66.0.tgz",
+        "integrity": "sha512-u7aTfS3R6C4hRsqXSzaO6qLZYLVuMkHMvcWlux4IM8IJif1VCl2cgPBSo5gSNoFoStQypQP+qwq8W1IyFBf1QQ==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-win32-arm64-msvc-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-win32-ia32-msvc",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.66.0.tgz",
+        "integrity": "sha512-e+i9ueHrH1Bafb0cf0woAIVJbYcoC8vRaD+vz+Xi8w6jz9cYJSV3vyKO6ELGSZ6g4W4MJOm2WPLN4/nQf77h7w==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-win32-ia32-msvc-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-win32-x64-gnu",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.66.0.tgz",
+        "integrity": "sha512-KfTCbrtr2zXTqH2E1F+uYlFTrYibxHKqPAHobpd8Kfg49cEHmuHebOidCTDRgqG1suaPFX7oejFQeGE71zWKfA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-win32-x64-gnu-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@rollup/rollup-win32-x64-msvc",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.66.0.tgz",
+        "integrity": "sha512-xA+neBh1bqkqaS3b48T2UHZnDsTIpb9B0h+TdBzynjF/ymCpYndhfY10RqW0qSKB1HqqQA83mINVhAdwA+mETg==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": false,
+        "notice_basis": "upstream family notice from installed rollup",
+        "notices": [
+          "frontend-@rollup__rollup-win32-x64-msvc-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "@types/estree",
+        "version": "1.0.9",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz",
+        "integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__estree-1.0.9/LICENSE"
+        ]
+      },
+      {
+        "name": "@types/node",
+        "version": "22.19.15",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/@types/node/-/node-22.19.15.tgz",
+        "integrity": "sha512-F0R/h2+dsy5wJAUe3tAU6oqa2qbWY5TpNfL/RGmo1y38hiyO1w3x2jPtt76wmuaJI4DQnOBu21cNXQ2STIUUWg==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-@types__node-22.19.15/LICENSE"
+        ]
+      },
+      {
+        "name": "esbuild",
+        "version": "0.28.1",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/esbuild/-/esbuild-0.28.1.tgz",
+        "integrity": "sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-esbuild-0.28.1/LICENSE.md"
+        ]
+      },
+      {
+        "name": "fdir",
+        "version": "6.5.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz",
+        "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-fdir-6.5.0/LICENSE"
+        ]
+      },
+      {
+        "name": "fsevents",
+        "version": "2.3.2",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz",
+        "integrity": "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-fsevents-2.3.2/LICENSE"
+        ]
+      },
+      {
+        "name": "nanoid",
+        "version": "3.3.20",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz",
+        "integrity": "sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-nanoid-3.3.20/LICENSE"
+        ]
+      },
+      {
+        "name": "picocolors",
+        "version": "1.1.1",
+        "license": "ISC",
+        "source": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
+        "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-picocolors-1.1.1/LICENSE"
+        ]
+      },
+      {
+        "name": "picomatch",
+        "version": "4.0.7",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.7.tgz",
+        "integrity": "sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-picomatch-4.0.7/LICENSE"
+        ]
+      },
+      {
+        "name": "postcss",
+        "version": "8.5.32",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz",
+        "integrity": "sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-postcss-8.5.32/LICENSE"
+        ]
+      },
+      {
+        "name": "rollup",
+        "version": "4.66.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/rollup/-/rollup-4.66.0.tgz",
+        "integrity": "sha512-Onq6/qO4ARhxIs+jYiHE0pYehadLyMECAiGEqQ+0/aWND3+2PmifJIIqBLYtuBODqHTlOUEQFtIVPyCy0Lck7A==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-rollup-4.66.0/LICENSE.md"
+        ]
+      },
+      {
+        "name": "source-map-js",
+        "version": "1.2.2",
+        "license": "BSD-3-Clause",
+        "source": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz",
+        "integrity": "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-source-map-js-1.2.2/LICENSE"
+        ]
+      },
+      {
+        "name": "tinyglobby",
+        "version": "0.2.17",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz",
+        "integrity": "sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-tinyglobby-0.2.17/LICENSE"
+        ]
+      },
+      {
+        "name": "typescript",
+        "version": "5.9.3",
+        "license": "Apache-2.0",
+        "source": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+        "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-typescript-5.9.3/LICENSE.txt",
+          "frontend-typescript-5.9.3/ThirdPartyNoticeText.txt"
+        ]
+      },
+      {
+        "name": "undici-types",
+        "version": "6.21.0",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
+        "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-undici-types-6.21.0/LICENSE"
+        ]
+      },
+      {
+        "name": "vite",
+        "version": "7.3.7",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/vite/-/vite-7.3.7.tgz",
+        "integrity": "sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==",
+        "scope": "build/test",
+        "optional": false,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-vite-7.3.7/LICENSE.md"
+        ]
+      },
+      {
+        "name": "fsevents",
+        "version": "2.3.3",
+        "license": "MIT",
+        "source": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
+        "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
+        "scope": "build/test",
+        "optional": true,
+        "installed": true,
+        "notice_basis": "installed package notice",
+        "notices": [
+          "frontend-fsevents-2.3.3/LICENSE"
         ]
       }
     ],

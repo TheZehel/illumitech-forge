@@ -157,6 +157,7 @@ pub fn validate_file(path: &Path, root_path: &Path) -> Result<Value> {
                 "request_sha256",
                 "specs",
                 "delta",
+                "operation_id",
                 "candidate_manifest"
             ]
             .contains(&k.as_str()))),

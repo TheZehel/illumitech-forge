@@ -4,6 +4,7 @@ mod editor;
 mod markdown;
 mod transcript;
 mod ui;
+mod workflows;
 use crate::workbench::{Action, App, Session, View, approval_choices};
 use anyhow::{Result, ensure};
 use commands::Panel;
@@ -48,6 +49,9 @@ struct Chat {
     transcript: transcript::Cache,
     active_started: Option<std::time::Instant>,
     choosing: Option<Value>,
+    workflow: Value,
+    workflow_id: String,
+    workflow_digest: String,
 }
 impl Chat {
     fn history_matches(&self) -> Vec<String> {
@@ -165,6 +169,7 @@ pub async fn run(root: &Path, state: &Path, executable: Option<PathBuf>) -> Resu
         p.handle.abort();
         let _ = p.handle.await;
     }
+    app.stop_forge().await;
     if let Some(n) = app.native.write().await.take() {
         n.shutdown().await;
     }
@@ -200,6 +205,16 @@ async fn run_loop(
                         chat.editor.clear();
                     }
                     chat.notice.clear();
+                    if p.route.starts_with("workflow/") {
+                        if let Some(id) = v["workflow_id"].as_str() {
+                            chat.workflow_id = id.into();
+                        }
+                        if let Some(digest) = v["scope_digest"].as_str() {
+                            chat.workflow_digest = digest.into();
+                        }
+                        chat.workflow = v;
+                        chat.open_panel(Panel::Workflow);
+                    }
                 }
                 Err(e) => chat.notice = format!("{e}. Nenhuma ação reenviada automaticamente."),
             }
@@ -434,6 +449,22 @@ async fn run_loop(
                         chat.editor.edit(key);
                     }
                     continue;
+                }
+                if key.code == KeyCode::Enter {
+                    let text = chat.editor.text.trim().to_owned();
+                    match workflows::pending(app, chat, &text) {
+                        Ok(Some(p)) => {
+                            chat.busy = p.route.clone();
+                            chat.editor.clear();
+                            *pending = Some(p);
+                            continue;
+                        }
+                        Err(e) => {
+                            chat.notice = e.to_string();
+                            continue;
+                        }
+                        Ok(None) => {}
+                    }
                 }
                 let mut route = String::new();
                 let mut payload = action(&chat.selected)?;

@@ -1,6 +1,6 @@
 # P0 — Economizador de tokens
 
-Status: Discovery. Prioridade: primeira frente após 0.3.0.
+Registro histórico da descoberta após 0.3.0. Para capacidades atuais, consulte [medição e contexto](../token-economy.md) e [comparação da candidata 1.2](../guides/economy.pt.md).
 Área: contexto, execução, uso e avaliação. Repositório: Illumitech Forge.
 
 ## Objetivo

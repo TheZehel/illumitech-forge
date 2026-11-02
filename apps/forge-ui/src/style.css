@@ -2,3 +2,11 @@
 .brand{flex-direction:column;align-items:flex-start;gap:8px}.brand img{width:134px;height:26px;object-fit:contain;object-position:left center}.brand>span{display:block}.brand small{margin-top:2px}@media(max-width:560px){.brand{flex-direction:row;align-items:center;justify-content:space-between}.brand img{width:110px;height:24px}}
 
 .details input[type="checkbox"]{width:auto;padding:0;margin:0 8px 0 0;accent-color:#ff7a1a}.details code{overflow-wrap:anywhere}
+/* Scope review shares the Workbench visual language and keyboard focus. */
+.workflow-view { display: grid; gap: .7rem; }
+.workflow-view h3,.workflow-view h4 { margin: .4rem 0; }
+.workflow-view select,select { max-width: 100%; padding: .7rem; border: 1px solid #3b454d; border-radius: .6rem; color: #edf1f1; background: #161f26; font: inherit; }
+.workflow-view .scope-consent { display: flex; gap: .65rem; align-items: flex-start; line-height: 1.5; }
+.workflow-view .scope-consent input { width: auto; margin-top: .3rem; }
+.workflow-view pre { max-height: 22rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.workflow-view :focus-visible { outline: 2px solid #ff7a1a; outline-offset: 3px; }

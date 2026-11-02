@@ -1,3 +1,5 @@
+> Registro histórico de paridade. Publicação atual: 1.1.1; incremento local: [candidata 1.2.0](growth-candidate.md). Pilotos históricos não atestam uma nova revisão.
+
 # Paridade operacional e adoção — 0.2.0
 
 A v0.1.0 publicada permanece disponível. Esta entrega fecha as lacunas necessárias para adoção

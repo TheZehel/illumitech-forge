@@ -173,6 +173,20 @@ impl Store {
         )?;
         Ok(())
     }
+    /// Persist an operational transition and its audit event in the same transaction.
+    pub fn journal_metadata(&mut self, release: &str, key: &str, body: &Value) -> Result<()> {
+        let tx = self.conn.transaction()?;
+        tx.execute(
+            "INSERT INTO metadata VALUES(?1,?2) ON CONFLICT(key) DO UPDATE SET body=excluded.body",
+            params![key, body.to_string()],
+        )?;
+        tx.execute(
+            "INSERT INTO events(release_id,kind,body) VALUES(?1,?2,?3)",
+            params![release, key, body.to_string()],
+        )?;
+        tx.commit()?;
+        Ok(())
+    }
     pub fn remove_metadata(&self, key: &str) -> Result<()> {
         self.conn
             .execute("DELETE FROM metadata WHERE key=?1", [key])?;

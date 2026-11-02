@@ -5,6 +5,22 @@ pub(super) struct Command {
 }
 pub(super) const COMMANDS: &[Command] = &[
     Command {
+        name: "plan",
+        description: "Planejar PEDIDO ou carregar @JSON; revisar antes de executar",
+    },
+    Command {
+        name: "run",
+        description: "Autorizar o digest do plano e executar o escopo",
+    },
+    Command {
+        name: "tasks",
+        description: "Listar tarefas, diagnosticar ID ou /tasks resume ID",
+    },
+    Command {
+        name: "report",
+        description: "Evidências e consumo do workflow atual ou ID",
+    },
+    Command {
         name: "help",
         description: "Ajuda e atalhos de teclado",
     },
@@ -64,4 +80,5 @@ pub(super) enum Panel {
     Status,
     Sessions,
     History,
+    Workflow,
 }

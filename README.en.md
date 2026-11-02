@@ -5,16 +5,16 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.1.1.** Native `forge`, formatted conversations and a dedicated terminal experience.
+**Illumitech Forge 1.2.0.** Native `forge`, formatted conversations and a dedicated terminal experience.
 Building this tree does not replace an installed binary. See the
-[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1) for artifacts,
+[release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.2.0) for artifacts,
 checksums and platform limits. [Português](README.md) · [Validation guide](docs/v1-candidate.md).
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
 The **1.1** series provides the native Rust `forge` command and a terminal experience with
 ASCII identity, Markdown, command menu, visual help and searchable session history.
-See [1.1.1 release notes](docs/release-v1.1.1.md) for validation and operational limits.
+See [1.2.0 release notes](docs/release-v1.2.0.md) for validation and operational limits.
 
 ## Features
 
@@ -32,7 +32,7 @@ No paid API fallback or permission bypass is introduced.
 ## Start with the published release
 
 ```sh
-cargo install illumitech-forge-cli --version 1.1.1 --locked
+cargo install illumitech-forge-cli --version 1.2.0 --locked
 forge --version
 forge
 ```
@@ -42,11 +42,11 @@ separately for conversations; its account, model and permissions are preserved. 
 interface needs no `init`, ai-memory, Python or Node. Free chat is read-only; implementation
 execution requires a reviewed manifest.
 
-Cargo needs Rust 1.94.0. The [private macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.1.1)
-needs no Rust compiler and requires authorized repository access. Crate source is public under MIT.
+Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.2.0)
+needs no Rust compiler. The GitHub repository and crate source are public under MIT.
 See the [quickstart](docs/quickstart.md) for installation, version/PATH checks and Workbench.
 
-## New in 1.1.1
+## First-run foundation
 
 - `forge demo create DIRECTORY`: native command/gate/state example without an agent, account
   or Python. See the [walkthrough](docs/quickstart.md#demonstracao-sem-agente).
@@ -92,3 +92,11 @@ marker cannot guarantee that remote events will not trigger workflows.
 Copyright Illumitech, [MIT](LICENSE). Preserve [third-party notices](THIRD_PARTY_NOTICES),
 [dependency inventory](docs/dependencies.json) and [asset provenance](docs/assets/provenance.json).
 Commits and releases use the configured human identity, with no agent authorship attribution.
+
+## New in 1.2.0
+
+Integrated workflows, scope consent, external verification, SARIF import and delivery comparisons
+are available in 1.2.0. See [workflow guide](docs/guides/workflows.en.md),
+[economy](docs/guides/economy.en.md) and [implementation limits](docs/growth-candidate.md).
+The GitHub repository is public as of 2026-11-02. Source and release verification identify the evaluated revision.
+The PT/EN website is a local preview; no domain, telemetry or deployment is enabled.

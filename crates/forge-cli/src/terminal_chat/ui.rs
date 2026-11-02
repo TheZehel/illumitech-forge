@@ -134,7 +134,7 @@ impl Chat {
             let mut lines = if chunks[1].height >= 12 && chunks[1].width >= 55 {
                 banner()
             } else {
-                vec![title("Bem-vindo ao Forge")]
+                vec![title("Bem-vindo ao Forge · /plan organiza uma tarefa")]
             };
             lines.extend([
                 Line::default(),
@@ -317,6 +317,22 @@ impl Chat {
                 area,
                 &mut state,
             );
+            return;
+        }
+        if panel == Panel::Workflow {
+            let mut lines = vec![
+                title("Plano, execução e evidências"),
+                Line::from("PgUp/PgDn percorrem o escopo. Esc volta ao editor."),
+                Line::from(
+                    "/run DIGEST confirma o escopo; /tasks ID diagnostica; /tasks resume ID retoma.",
+                ),
+            ];
+            lines.extend(
+                display(&serde_json::to_string_pretty(&self.workflow).unwrap_or_default())
+                    .lines()
+                    .map(|s| Line::from(s.to_owned())),
+            );
+            self.render_lines(f, lines, area);
             return;
         }
         let lines = if panel == Panel::Help {

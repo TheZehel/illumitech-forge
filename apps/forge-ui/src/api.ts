@@ -51,12 +51,13 @@ export async function bootstrap(): Promise<void> {
 }
 export async function api(path: string, body?: ObjectValue, signal?: AbortSignal): Promise<unknown> {
     const reading = body === undefined;
+    const readOnly = reading || ['workflow-status', 'workflow-list', 'workflow-open', 'workflow-recipes', 'workflow-preview', 'workflow-review', 'workflow-findings', 'workflow-compare'].includes(path);
     const controller = new AbortController();
     let timedOut = false;
     const abort = () => controller.abort(signal?.reason);
     if (signal?.aborted) abort();
     else signal?.addEventListener('abort', abort, { once: true });
-    const timer = reading ? setTimeout(() => { timedOut = true; controller.abort(); }, 5000) : undefined;
+    const timer = readOnly ? setTimeout(() => { timedOut = true; controller.abort(); }, 5000) : undefined;
     try {
         const r = await fetch(`/api/${path}`, { method: reading ? 'GET' : 'POST', headers: { 'X-Forge-CSRF': capability, ...(!reading ? { 'Content-Type': 'application/json' } : {}) }, body: reading ? undefined : JSON.stringify({ ...body, operation_id: crypto.randomUUID() }), signal: controller.signal });
         const v: unknown = await r.json();

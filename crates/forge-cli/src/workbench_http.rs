@@ -159,6 +159,16 @@ async fn handle(r: Request, app: Arc<App>, origin: &str, token: &str) -> Result<
                 "Origin required for controls"
             );
             let route = r.path.strip_prefix("/api/").context("route")?;
+            if route.starts_with("workflow-") {
+                let action: crate::workflow::ui::Action = serde_json::from_slice(&r.body)?;
+                return Ok(match app.workflow_action(route, action).await {
+                    Ok(v) => json_response(200, v),
+                    Err(e) => json_response(
+                        409,
+                        json!({"error":forge_adapters::process::redact(&e.to_string()),"replayed":false}),
+                    ),
+                });
+            }
             if route.starts_with("forge-") {
                 let action: crate::operational::ForgeAction = serde_json::from_slice(&r.body)?;
                 return Ok(match app.forge_action(route, action).await {

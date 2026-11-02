@@ -1,7 +1,8 @@
-# Roadmap até 1.0.0
+# Histórico do roadmap até 1.0.0
 
-Status: as treze frentes têm implementação local na candidata 1.0.0, sem publicação.
-Aceite final por revisão e pilotos permanecem no ledger externo. Base publicada: 0.3.0.
+Status atual: versão publicada 1.1.1; candidata local 1.2.0 em implementação/validação.
+Este documento preserva o planejamento histórico da 1.0.0. Para o incremento atual, consulte [candidata 1.2](growth-candidate.md).
+Aceites por revisão e limites de plataforma permanecem no ledger externo.
 Veja [implementação, evidências históricas e limites](v1-candidate.md).
 Os marcos abaixo registram a ordem original de produto, não versões intermediárias publicadas.
 
@@ -42,7 +43,7 @@ representam ordem de produto e as versões são sugestões, sem compromisso de d
 O [plano de execução até 1.0](v1-execution-plan.md) decompõe todas as frentes em specs,
 42 passos novos, revalidação do estimador e sete checkpoints. Contratos foram preparados
 para inspect/dry-run; suites de comportamento serão materializadas pelo coordenador antes
-de cada marco. Implementação integral ainda não iniciada.
+de cada marco. A frase de planejamento original não descreve o estado atual: a base foi implementada e publicada; os marcos preservam intenção e sequência históricas.
 
 ## Sequência
 

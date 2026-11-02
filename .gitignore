@@ -13,3 +13,11 @@ __pycache__/
 /apps/forge-ui/dist/
 /apps/forge-ui/test-results/
 /apps/forge-ui/playwright-report/
+
+# Local static documentation build
+apps/forge-site/.generated/
+apps/forge-site/dist/
+apps/forge-site/node_modules/
+apps/forge-site/test-results/
+apps/forge-site/playwright-report/
+/target

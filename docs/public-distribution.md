@@ -1,7 +1,7 @@
 # Public distribution preparation
 
-This tree contains release 1.0.0. Publication requires separate owner authorization. Packages use MIT;
-the executable remains `illumitech-forge`. Rust dependency aliases retain the existing
+This tree targets release 1.2.0. The owner authorized publication of the reviewed code and packages; the website remains a local preview. Future publication requires separate owner authorization. Packages use MIT;
+native executable names are `forge` and `illumitech-forge`. Rust dependency aliases retain the existing
 `forge_domain`, `forge_adapters` and `forge_catalog` imports. Package names are now:
 
 1. `illumitech-forge-domain`
@@ -12,9 +12,17 @@ the executable remains `illumitech-forge`. Rust dependency aliases retain the ex
 Domain and catalog are independent; adapters depends on the exact domain version, and the CLI depends on all three exact versions. Publish domain before adapters. Directories
 remain `crates/forge-*`. Recipes now live inside the catalog package at
 `crates/forge-catalog/src/recipes.json`, so compilation never needs a parent checkout.
-The four names use version 1.0.0 for this release; earlier version 0.3.0 remains available.
+The four workspace packages and current install examples use version 1.2.0. Provider receipts attest successful uploads.
 Check the new version, ownership and authentication before a separately authorized upload.
 Current candidate scope and native/platform limits are in [v1-candidate.md](v1-candidate.md).
+
+## Current visibility — 2026-11-02
+
+The owner opened the GitHub repository and a read-only provider check confirmed `PUBLIC`.
+MIT remains unchanged. Public visibility does not publish this local 1.2.0 candidate,
+replace source-bound acceptance, or authorize Actions, a website deployment or registry upload.
+Future GitHub release operations must explicitly use `--expected-visibility PUBLIC`.
+The dated 0.3.0 path below is historical; its private-repository premise no longer applies.
 
 ## Local preparation
 

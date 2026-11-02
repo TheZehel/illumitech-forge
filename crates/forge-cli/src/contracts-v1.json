@@ -12,7 +12,10 @@
     "snapshot": 1,
     "installation_receipt": 1,
     "native_demo": 1,
-    "installation_path_diagnostics": 1
+    "installation_path_diagnostics": 1,
+    "workflow": 1,
+    "delivery_comparison": 1,
+    "sarif_import": 1
   },
   "compatibility": {
     "readers": "Ignore unknown output fields; reject unsupported schema versions. Input contracts reject unknown fields.",

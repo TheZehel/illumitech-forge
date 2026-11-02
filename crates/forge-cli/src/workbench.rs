@@ -68,6 +68,7 @@ pub struct App {
     epoch: AtomicU64,
     pub(crate) forge_control: Mutex<()>,
     pub(crate) forge_run: Mutex<Option<tokio::task::JoinHandle<()>>>,
+    pub(crate) workflow_active: Mutex<Option<(PathBuf, String)>>,
     pub(crate) release_id: Option<String>,
     pub(crate) allowed_roots: std::collections::BTreeSet<PathBuf>,
 }
@@ -161,6 +162,7 @@ impl App {
             epoch: AtomicU64::new(0),
             forge_control: Mutex::new(()),
             forge_run: Mutex::new(None),
+            workflow_active: Mutex::new(None),
             release_id,
             allowed_roots,
         }))
@@ -361,7 +363,7 @@ impl App {
             } else {
                 None
             };
-            return crate::planning::propose_reserved(
+            let mut result = crate::planning::propose_reserved(
                 &self.root,
                 a.request.as_deref().context("request required")?,
                 &self.state.join("workbench-candidates"),
@@ -374,7 +376,9 @@ impl App {
                 None,
                 reservation,
             )
-            .await;
+            .await?;
+            result["operation_id"] = json!(a.operation_id);
+            return Ok(result);
         }
         if route == "reconnect" {
             self.connect().await?;

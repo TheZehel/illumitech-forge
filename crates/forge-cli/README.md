@@ -1,9 +1,9 @@
-# Illumitech Forge CLI 1.1.1
+# Illumitech Forge CLI 1.2.0
 
 Evidence-backed release execution, local web workbench and native interactive terminal.
 
 ```sh
-cargo install illumitech-forge-cli --version 1.1.1 --locked
+cargo install illumitech-forge-cli --version 1.2.0 --locked
 forge
 ```
 
@@ -34,3 +34,16 @@ native evaluator is pinned by SHA-256 and verifies an artifact and preserved fil
 and preserves existing configuration. `installation doctor` inspects both executable names
 without running unknown candidates. Status/report return 2 for stale evidence even if the
 historical run snapshot remains passed. See the release verification for support limits.
+
+## Integrated workflows in 1.2.0
+
+`/plan REQUEST` prepares structured work through the native client. Review the scope digest
+and use `/run DIGEST` to authorize that scope. `/tasks` and `/report ID` expose state and evidence.
+The Workbench offers the same workflow. Native permissions and declared final human gates
+remain separate; scope consent never approves completion.
+
+CLI automation includes `workflow prepare|start|status|diagnose|resume|list|recipes|findings`
+and read-only `eval compare`. Bug regressions are frozen outside the project; dependency
+remediation requires SARIF rescan plus project checks. Unknown usage stays unknown; the small
+native pilot did not demonstrate token savings. Public GitHub uses MIT. The PT/EN website
+remains a local preview, with no deployment, telemetry or native bridge.
