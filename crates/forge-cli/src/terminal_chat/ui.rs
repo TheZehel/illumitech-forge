@@ -55,6 +55,7 @@ impl Chat {
         }
         let session = view.sessions.get(&self.selected);
         self.transcript.update(session, self.activities);
+        self.activity_panel.update(session);
         let approval = view
             .approvals
             .values()
@@ -245,7 +246,7 @@ impl Chat {
             vec![
                 Line::styled(status, Style::default().fg(TEAL)),
                 Line::styled(
-                    "F1 ajuda · / comandos · Ctrl+Q sai",
+                    "F1 ajuda · F2 atividades · Ctrl+Q sai",
                     Style::default().fg(Color::Gray),
                 ),
             ]
@@ -255,7 +256,7 @@ impl Chat {
                 Line::styled(display(notice), Style::default().fg(ORANGE)),
                 Line::from(format!("{usage}{scroll}")),
                 Line::styled(
-                    "F1 ajuda · / comandos · Ctrl+R histórico · Ctrl+Q sai · Chat não comprova gates",
+                    "F1 ajuda · F2 atividades · Ctrl+R histórico · Ctrl+Q sai · Chat não comprova gates",
                     Style::default().fg(Color::Gray),
                 ),
             ]
@@ -272,6 +273,23 @@ impl Chat {
         );
     }
     fn render_panel(&mut self, f: &mut Frame, panel: Panel, view: &View, root: &Path, area: Rect) {
+        if panel == Panel::Activities {
+            let lines = self.activity_panel.lines(
+                area.width.saturating_sub(2),
+                area.height.saturating_sub(2),
+                &mut self.panel_scroll,
+            );
+            f.render_widget(
+                Paragraph::new(lines)
+                    .wrap(Wrap { trim: false })
+                    .scroll((self.panel_scroll, 0))
+                    .block(block(
+                        "Atividades · chamadas, comandos e arquivos · Esc volta",
+                    )),
+                area,
+            );
+            return;
+        }
         if panel == Panel::Sessions || panel == Panel::History {
             let rows = if panel == Panel::Sessions {
                 view.sessions
@@ -351,6 +369,8 @@ impl Chat {
                 "Ctrl+C limpa com recuperação por Ctrl+Y; Esc interrompe turno",
                 "PgUp/PgDn lê histórico · Ctrl+L redesenha a tela",
                 "Ctrl+O expande atividades · Ctrl+Q sai",
+                "F2 / /activities: ↑/↓ selecionam, Enter/Espaço alternam detalhes",
+                "No painel: ←/→ recolhem/expandem cada chamada ou arquivo",
             ] {
                 lines.push(Line::from(text));
             }

@@ -1,0 +1,11 @@
+# FORGE-051 — Atividades estruturadas na conversa
+
+Apresentar chamadas MCP, comandos e mudanças em arquivos com resumo visível e detalhes recolhidos. O exemplo do usuário é referência de apresentação; seus logs de produção não são fixtures nem escopo de investigação.
+
+## Aceites
+- AC1: uma atividade por ID, atualizada de início a conclusão, incluindo saída parcial. MCP preserva servidor, ferramenta, argumentos, resultado e erro observado; comandos mostram comando, diretório, código de saída e saída separadamente.
+- AC2: arquivos têm detalhes individuais e contagens apenas para linhas de hunks recebidos. Mudança proposta, ferramenta concluída e gate aprovado permanecem conceitos distintos.
+- AC3: Workbench permite mostrar/ocultar detalhes por teclado, sem executar HTML nem carregar conteúdo remoto; polling não fecha detalhes abertos. Saídas extensas têm limite explícito e layout móvel utilizável.
+- AC4: terminal mantém resumo compacto e Ctrl+O mostra/oculta argumentos, resultados e diffs. F2 ou /activities abre inspeção por atividade: setas selecionam, Enter/Espaço alternam detalhes e cada arquivo tem diff independente. Atualizações preservam seleção/expansão e a troca de sessão as limpa. O painel preserva rascunho, permite rolagem e funciona durante streaming sem executar ou aprovar ações. Validar teclas em PTY real com fixture de protocolo, além do renderer. Streaming não duplica atividades e caracteres de controle não escapam ao renderer.
+- AC5: limites e redação existentes da ponte são preservados; dados excessivos são sinalizados, sem inventar sucesso. Regressões, build, lint, documentação e avaliação externa local passam. Sem inferência paga, Actions, publicação ou instalação global.
+- AC6: a compactação preserva result.isError, presença/código/tipo de erro, status, IDs e caminho/tipo de cada arquivo retido independentemente do orçamento de conteúdo. Até 32 arquivos, com total original explícito. Se escapes JSON excederem 64 KiB, reduzir a conteúdo omitido com metadados preservados; metadados que sozinhos excedam o limite produzem aviso explícito. Validar resultados MCP com três textos de 30 mil caracteres e múltiplos diffs extensos pela ponte real, no Workbench e no PTY.

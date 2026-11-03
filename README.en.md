@@ -5,7 +5,10 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.2.0.** Native `forge`, formatted conversations and a dedicated terminal experience.
+**Illumitech Forge 1.3.0 candidate.** Show/hide tool activity in the Workbench and
+terminal: F2 or `/activities` opens per-call and per-file details. See the
+[candidate notes](docs/release-v1.3.0.md). The published version remains **1.2.0**
+until this revision is approved and published.
 Building this tree does not replace an installed binary. See the
 [release notes](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.2.0) for artifacts,
 checksums and platform limits. [Português](README.md) · [Validation guide](docs/v1-candidate.md).

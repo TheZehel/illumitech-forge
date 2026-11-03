@@ -1,9 +1,11 @@
-# Illumitech Forge CLI 1.2.0
+# Illumitech Forge CLI 1.3.0
 
 Evidence-backed release execution, local web workbench and native interactive terminal.
 
+After this candidate is published:
+
 ```sh
-cargo install illumitech-forge-cli --version 1.2.0 --locked
+cargo install illumitech-forge-cli --version 1.3.0 --locked
 forge
 ```
 
@@ -12,7 +14,10 @@ explicit project picker. `forge --root PATH` selects another project. State defa
 external per-project directory. `illumitech-forge` remains available for existing scripts.
 
 The terminal includes an ASCII identity, Markdown, `/` command menu, F1 help, `/status`,
-Ctrl+R session history, readline editing and native permission decisions. Managed native
+Ctrl+R session history, readline editing and native permission decisions. F2 or
+`/activities` opens per-call and per-file details; arrows select, Enter/Space toggle
+and Esc returns to the preserved draft. MCP failure indicators and file identities
+survive bounded output truncation. Managed native
 Codex authentication is preserved; Forge does not silently switch accounts, models or APIs.
 ai-memory is optional. Chat text is not gate evidence, and publication is always explicit.
 

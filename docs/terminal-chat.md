@@ -49,7 +49,25 @@ As boas-vindas usam uma marca ASCII Illumitech; a composição se adapta ao tama
 Respostas exibem títulos, ênfase, listas, tabelas e código como Markdown no terminal. A fonte
 original permanece no histórico nativo. HTML e imagens não são executados ou carregados;
 caracteres de controle não viram comandos do terminal. Ferramentas ficam resumidas por padrão,
-com Ctrl+O ou `/activities` para alternar detalhes. Falhas e permissões continuam visíveis.
+com Ctrl+O para alternar todos os detalhes. Falhas e permissões continuam visíveis.
+
+Para inspecionar individualmente no próprio terminal, pressione **F2** ou digite
+`/activities`. Use ↑/↓ para selecionar uma chamada ou arquivo, **Enter**, **Espaço**
+ou **Ctrl+O** para mostrar/ocultar seus detalhes, e ←/→ para recolher/expandir.
+Abra a atividade de arquivos para selecionar e expandir cada diff separadamente.
+PgUp/PgDn percorrem saídas longas; Home/End selecionam a primeira/última atividade
+visível. **Esc** ou **F2** retorna à conversa com o rascunho preservado. O painel
+funciona durante a resposta e mantém seleção e expansão nas atualizações; trocar
+de sessão limpa essa seleção. Essas teclas não executam ferramentas nem aprovam gates.
+
+Chamadas MCP mostram `servidor.ferramenta`; expanda para consultar argumentos,
+resultado e erro separadamente. Comandos preservam diretório, código de saída e saída.
+Mudanças em arquivos mostram caminhos, diffs e contagens dos hunks recebidos.
+No Workbench, cada atividade oferece **Mostrar detalhes / Ocultar detalhes**, e cada
+arquivo abre seu próprio diff. Enter e Espaço alternam o resumo em foco. Atualizações
+mantêm o cartão aberto. Saídas longas têm área de rolagem e limite explícito; dados
+excessivos na ponte são marcados como parciais. Uma atividade concluída ou um diff
+não substitui os gates nem o aceite do Forge.
 
 Digite `/` para ver os comandos realmente disponíveis e filtrar pelo nome. ↑/↓ selecionam,
 Tab completa e Enter confirma. Esc recolhe o menu, preservando o texto. F1 ou `?` com entrada

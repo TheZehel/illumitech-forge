@@ -59,6 +59,7 @@ def package(root, target, binary=None, output=None, forge_binary=None):
     out.mkdir(parents=True, exist_ok=True)
     version = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
     names = ['README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES', 'docs/dependencies.json',
+             f'docs/release-v{version}.md',
              'docs/v1-candidate.md', 'docs/native-command.md', 'docs/terminal-chat.md', 'docs/workbench.md', 'docs/token-economy.md', 'docs/duration-estimates.md',
              'docs/quickstart.md', 'docs/operational-parity.md', 'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py']
     if windows:

@@ -42,5 +42,22 @@
 .latest-response { align-self: center; margin: 0 16px 2px; font-size: 11px; border-radius: 20px; box-shadow: 0 3px 12px #0004; }
 .composer[aria-busy=true] { border-color: #c28957; }
 .chat-footer details { margin: 0; }.chat-footer summary { font-size: 9px; }.chat-footer p { margin: 6px 0 0; }
+.activity-card { margin: 10px 0; padding: 0; border: 1px solid #45494b; border-radius: 12px; background: #1c2023; min-width: 0; }
+.activity-card > details { margin: 0; }
+.activity-card > details > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-height: 48px; padding: 12px 14px; color: #f7f7f7; list-style: none; }
+.activity-card summary::-webkit-details-marker { display: none; }
+.activity-title { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; font-size: 12px; font-weight: 600; }
+.activity-title::before { content: '›'; color: #ff7a1a; margin-right: 9px; }
+.activity-card > details[open] > summary .activity-title::before { content: '⌄'; }
+.activity-status { color: #cdcfd0; font-size: 10px; }
+.activity-toggle { color: #ffb67f; font-size: 11px; }
+.activity-body { padding: 0 14px 14px; border-top: 1px solid #45494b; }
+.activity-body h4 { margin: 14px 0 6px; font-size: 11px; color: #cdcfd0; }
+.activity-body pre { margin: 0; max-height: 340px; overflow: auto; white-space: pre-wrap; tab-size: 4; font-size: 11px; background: #161616; border-color: #45494b; color: #f7f7f7; }
+.activity-body .activity-file { margin: 8px 0; }
+.activity-file summary { display: flex; flex-wrap: wrap; gap: 6px 12px; min-height: 44px; align-items: center; overflow-wrap: anywhere; }
+.activity-file summary span { flex: 1 1 200px; }
+.activity-file small { color: #cdcfd0; }
+.activity-body .activity-notice { color: #b9c7c4; font-size: 10px; margin: 12px 0 0; }
 @media (prefers-reduced-motion: reduce) { .skeleton,.thinking-dots i { animation: none; } button { transition: none; } }
 @media (max-width: 560px) { .message.userMessage { max-width: 96%; }.markdown pre { padding: 12px; }.message .markdown p { font-size: 13px; } }

@@ -46,7 +46,7 @@ pub(super) const COMMANDS: &[Command] = &[
     },
     Command {
         name: "activities",
-        description: "Expandir ou recolher ferramentas · Ctrl+O",
+        description: "Inspecionar chamadas e diffs individualmente · F2",
     },
     Command {
         name: "reconnect",
@@ -81,4 +81,5 @@ pub(super) enum Panel {
     Sessions,
     History,
     Workflow,
+    Activities,
 }

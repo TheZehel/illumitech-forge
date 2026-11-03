@@ -1,4 +1,6 @@
 //! Interactive Forge terminal frontend. Uses the same guarded native bridge as the web UI.
+mod activity;
+mod activity_panel;
 mod commands;
 mod editor;
 mod markdown;
@@ -46,6 +48,7 @@ struct Chat {
     history_query: String,
     palette_selection: usize,
     activities: bool,
+    activity_panel: activity_panel::State,
     transcript: transcript::Cache,
     active_started: Option<std::time::Instant>,
     choosing: Option<Value>,
@@ -66,6 +69,9 @@ impl Chat {
     }
     fn open_panel(&mut self, panel: Panel) {
         self.panel = Some(panel);
+        if panel == Panel::Activities {
+            self.activity_panel.focus();
+        }
         self.panel_selection = 0;
         self.panel_scroll = 0;
         if panel == Panel::History {
@@ -277,7 +283,19 @@ async fn run_loop(
                     continue;
                 }
                 if ctrl && key.code == KeyCode::Char('o') {
-                    chat.activities = !chat.activities;
+                    if chat.panel == Some(Panel::Activities) {
+                        chat.activity_panel.toggle();
+                    } else {
+                        chat.activities = !chat.activities;
+                    }
+                    continue;
+                }
+                if key.code == KeyCode::F(2) {
+                    if chat.panel == Some(Panel::Activities) {
+                        chat.panel = None;
+                    } else {
+                        chat.open_panel(Panel::Activities);
+                    }
                     continue;
                 }
                 if key.code == KeyCode::PageUp || key.code == KeyCode::PageDown {
@@ -299,6 +317,19 @@ async fn run_loop(
                 if let Some(panel) = chat.panel {
                     if key.code == KeyCode::Esc {
                         chat.panel = None;
+                        continue;
+                    }
+                    if panel == Panel::Activities {
+                        match key.code {
+                            KeyCode::Up => chat.activity_panel.move_by(-1),
+                            KeyCode::Down => chat.activity_panel.move_by(1),
+                            KeyCode::Enter | KeyCode::Char(' ') => chat.activity_panel.toggle(),
+                            KeyCode::Left => chat.activity_panel.set_open(false),
+                            KeyCode::Right => chat.activity_panel.set_open(true),
+                            KeyCode::Home => chat.activity_panel.move_by(isize::MIN),
+                            KeyCode::End => chat.activity_panel.move_by(isize::MAX),
+                            _ => {}
+                        }
                         continue;
                     }
                     let count = if panel == Panel::Sessions {
@@ -431,8 +462,8 @@ async fn run_loop(
                             continue;
                         }
                         "/activities" => {
-                            chat.activities = !chat.activities;
                             chat.editor.clear();
+                            chat.open_panel(Panel::Activities);
                             continue;
                         }
                         "/sessions" => {

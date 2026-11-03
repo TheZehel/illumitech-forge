@@ -2,6 +2,7 @@ import { Children, isValidElement, memo, useEffect, useRef, useState, type React
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { choiceLabel, type Message } from './conversation';
+import { ActivityView } from './activity-view';
 
 function plainText(node: ReactNode): string {
     return Children.toArray(node).map(child => typeof child === 'string' || typeof child === 'number'
@@ -38,7 +39,8 @@ const activityLabels: Record<string, string> = {
     commandExecution: 'Execução de ferramenta', fileChange: 'Mudanças em arquivos', diff: 'Alterações propostas',
     plan: 'Plano proposto', reasoning: 'Raciocínio disponibilizado pelo cliente', webSearch: 'Pesquisa',
 };
-export const MessageView = memo(function MessageView({ kind, text, status }: Omit<Message, 'id'>) {
+export const MessageView = memo(function MessageView({ kind, text, status, activity }: Omit<Message, 'id'>) {
+    if (activity) return <ActivityView value={activity} status={statusLabels[status] || (status ? 'Estado informado pelo cliente' : '')}/>;
     if (kind === 'turn') {
         const label = status === 'completed' ? 'Resposta concluída' : status === 'interrupted'
             ? 'Resposta interrompida' : status === 'failed' ? 'Não foi possível concluir a resposta' : 'Resposta encerrada';

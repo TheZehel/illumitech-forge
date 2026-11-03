@@ -1,0 +1,3 @@
+# Plano FORGE-051
+
+Depende de FORGE-023, 035, 036 e 038. Projetar itens nativos em atividades tipadas, mantendo mensagens conversacionais e aprovações existentes. Reconciliar por ID e preservar eventos originais dentro dos limites operacionais. UI com disclosure nativo, seções e arquivos individuais; terminal mantém Ctrl+O global e acrescenta painel F2 com expansão individual de chamadas e diffs. Testes sintéticos de contrato, teclado, atualização incremental, erro, volume, HTML hostil e piloto PTY. Executar o contrato Forge com avaliadores e estado externos ao worktree. Fixture de protocolo não substitui aceite de conta nativa.

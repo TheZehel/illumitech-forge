@@ -25,6 +25,8 @@ fn entries(session: Option<&Session>) -> Vec<(&'static str, String)> {
         }
     }
     let mut seen = std::collections::BTreeSet::new();
+    let activities = super::activity::items(&session.events);
+    let mut seen_activities = std::collections::BTreeSet::new();
     let mut echo = None;
     for e in &session.events {
         let p = &e["params"];
@@ -83,19 +85,25 @@ fn entries(session: Option<&Session>) -> Vec<(&'static str, String)> {
             )
         } else if method == "bridge/decision" {
             ("Decisão enviada", super::decision_label(&p["decision"]))
-        } else if method == "item/completed" && !kind.is_empty() {
-            (
-                "Atividade",
-                format!(
-                    "{}|{}\n{}",
-                    kind,
-                    item["status"].as_str().unwrap_or(""),
-                    item["aggregatedOutput"]
-                        .as_str()
-                        .or(item["command"].as_str())
-                        .unwrap_or("")
-                ),
-            )
+        } else if matches!(
+            method,
+            "item/started"
+                | "item/completed"
+                | "item/commandExecution/outputDelta"
+                | "item/fileChange/outputDelta"
+                | "item/mcpToolCall/progress"
+        ) {
+            if matches!(kind, "userMessage" | "agentMessage" | "reasoning") {
+                continue;
+            }
+            let id = item["id"].as_str().or(p["itemId"].as_str()).unwrap_or("");
+            let Some(activity) = activities.get(id) else {
+                continue;
+            };
+            if !seen_activities.insert(id.to_owned()) {
+                continue;
+            }
+            ("Atividade", super::activity::entry(activity))
         } else {
             continue;
         };
@@ -131,7 +139,7 @@ fn render(session: Option<&Session>, details: bool) -> Vec<Line<'static>> {
         }
         if label == "Atividade" {
             let (tag, output) = text.split_once('\n').unwrap_or((&text, ""));
-            let (kind, status) = tag.split_once('|').unwrap_or((tag, ""));
+            let (title, status) = tag.split_once('|').unwrap_or((tag, ""));
             let state = match status {
                 "failed" => " · falhou",
                 "completed" => " · concluída",
@@ -140,13 +148,7 @@ fn render(session: Option<&Session>, details: bool) -> Vec<Line<'static>> {
                 "inProgress" => " · em andamento",
                 _ => "",
             };
-            let title = match kind {
-                "commandExecution" => "Ferramenta",
-                "fileChange" => "Mudanças em arquivos",
-                "webSearch" => "Pesquisa",
-                "reasoning" => "Raciocínio disponibilizado pelo cliente",
-                _ => "Atividade do cliente",
-            };
+            let title = display(title);
             lines.push(Line::styled(
                 format!(
                     "  › {title}{state}{}",
@@ -226,6 +228,34 @@ impl Cache {
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn streaming_tools_and_files_have_one_summary_and_opt_in_payloads() {
+        let session = Session { events: [
+            json!({"method":"item/started","params":{"item":{"id":"cmd","type":"commandExecution","command":"cargo check","cwd":"/project"}}}),
+            json!({"method":"item/commandExecution/outputDelta","params":{"itemId":"cmd","delta":"PARTIAL_OUTPUT"}}),
+            json!({"method":"item/completed","params":{"item":{"id":"cmd","type":"commandExecution","status":"completed","exitCode":0,"aggregatedOutput":"FINAL_OUTPUT"}}}),
+            json!({"method":"item/completed","params":{"item":{"id":"mcp","type":"mcpToolCall","server":"logs","tool":"query","arguments":{"status":500},"result":{"message":"\u{1b}[2JPRIVATE_RESULT"},"status":"completed"}}}),
+            json!({"method":"item/completed","params":{"item":{"id":"files","type":"fileChange","status":"completed","changes":[{"path":"src/test.rs","diff":"@@ -1 +1 @@\n-old\n+new\n"}]}}}),
+        ].into(), ..Default::default() };
+        let collapsed = render(Some(&session), false)
+            .iter()
+            .map(ToString::to_string)
+            .collect::<String>();
+        assert_eq!(collapsed.matches("Comando · cargo check").count(), 1);
+        assert!(collapsed.contains("Chamada · logs.query"));
+        assert!(collapsed.contains("+1 −1"));
+        assert!(!collapsed.contains("PRIVATE_RESULT"));
+        let expanded = render(Some(&session), true)
+            .iter()
+            .map(ToString::to_string)
+            .collect::<String>();
+        assert!(expanded.contains("Argumentos"));
+        assert!(expanded.contains("Resultado"));
+        assert!(expanded.contains("FINAL_OUTPUT"));
+        assert!(!expanded.contains("PARTIAL_OUTPUT"));
+        assert!(expanded.contains("src/test.rs"));
+        assert!(!expanded.contains('\u{1b}'));
+    }
     #[test]
     fn streaming_replaces_partial_and_activity_details_are_opt_in() {
         let session=Session{events:[json!({"method":"bridge/user","params":{"text":"pedido"}}),json!({"method":"item/agentMessage/delta","params":{"itemId":"a","delta":"parcial"}}),json!({"method":"item/completed","params":{"item":{"id":"a","type":"agentMessage","text":"**Resposta** completa"}}}),json!({"method":"item/completed","params":{"item":{"id":"tool","type":"commandExecution","aggregatedOutput":"SAIDA_PRIVADA_DO_TESTE"}}})].into(),..Default::default()};

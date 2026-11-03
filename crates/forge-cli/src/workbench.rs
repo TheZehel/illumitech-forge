@@ -29,11 +29,7 @@ pub struct Session {
 }
 impl Session {
     fn push(&mut self, event: Value) {
-        let event = if serde_json::to_vec(&event).is_ok_and(|b| b.len() <= 65536) {
-            event
-        } else {
-            json!({"method":"bridge/truncated","params":{"reason":"Native event exceeds display limit; inspect locally"}})
-        };
+        let event = display_event(event);
         self.events.push_back(event);
         while self.events.len() > 256
             || self
@@ -46,6 +42,127 @@ impl Session {
             self.events.pop_front();
         }
     }
+}
+// Keep tool identity/status when a large payload exceeds the bridge display budget.
+// This projection never changes the native request or approval payload.
+fn display_event(mut event: Value) -> Value {
+    if serde_json::to_vec(&event).is_ok_and(|b| b.len() <= 65536) {
+        return event;
+    }
+    fn compact(value: &Value, budget: &mut usize, depth: usize) -> Value {
+        if *budget == 0 || depth > 8 {
+            return json!("… Conteúdo omitido pelo limite de exibição.");
+        }
+        match value {
+            Value::String(s) => {
+                let end = s.floor_char_boundary((*budget).min(8000).min(s.len()));
+                *budget = budget.saturating_sub(end);
+                if end < s.len() {
+                    json!(format!("{}\n… Conteúdo limitado.", &s[..end]))
+                } else {
+                    value.clone()
+                }
+            }
+            Value::Array(a) => {
+                let mut result = Vec::new();
+                for v in a.iter().take(32) {
+                    if *budget == 0 {
+                        break;
+                    }
+                    *budget = budget.saturating_sub(16);
+                    result.push(compact(v, budget, depth + 1));
+                }
+                if result.len() < a.len() {
+                    result.push(json!("… Itens omitidos pelo limite de exibição."));
+                }
+                result.into()
+            }
+            Value::Object(o) => {
+                let mut result = serde_json::Map::new();
+                for (k, v) in o.iter().take(32) {
+                    if *budget < k.len() + 16 {
+                        break;
+                    }
+                    *budget -= k.len() + 16;
+                    result.insert(k.clone(), compact(v, budget, depth + 1));
+                }
+                Value::Object(result)
+            }
+            _ => {
+                *budget = budget.saturating_sub(16);
+                value.clone()
+            }
+        }
+    }
+    // The content budget must not decide whether an error or file identity exists.
+    // Restore these fields from the original, even if compact() returned a marker.
+    fn preserve_fields(target: &mut Value, original: &Value, fields: &[&str]) {
+        for field in fields {
+            if let Some(value) = original.get(*field) {
+                if !target.is_object() {
+                    *target = json!({"forgeContentOmitted":target.take()});
+                }
+                target[*field] = value.clone();
+            }
+        }
+    }
+    fn project(original: &Value, mut budget: usize) -> Value {
+        let mut item = original.clone();
+        // Reserve file identity independently of all output/diff allocation. Keep
+        // the native order and original count; omitted files are not fake rows.
+        let files = original["changes"].as_array().map(|files| {
+            files
+                .iter()
+                .filter(|file| file.is_object())
+                .take(32)
+                .map(|file| {
+                    let mut metadata = json!({});
+                    preserve_fields(&mut metadata, file, &["id", "path", "kind"]);
+                    (metadata, file)
+                })
+                .collect::<Vec<_>>()
+        });
+        for key in [
+            "aggregatedOutput",
+            "result",
+            "arguments",
+            "contentItems",
+            "text",
+            "error",
+        ] {
+            if !original[key].is_null() {
+                item[key] = compact(&original[key], &mut budget, 0);
+            }
+        }
+        preserve_fields(&mut item["result"], &original["result"], &["isError"]);
+        preserve_fields(&mut item["error"], &original["error"], &["code", "type"]);
+        if let Some(files) = files {
+            item["forgeOriginalFileCount"] = original["changes"].as_array().unwrap().len().into();
+            item["changes"] = files
+                .into_iter()
+                .map(|(mut metadata, file)| {
+                    if !file["diff"].is_null() {
+                        metadata["diff"] = compact(&file["diff"], &mut budget, 0);
+                    }
+                    metadata
+                })
+                .collect();
+        }
+        item["forgeDisplayTruncated"] = true.into();
+        item
+    }
+    if event["params"]["item"].is_object() {
+        let original = event["params"]["item"].take();
+        // JSON escaping can exceed the byte limit despite the text budget. In
+        // that case retain metadata, rather than losing it to a content fallback.
+        for budget in [20000, 0] {
+            event["params"]["item"] = project(&original, budget);
+            if serde_json::to_vec(&event).is_ok_and(|b| b.len() <= 65536) {
+                return event;
+            }
+        }
+    }
+    json!({"method":"bridge/truncated","params":{"reason":"Native event exceeds display limit; inspect locally"}})
 }
 #[derive(Default)]
 pub struct View {
@@ -688,6 +805,67 @@ pub async fn serve(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn oversized_mcp_keeps_error_flag_after_content_exhausts_budget() {
+        let original = json!({"method":"item/completed","params":{"threadId":"thread","item":{"id":"tool","type":"mcpToolCall","status":"completed","server":"logs","tool":"query","result":{"content":[{"type":"text","text":"a".repeat(30000)},{"type":"text","text":"b".repeat(30000)},{"type":"text","text":"c".repeat(30000)}],"isError":true}}}});
+        let event = display_event(original.clone());
+        assert_eq!(event["params"]["item"]["result"]["isError"], true);
+        assert_eq!(event["params"]["item"]["status"], "completed");
+        assert_eq!(event["params"]["item"]["id"], "tool");
+        assert_eq!(event["params"]["item"]["forgeDisplayTruncated"], true);
+        assert!(serde_json::to_vec(&event).unwrap().len() <= 65536);
+        assert!(original["params"]["item"]["forgeDisplayTruncated"].is_null());
+    }
+    #[test]
+    fn oversized_diffs_keep_every_retained_file_identity_without_content_budget() {
+        let changes = (0..40).map(|i| json!({"id":format!("file-{i}"),"path":format!("src/ação-{i}.rs"),"kind":{"type":"update","move_path":format!("src/original-{i}.rs")},"diff":format!("@@ -0,0 +1 @@\n+{}\n", "x".repeat(30000))})).collect::<Vec<_>>();
+        let event = display_event(
+            json!({"method":"item/completed","params":{"item":{"id":"files","type":"fileChange","status":"completed","aggregatedOutput":"x".repeat(30000),"changes":changes}}}),
+        );
+        let item = &event["params"]["item"];
+        let files = item["changes"].as_array().unwrap();
+        assert_eq!(files.len(), 32);
+        assert_eq!(item["forgeOriginalFileCount"], 40);
+        for (i, file) in files.iter().enumerate() {
+            assert_eq!(file["id"], format!("file-{i}"));
+            assert_eq!(file["path"], format!("src/ação-{i}.rs"));
+            assert_eq!(file["kind"]["move_path"], format!("src/original-{i}.rs"));
+            assert!(file["diff"].is_string());
+        }
+        assert!(serde_json::to_vec(&event).unwrap().len() <= 65536);
+    }
+    #[test]
+    fn escaped_payload_falls_back_to_metadata_and_preserves_error_code() {
+        let event = display_event(
+            json!({"method":"item/completed","params":{"item":{"id":"tool","type":"mcpToolCall","status":"completed","result":{"content":[{"text":"\u{0}".repeat(30000)},{"text":"\u{0}".repeat(30000)},{"text":"\u{0}".repeat(30000)}],"isError":true},"error":{"code":7,"type":"provider","message":"error"}}}}),
+        );
+        let item = &event["params"]["item"];
+        assert_eq!(item["result"]["isError"], true);
+        assert!(item["result"]["forgeContentOmitted"].is_string());
+        assert_eq!(item["error"]["code"], 7);
+        assert_eq!(item["error"]["type"], "provider");
+        assert!(serde_json::to_vec(&event).unwrap().len() <= 65536);
+    }
+    #[test]
+    fn small_events_remain_identical_and_oversized_metadata_fails_explicitly() {
+        let event = json!({"method":"item/completed","params":{"item":{"id":"tool","type":"mcpToolCall","result":{"isError":true}}}});
+        assert_eq!(display_event(event.clone()), event);
+        let event = display_event(
+            json!({"method":"item/completed","params":{"item":{"id":"files","type":"fileChange","changes":[{"path":"x".repeat(70000),"diff":""}]}}}),
+        );
+        assert_eq!(event["method"], "bridge/truncated");
+    }
+    #[test]
+    fn oversized_tool_keeps_identity_and_marks_display_projection() {
+        let original = serde_json::json!({"method":"item/completed","params":{"threadId":"thread","item":{"id":"tool","type":"mcpToolCall","status":"failed","server":"logs","tool":"query","arguments":{"limit":10},"error":{"message":"unavailable"},"result":{"text":"é".repeat(100000)}}}});
+        let event = super::display_event(original.clone());
+        assert_eq!(event["params"]["item"]["tool"], "query");
+        assert_eq!(event["params"]["item"]["status"], "failed");
+        assert_eq!(event["params"]["item"]["forgeDisplayTruncated"], true);
+        assert_eq!(event["params"]["item"]["arguments"]["limit"], 10);
+        assert!(serde_json::to_vec(&event).unwrap().len() <= 65536);
+        assert!(original["params"]["item"]["forgeDisplayTruncated"].is_null());
+    }
     use super::*;
     use std::time::Duration;
     fn action(value: Value) -> Action {

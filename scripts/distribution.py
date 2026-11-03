@@ -124,7 +124,8 @@ def run(mode, output=None):
             members.append(stem)
         patches = '\n'.join(f'{name} = {{ path = "{stem}" }}' for name, stem in zip(ORDER, members))
         (extracted / 'Cargo.toml').write_text('[workspace]\nresolver = "2"\nmembers = ' + json.dumps(members) + '\n[patch.crates-io]\n' + patches + '\n')
-        cargo(extracted, 'build', '--workspace', '--offline', '--target-dir', str(temp / 'build'))
+        shutil.copyfile(ROOT / 'Cargo.lock', extracted / 'Cargo.lock')
+        cargo(extracted, 'build', '--workspace', '--locked', '--offline', '--target-dir', str(temp / 'build'))
         executable = temp / 'build/debug' / ('illumitech-forge.exe' if __import__('os').name == 'nt' else 'illumitech-forge')
         contracts = json.loads(subprocess.check_output([executable, '--json', 'contracts'], cwd=extracted))
         if contracts['contracts']['manifest'] != 1:
@@ -134,7 +135,7 @@ def run(mode, output=None):
         if short_contracts != contracts or not subprocess.check_output([short, '--version'], text=True).startswith('forge '):
             raise ValueError('extracted native forge contract mismatch')
         cargo(extracted, 'test', '-p', ORDER[-1], '--lib',
-              'standalone_package_embeds_all_referenced_ui_assets', '--offline',
+              'standalone_package_embeds_all_referenced_ui_assets', '--locked', '--offline',
               '--target-dir', str(temp / 'build'))
         if output is not None:
             output.mkdir(parents=True)

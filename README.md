@@ -5,7 +5,10 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.2.0.** Comando nativo `forge`, conversa formatada e experiência de terminal.
+**Candidata Illumitech Forge 1.3.0.** Atividades com mostrar/ocultar detalhes no
+Workbench e no CLI: `F2` ou `/activities`, inspeção por chamada e diff por arquivo.
+Veja as [notas da candidata](docs/release-v1.3.0.md). A versão publicada continua
+sendo a **1.2.0** até o aceite e a publicação desta revisão.
 Compilar esta árvore não altera seu binário instalado. Consulte as
 [notas da entrega](docs/release-v1.2.0.md) para artefatos, validação e limites de suporte.
 

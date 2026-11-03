@@ -1,14 +1,22 @@
 import { type Event, list, object, string } from './api';
+import { activity, bounded, type Activity } from './activity';
 export interface Message {
     id: string;
     kind: string;
     text: string;
     status: string;
+    activity?: Activity;
 }
 export function messages(events: Event[]): Message[] {
     const result = new Map<string, Message>();
     let echo: Message | undefined;
     const aliases = new Map<string, string>();
+    const items = new Map<string, Record<string, unknown>>();
+    const putActivity = (id: string, item: Record<string, unknown>) => {
+        items.set(id, item);
+        const failed = item.error != null || object(item.result).isError === true || item.success === false || typeof item.exitCode === 'number' && item.exitCode !== 0;
+        result.set(id, { id, kind: string(item.type), text: '', status: failed ? 'failed' : string(item.status), activity: activity(item) });
+    };
     events.forEach((e, index) => {
         const p = e.params;
         const item = object(p.item);
@@ -31,11 +39,21 @@ export function messages(events: Event[]): Message[] {
                 echo = undefined;
                 return;
             }
-            if (kind && (kind !== 'userMessage' || text))
+            if (kind && !['agentMessage', 'userMessage', 'reasoning'].includes(kind)) {
+                putActivity(id, { ...items.get(id), ...item, status: string(item.status) || (e.method === 'item/started' ? 'inProgress' : '') });
+            } else if (kind && (kind !== 'userMessage' || text))
                 result.set(id, { id, kind, text, status: string(item.status) });
         }
+        else if (e.method === 'item/commandExecution/outputDelta' || e.method === 'item/fileChange/outputDelta') {
+            const old = items.get(id) ?? { type: e.method.includes('commandExecution') ? 'commandExecution' : 'fileChange', status: 'inProgress' };
+            putActivity(id, { ...old, aggregatedOutput: bounded(string(old.aggregatedOutput) + string(p.delta)) });
+        }
+        else if (e.method === 'item/mcpToolCall/progress') {
+            const old = items.get(id) ?? { type: 'mcpToolCall', status: 'inProgress' };
+            putActivity(id, { ...old, progress: bounded([string(old.progress), string(p.message)].filter(Boolean).join('\n')) });
+        }
         else if (e.method === 'turn/diff/updated')
-            result.set(id, { id, kind: 'diff', text: string(p.diff), status: '' });
+            putActivity(`diff-${string(p.turnId) || id}`, { type: 'diff', diff: string(p.diff), status: 'proposed' });
         else if (e.method === 'bridge/decision')
             result.set(id, { id, kind: 'decision', text: typeof p.decision === 'string' ? p.decision : JSON.stringify(p.decision), status: 'submitted' });
         else if (e.method === 'error' || e.method === 'bridge/truncated')

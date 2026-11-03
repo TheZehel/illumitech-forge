@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve, join } from 'node:path';
 import { messages } from '../src/conversation';
+import { diffCounts } from '../src/activity';
 
 let child: ChildProcess;
 let directory = '';
@@ -162,4 +163,93 @@ test('native user echo collapses within a turn while repeated prompts across tur
     const events = [user('Mesmo pedido'), input('u1'), event('turn/completed', { turn: { status: 'completed' } }), user('Mesmo pedido'), input('u2')].map(e => ({ ...e, choices: [] }));
     expect(messages(events).filter(m => m.kind === 'userMessage')).toHaveLength(2);
     expect(messages([input('history-u1'), input('history-u2')]).filter(m => m.kind === 'userMessage')).toHaveLength(2);
+});
+
+test('activity lifecycle merges partial output by ID and preserves structured tool errors', () => {
+    const input = [event('item/started', { item: { id: 'command', type: 'commandExecution', command: 'cargo check', cwd: '/project' } }),
+        event('item/commandExecution/outputDelta', { itemId: 'command', delta: 'Compiling\n' }),
+        event('item/commandExecution/outputDelta', { itemId: 'command', delta: 'Done\n' })].map(e => ({ ...e, choices: [] }));
+    const partial = messages(input);
+    expect(partial).toHaveLength(1);
+    expect(partial[0].status).toBe('inProgress');
+    expect(partial[0].activity?.sections.find(s => s.label === 'Saída')?.text).toBe('Compiling\nDone\n');
+    const final = messages([...input, { ...event('item/completed', { item: { id: 'command', type: 'commandExecution', status: 'completed', exitCode: 0, aggregatedOutput: 'Final\n' } }), choices: [] }]);
+    expect(final).toHaveLength(1);
+    expect(final[0].activity?.sections.find(s => s.label === 'Comando')?.text).toBe('cargo check');
+    expect(final[0].activity?.sections.find(s => s.label === 'Saída')?.text).toBe('Final\n');
+    const failed = messages([{ ...event('item/completed', { item: { id: 'mcp', type: 'mcpToolCall', server: 'logs', tool: 'query', status: 'completed', arguments: { limit: 3 }, result: { isError: true, content: [{ text: 'Unavailable' }] } } }), choices: [] }]);
+    expect(failed[0].status).toBe('failed');
+    expect(failed[0].activity?.title).toBe('Chamada · logs.query');
+    expect(failed[0].activity?.sections.map(s => s.label)).toEqual(['Argumentos', 'Resultado']);
+    expect(diffCounts('--- a\n+++ b\n@@ -1 +1,2 @@\n-old\n+new\n+++ literal\n')).toEqual({ added: 2, removed: 1 });
+    expect(diffCounts('+++ header\n+text without a hunk')).toEqual({});
+    const truncated = messages([{ ...event('item/completed', { item: { id: 'files', type: 'fileChange', forgeOriginalFileCount: 100, forgeDisplayTruncated: true, changes: [{ path: 'a.rs', diff: '@@ -0,0 +1 @@\n+new\n' }, '… omitted'] } }), choices: [] }]);
+    expect(truncated[0].activity?.files).toHaveLength(1);
+    expect(truncated[0].activity?.title).toContain('1 de 100 arquivos');
+});
+
+test('MCP details are keyboard accessible, safe, and remain open across streaming updates', async ({ page }, info) => {
+    const start = event('item/started', { item: { id: 'mcp', type: 'mcpToolCall', server: 'observability', tool: 'list_logs', arguments: { status: 500, limit: 5 } } });
+    let current = state([start], 'active');
+    await page.route('**/api/state', r => r.fulfill({ json: current }));
+    await page.goto(url);
+    const card = page.getByTestId('activity-card');
+    await expect(card).toHaveCount(1);
+    const summary = card.locator('summary').first();
+    await expect(summary).toContainText('Chamada · observability.list_logs');
+    await expect(summary).toContainText('Em andamento');
+    await expect(card.getByRole('heading', { name: 'Argumentos' })).toHaveCount(0);
+    await summary.focus(); await page.keyboard.press('Enter');
+    await expect(summary).toContainText('Ocultar detalhes');
+    await expect(card.getByRole('heading', { name: 'Argumentos' })).toBeVisible();
+    current = state([start, event('item/mcpToolCall/progress', { itemId: 'mcp', message: 'Consultando eventos' })], 'active');
+    await expect(card.getByText('Consultando eventos', { exact: true })).toBeVisible();
+    current = state([start, event('item/completed', { item: { id: 'mcp', type: 'mcpToolCall', status: 'failed', result: { events: [{ message: '<img src="https://invalid.example/pixel" onerror="alert(1)">' }] }, error: { message: 'Consulta incompleta' } } })]);
+    await expect(card).toHaveCount(1);
+    await expect(summary).toContainText('Falhou');
+    await expect(card.getByRole('heading', { name: 'Resultado' })).toBeVisible();
+    await expect(card.getByRole('heading', { name: 'Erro', exact: true })).toBeVisible();
+    await expect(card.locator('img, script')).toHaveCount(0);
+    await expect(card.getByRole('heading', { name: 'Argumentos' })).toBeVisible();
+    await page.screenshot({ path: info.outputPath('mcp-expanded.png'), fullPage: true });
+    await summary.press('Space');
+    await expect(summary).toContainText('Mostrar detalhes');
+    await expect(card.getByRole('heading', { name: 'Resultado' })).toHaveCount(0);
+});
+
+test('file edits show received line counts and individual collapsible diffs', async ({ page }, info) => {
+    await page.route('**/api/state', r => r.fulfill({ json: state([event('item/completed', { item: { id: 'files', type: 'fileChange', status: 'completed', changes: [
+        { path: 'src/example.rs', kind: { type: 'update' }, diff: '--- a/src/example.rs\n+++ b/src/example.rs\n@@ -1 +1,2 @@\n-old\n+new\n+second\n' },
+        { path: 'README.md', kind: { type: 'add' }, diff: '@@ -0,0 +1 @@\n+# Example\n' },
+    ] } })]) }));
+    await page.goto(url);
+    const card = page.getByTestId('activity-card');
+    await expect(card.locator('summary').first()).toContainText('2 arquivos (+3 −1)');
+    await card.locator('summary').first().click();
+    const file = card.locator('.activity-file').first();
+    await expect(file.locator('summary')).toContainText('src/example.rs');
+    await expect(file.locator('pre')).toBeHidden();
+    await file.locator('summary').click();
+    await expect(file.locator('pre')).toBeVisible();
+    await expect(file.locator('pre')).toContainText('+second');
+    await expect(card).toContainText('Alterações não comprovam aceite');
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: info.outputPath('file-details-mobile.png'), fullPage: true });
+});
+
+test('large activity output is bounded and command metadata stays separate', async ({ page }) => {
+    await page.route('**/api/state', r => r.fulfill({ json: state([event('item/completed', { item: { id: 'cmd', type: 'commandExecution', command: 'cargo test', cwd: '/project', status: 'completed', exitCode: 0, aggregatedOutput: 'line\n'.repeat(8000), forgeDisplayTruncated: true } })]) }));
+    await page.goto(url);
+    const card = page.getByTestId('activity-card');
+    await expect(card.locator('summary').first()).toContainText('Comando · cargo test · parcial');
+    await expect(card.locator('pre')).toHaveCount(0);
+    await card.locator('summary').first().click();
+    await expect(card.getByRole('heading', { name: 'Código de saída' })).toBeVisible();
+    await page.waitForResponse(r => r.url().endsWith('/api/state'));
+    await expect(card.locator('summary').first()).toContainText('Ocultar detalhes');
+    await expect(card).toContainText('Exibição limitada a 24000 caracteres');
+    const output = card.getByRole('region', { name: 'Saída', exact: true }).locator('pre');
+    expect((await output.textContent())!.length).toBeLessThan(24200);
+    expect(await output.evaluate(e => e.scrollHeight > e.clientHeight)).toBe(true);
 });
