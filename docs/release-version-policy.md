@@ -37,4 +37,4 @@ A classificação e a completude do registro precisam de revisão. O cálculo é
 4. Exigir evidências atuais, artefatos/checksums e aceite humano da revisão antes de upload. Actions continuam desativadas salvo autorização explícita; o planejador nunca publica ou modifica arquivos.
 5. Arquivar o registro avaliado junto às evidências. Antes da próxima release, atualizar a base e substituir as mudanças pelo novo conjunto; não reutilizar entries já publicadas.
 
-O conjunto atual propõe 1.4.0: doctor com campos adicionais e novo comando de política, mais os dois fixes. As versões coordenadas dos pacotes foram preparadas em 1.4.0; a disponibilidade depende do recibo de publicação.
+A entrega 1.4.0 reuniu campos adicionais no doctor, os dois fixes e o novo comando de política. O registro em `release/changes.json` descreve o próximo conjunto; execute o gate para calcular a proposta atual.

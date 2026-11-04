@@ -5,7 +5,7 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.4.0.** Installation diagnostics now preserve invoked aliases and disclose incomplete PATH scans. The new `release version` command computes and validates Semantic Versioning from reviewed changes. See the [release notes](docs/release-v1.4.0.md) and [version policy](docs/release-version-policy.md). Availability and checksums are recorded in [GitHub releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update your installed binary.
+**Illumitech Forge 1.4.1.** Terminal reading stays anchored during streaming and resizing, with mouse/trackpad scrolling, PgUp/PgDn and Ctrl+Home/End. A compact header, footer and editor leave more room for conversation. See the [release notes](docs/release-v1.4.1.md). Availability and checksums are recorded in [GitHub releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
@@ -29,7 +29,7 @@ No paid API fallback or permission bypass is introduced.
 ## Start with the published release
 
 ```sh
-cargo install illumitech-forge-cli --version 1.4.0 --locked
+cargo install illumitech-forge-cli --version 1.4.1 --locked
 forge --version
 forge
 ```

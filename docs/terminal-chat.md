@@ -22,7 +22,8 @@ abrir a outra nesse mesmo diretório.
 | Enter | Enviar mensagem; aguarda o turno atual antes de outro envio |
 | Alt+Enter (ou Shift+Enter quando suportado pelo terminal) | Nova linha |
 | Setas, Home, End, Backspace e Delete | Editar rascunho Unicode |
-| PgUp / PgDn | Ler histórico / voltar à resposta |
+| Mouse/trackpad ou PgUp / PgDn | Percorrer a conversa; a leitura não é deslocada por novas saídas |
+| Ctrl+Home / Ctrl+End | Ir ao início / retomar acompanhamento da resposta mais recente |
 | Esc ou Ctrl+C durante um turno | Solicitar interrupção nativa |
 | Ctrl+C sem turno | Limpar rascunho |
 | Alt+1…9 | Enviar uma das decisões nativas exibidas, na ordem apresentada |
@@ -98,3 +99,7 @@ Referências de interação, consultadas em 31/10/2026:
 e [modo interativo do Claude Code](https://code.claude.com/docs/en/interactive-mode).
 Essas referências não significam suporte a todos os comandos daqueles clientes: este incremento
 não adiciona troca de modelo/permissões, compactação, shell direto ou execução de skills por `/`.
+
+## Preservação da leitura (FORGE-056, 1.4.1)
+
+O histórico permanece dentro da área rolável do Forge. Ao subir, o texto fica ancorado enquanto a resposta cresce; Ctrl+End volta ao fim. Redimensionar preserva a linha lógica lida. Cabeçalho e rodapé compactos deixam mais espaço para a conversa, e o editor cresce com o rascunho. Em terminais que reservam seleção ao aplicativo, use Shift ao selecionar/copiar texto. A captura do mouse é restaurada ao sair. Esta correção não muda a retenção do histórico no cliente nativo nem equivale ao scrollback externo do emulador.

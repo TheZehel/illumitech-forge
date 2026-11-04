@@ -1,6 +1,6 @@
 # Public distribution preparation
 
-This tree prepares version 1.4.0. Provider receipts determine publication status;
+This tree prepares version 1.4.1. Provider receipts determine publication status;
 source files and version numbers are not upload receipts. Publication requires
 reviewed source and current passing evidence. The website remains a local preview. Packages use MIT;
 native executable names are `forge` and `illumitech-forge`. Rust dependency aliases retain the existing
@@ -14,7 +14,7 @@ native executable names are `forge` and `illumitech-forge`. Rust dependency alia
 Domain and catalog are independent; adapters depends on the exact domain version, and the CLI depends on all three exact versions. Publish domain before adapters. Directories
 remain `crates/forge-*`. Recipes now live inside the catalog package at
 `crates/forge-catalog/src/recipes.json`, so compilation never needs a parent checkout.
-The four workspace packages target 1.4.0. Install examples target this release after publication. No upload receipt is claimed for this candidate.
+The four workspace packages target 1.4.1. Install examples target this release after publication. No upload receipt is claimed for this candidate.
 Check the new version, ownership and authentication before a separately authorized upload.
 Current candidate scope and native/platform limits are in [v1-candidate.md](v1-candidate.md).
 

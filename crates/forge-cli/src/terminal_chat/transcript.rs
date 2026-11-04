@@ -194,6 +194,7 @@ pub(super) struct Cache {
     events: VecDeque<Value>,
     details: bool,
     pub lines: Vec<Line<'static>>,
+    pub revision: u64,
     pub history: Vec<String>,
 }
 impl Cache {
@@ -207,6 +208,7 @@ impl Cache {
             self.events = session.map(|s| s.events.clone()).unwrap_or_default();
             self.details = details;
             self.lines = render(session, details);
+            self.revision = self.revision.wrapping_add(1);
             let mut history = entries(session)
                 .into_iter()
                 .filter(|(label, _)| *label == "Você")

@@ -84,12 +84,24 @@ impl Chat {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Length(if compact { 2 } else { 3 }),
+                Constraint::Length(2),
                 Constraint::Min(1),
                 Constraint::Length(approval_height),
                 Constraint::Length(palette_height),
-                Constraint::Length(if compact { 3 } else { 5 }),
-                Constraint::Length(if compact { 2 } else { 4 }),
+                Constraint::Length(
+                    (self
+                        .editor
+                        .text
+                        .split('\n')
+                        .count()
+                        .clamp(1, if compact { 2 } else { 5 })
+                        + 2) as u16,
+                ),
+                Constraint::Length(if view.error.is_some() || !self.notice.is_empty() {
+                    3
+                } else {
+                    2
+                }),
             ])
             .split(area);
         let model = session
@@ -109,12 +121,7 @@ impl Chat {
                     display(&root.file_name().unwrap_or_default().to_string_lossy()),
                     display(model)
                 )),
-            ])
-            .block(
-                Block::default()
-                    .borders(Borders::BOTTOM)
-                    .border_style(Style::default().fg(Color::DarkGray)),
-            ),
+            ]),
             chunks[0],
         );
         // Native approval scope always takes precedence over decorative panels.
@@ -128,7 +135,13 @@ impl Chat {
                     .lines()
                     .map(|s| Line::from(s.to_owned())),
             );
-            self.render_lines(f, lines, chunks[1]);
+            self.approval_scroll.draw(
+                f,
+                &lines,
+                chunks[1],
+                &format!("{}:{}", self.selected, a["id"]),
+                self.tick as u64,
+            );
         } else if let Some(panel) = self.panel {
             self.render_panel(f, panel, view, root, chunks[1]);
         } else if self.transcript.lines.is_empty() {
@@ -147,7 +160,13 @@ impl Chat {
             ]);
             f.render_widget(Paragraph::new(lines).wrap(Wrap { trim: false }), chunks[1]);
         } else {
-            self.render_lines(f, self.transcript.lines.clone(), chunks[1]);
+            self.scroll.draw(
+                f,
+                &self.transcript.lines,
+                chunks[1],
+                &self.selected,
+                self.transcript.revision,
+            );
         }
         if let Some(a) = approval {
             let options = approval_choices(a)
@@ -237,40 +256,28 @@ impl Chat {
             .and_then(|s| s.usage["total"]["totalTokens"].as_u64())
             .map(|n| format!("{n} tokens observados"))
             .unwrap_or_else(|| "Tokens ainda não observados".into());
-        let scroll = if self.scroll_back > 0 {
-            " · PgDn volta ao fim"
-        } else {
-            ""
-        };
-        let footer = if compact {
-            vec![
-                Line::styled(status, Style::default().fg(TEAL)),
-                Line::styled(
-                    "F1 ajuda · F2 atividades · Ctrl+Q sai",
-                    Style::default().fg(Color::Gray),
-                ),
-            ]
-        } else {
-            vec![
-                Line::styled(status, Style::default().fg(TEAL)),
+        let reading = !self.scroll.following && !self.transcript.lines.is_empty();
+        let mut footer = vec![
+            Line::styled(
+                if reading {
+                    "Lendo histórico · Ctrl+End: resposta mais recente".into()
+                } else {
+                    status
+                },
+                Style::default().fg(TEAL),
+            ),
+            Line::styled(
+                format!("PgUp/PgDn · rolagem do mouse · F1 ajuda · Ctrl+Q sai · {usage}"),
+                Style::default().fg(Color::Gray),
+            ),
+        ];
+        if !notice.is_empty() {
+            footer.insert(
+                1,
                 Line::styled(display(notice), Style::default().fg(ORANGE)),
-                Line::from(format!("{usage}{scroll}")),
-                Line::styled(
-                    "F1 ajuda · F2 atividades · Ctrl+R histórico · Ctrl+Q sai · Chat não comprova gates",
-                    Style::default().fg(Color::Gray),
-                ),
-            ]
-        };
+            );
+        }
         f.render_widget(Paragraph::new(footer), chunks[5]);
-    }
-    fn render_lines(&self, f: &mut Frame, lines: Vec<Line<'static>>, area: Rect) {
-        let paragraph = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false });
-        let height = paragraph.line_count(area.width).min(u16::MAX as usize) as u16;
-        let max = height.saturating_sub(area.height);
-        f.render_widget(
-            paragraph.scroll((max.saturating_sub(self.scroll_back), 0)),
-            area,
-        );
     }
     fn render_panel(&mut self, f: &mut Frame, panel: Panel, view: &View, root: &Path, area: Rect) {
         if panel == Panel::Activities {
@@ -350,7 +357,12 @@ impl Chat {
                     .lines()
                     .map(|s| Line::from(s.to_owned())),
             );
-            self.render_lines(f, lines, area);
+            f.render_widget(
+                Paragraph::new(lines)
+                    .wrap(Wrap { trim: false })
+                    .scroll((self.panel_scroll, 0)),
+                area,
+            );
             return;
         }
         let lines = if panel == Panel::Help {
@@ -363,11 +375,11 @@ impl Chat {
             for text in [
                 "Enter envia · Ctrl+J / Alt+Enter insere nova linha",
                 "↑/↓ recuperam pedidos quando o rascunho tem uma linha",
-                "Ctrl+R busca no histórico desta sessão",
+                "Ctrl+R busca pedidos · Shift+seleção copia no terminal",
                 "Ctrl+A/E início/fim da linha · Ctrl+W apaga palavra",
                 "Ctrl+U/K recorta antes/depois do cursor · Ctrl+Y recupera",
                 "Ctrl+C limpa com recuperação por Ctrl+Y; Esc interrompe turno",
-                "PgUp/PgDn lê histórico · Ctrl+L redesenha a tela",
+                "Mouse/PgUp/PgDn: histórico · Ctrl+Home/End: início/fim",
                 "Ctrl+O expande atividades · Ctrl+Q sai",
                 "F2 / /activities: ↑/↓ selecionam, Enter/Espaço alternam detalhes",
                 "No painel: ←/→ recolhem/expandem cada chamada ou arquivo",

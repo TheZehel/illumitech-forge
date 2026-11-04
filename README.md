@@ -5,7 +5,7 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.4.0.** Diagnóstico de instalação com identidade dos aliases e cobertura parcial do PATH explícita. O novo `release version` calcula e valida o versionamento a partir de mudanças revisadas. Veja as [notas](docs/release-v1.4.0.md) e a [política de versões](docs/release-version-policy.md). Disponibilidade e checksums constam nas [releases do GitHub](https://github.com/TheZehel/illumitech-forge/releases); compilar esta árvore não atualiza seu binário instalado.
+**Illumitech Forge 1.4.1.** A leitura no terminal permanece ancorada durante streaming e redimensionamento, com rolagem por mouse/trackpad, PgUp/PgDn e Ctrl+Home/End. Cabeçalho, rodapé e editor compactos deixam mais espaço para a conversa. Veja as [notas](docs/release-v1.4.1.md). Disponibilidade e checksums constam nas [releases do GitHub](https://github.com/TheZehel/illumitech-forge/releases); compilar esta árvore não atualiza seu binário instalado.
 
 [English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
@@ -32,7 +32,7 @@ somente leitura; a implementação usa um manifest revisado. A resposta do chat 
 ## Começar com a versão publicada
 
 ```sh
-cargo install illumitech-forge-cli --version 1.4.0 --locked
+cargo install illumitech-forge-cli --version 1.4.1 --locked
 forge --version
 forge
 ```

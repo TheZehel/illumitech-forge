@@ -6,14 +6,15 @@ mod editor;
 mod markdown;
 mod transcript;
 mod ui;
+mod viewport;
 mod workflows;
 use crate::workbench::{Action, App, Session, View, approval_choices};
 use anyhow::{Result, ensure};
 use commands::Panel;
 use crossterm::{
     event::{
-        self, DisableBracketedPaste, EnableBracketedPaste, Event, KeyCode, KeyEvent, KeyEventKind,
-        KeyModifiers,
+        self, DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture,
+        Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEventKind,
     },
     execute,
 };
@@ -21,7 +22,7 @@ use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout},
     style::{Color, Style},
-    text::{Line, Text},
+    text::Line,
     widgets::{Block, Borders, Paragraph, Wrap},
 };
 use serde_json::{Value, json};
@@ -39,7 +40,8 @@ struct Chat {
     editor: editor::Editor,
     notice: String,
     busy: String,
-    scroll_back: u16,
+    scroll: viewport::Viewport,
+    approval_scroll: viewport::Viewport,
     tick: usize,
     panel: Option<Panel>,
     panel_selection: usize,
@@ -87,7 +89,7 @@ struct Pending {
 struct Restore;
 impl Drop for Restore {
     fn drop(&mut self) {
-        let _ = execute!(stdout(), DisableBracketedPaste);
+        let _ = execute!(stdout(), DisableBracketedPaste, DisableMouseCapture);
         ratatui::restore();
     }
 }
@@ -153,7 +155,7 @@ pub async fn run(root: &Path, state: &Path, executable: Option<PathBuf>) -> Resu
     let app = App::new(root, state, executable, None)?;
     let _restore = Restore;
     let mut terminal = ratatui::try_init()?;
-    execute!(stdout(), EnableBracketedPaste)?;
+    execute!(stdout(), EnableBracketedPaste, EnableMouseCapture)?;
     let mut chat = Chat {
         busy: "connect".into(),
         ..Default::default()
@@ -244,6 +246,28 @@ async fn run_loop(
             continue;
         }
         match event::read()? {
+            Event::Mouse(mouse)
+                if matches!(
+                    mouse.kind,
+                    MouseEventKind::ScrollUp | MouseEventKind::ScrollDown
+                ) =>
+            {
+                let down = mouse.kind == MouseEventKind::ScrollDown;
+                if chat.panel.is_some() {
+                    chat.panel_scroll = if down {
+                        chat.panel_scroll.saturating_add(3)
+                    } else {
+                        chat.panel_scroll.saturating_sub(3)
+                    };
+                } else {
+                    let viewport = if chat.choosing.is_some() {
+                        &mut chat.approval_scroll
+                    } else {
+                        &mut chat.scroll
+                    };
+                    viewport.move_by(if down { 3 } else { -3 });
+                }
+            }
             Event::Paste(text) => {
                 if chat.panel == Some(Panel::History) {
                     let clean = display(&text);
@@ -259,6 +283,20 @@ async fn run_loop(
             }
             Event::Key(key) if key.kind == KeyEventKind::Press => {
                 let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
+                if ctrl && chat.panel.is_none() && matches!(key.code, KeyCode::Home | KeyCode::End)
+                {
+                    let viewport = if chat.choosing.is_some() {
+                        &mut chat.approval_scroll
+                    } else {
+                        &mut chat.scroll
+                    };
+                    if key.code == KeyCode::Home {
+                        viewport.start();
+                    } else {
+                        viewport.latest();
+                    }
+                    continue;
+                }
                 if ctrl && key.code == KeyCode::Char('q') {
                     return Ok(());
                 }
@@ -306,11 +344,17 @@ async fn run_loop(
                             chat.panel_scroll.saturating_sub(8)
                         };
                     } else {
-                        chat.scroll_back = if key.code == KeyCode::PageUp {
-                            chat.scroll_back.saturating_add(10)
+                        let viewport = if chat.choosing.is_some() {
+                            &mut chat.approval_scroll
                         } else {
-                            chat.scroll_back.saturating_sub(10)
+                            &mut chat.scroll
                         };
+                        let page = viewport.height.saturating_sub(1).max(1) as isize;
+                        viewport.move_by(if key.code == KeyCode::PageUp {
+                            -page
+                        } else {
+                            page
+                        });
                     }
                     continue;
                 }
@@ -562,7 +606,7 @@ async fn run_loop(
                     } else {
                         route = "turn".into();
                         payload.text = Some(chat.editor.text.clone());
-                        chat.scroll_back = 0;
+                        chat.scroll.latest();
                         chat.panel = None;
                     }
                 } else {
