@@ -17,3 +17,9 @@ Use MIT, preserve dependency notices. Windows remains experimental without a nat
 
 Commits and releases use the configured human identity. Never attribute authorship or
 coauthorship to Codex; do not add generated author trailers or agent branding to publication labels.
+
+Before preparing any release, maintain and review `release/changes.json` against the last published version.
+Use `release version --changes release/changes.json` to determine the highest compatibility impact,
+and require its `--target VERSION` check as an external release gate. Follow `docs/release-version-policy.md`;
+fix-only changes use patch, compatible features/deprecations minor, breaking contracts major.
+Validate workspace/package/tag coherence separately; computed versions never authorize publication.

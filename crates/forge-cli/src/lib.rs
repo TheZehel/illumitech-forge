@@ -20,6 +20,7 @@ mod parallel;
 mod planning;
 mod project;
 mod publication;
+mod release_version;
 mod review;
 mod service;
 mod snapshots;
@@ -286,6 +287,13 @@ enum SpecCommand {
 }
 #[derive(Subcommand)]
 enum ReleaseCommand {
+    /// Compute the next stable version from reviewed changes; --target enforces an exact gate.
+    Version {
+        #[arg(long)]
+        changes: PathBuf,
+        #[arg(long)]
+        target: Option<String>,
+    },
     ImportSpec {
         #[arg(long)]
         root: PathBuf,
@@ -613,6 +621,9 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
             SpecCommand::Check { root } => project::spec_check(root),
         },
         Command::Release { command } => match command {
+            ReleaseCommand::Version { changes, target } => {
+                release_version::inspect(changes, target.as_deref())
+            }
             ReleaseCommand::ImportSpec {
                 root,
                 spec,
@@ -750,6 +761,6 @@ async fn doctor() -> Result<Value> {
         checks.push(json!({"name":name,"discovered":find_executable(name).is_some(),"capabilities_verified":passed,"authentication_tested":false}));
     }
     Ok(
-        json!({"schema_version":1,"platform":std::env::consts::OS,"operational_support":cfg!(unix),"windows_candidate":cfg!(windows),"authenticated_windows_acceptance":false,"checks":checks}),
+        json!({"schema_version":1,"installation":installation::dispatch(&installation::Command::Doctor).await?,"platform":std::env::consts::OS,"operational_support":cfg!(unix),"windows_candidate":cfg!(windows),"authenticated_windows_acceptance":false,"checks":checks}),
     )
 }

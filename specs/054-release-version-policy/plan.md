@@ -1,0 +1,3 @@
+# Plano
+
+Separar cálculo puro no domínio e leitura limitada/CLI no adaptador de comando. Não inferir compatibilidade a partir de texto de commit. Automatizar seleção do incremento a partir de declarações revisadas, com saída utilizável como gate externo. Preservar fonte de verdade: specs para intenção, registro de mudanças para impacto declarado, manifests/gates para execução e aceite humano por revisão para publicação. Validar matriz patch/minor/major, deprecação, misturas, docs/internal, limites, overflow, registros inválidos e CLI real somente leitura. Evidências novas em operador externo, sem sobrescrever o ledger anterior do doctor.

@@ -227,3 +227,24 @@ Missing/mismatched experiment context or incomplete/nonaccepted samples cannot p
 figure. It never authenticates a native model/account from caller-provided JSON, converts tokens to
 currency, or claims generalized savings. SARIF imports accept 2.1.0, reject remote/traversal locations
 and unresolved bases, preserve scanner errors and never execute findings/fixes or mark them resolved.
+
+## FORGE-053 — Installation diagnostics in doctor
+
+`doctor` adds `installation`, identical to the read-only `installation doctor` response.
+Each PATH command adds `status` (`resolved`, `attention`, `not_found`, `incomplete`), `distinct_targets`
+and `next_action`. Canonical targets deduplicate symlinks; the two command names are
+not compared as if they must be the same file. Candidate versions remain unknown.
+Only the running version is reported; existing processes must be reopened after updating.
+The main doctor still performs its existing bounded client capability checks.
+
+FORGE-053 also adds per-command `coverage` (`complete` or `partial`). The invoked command name
+comes from argv[0], before resolving symlinks. A truncated PATH scan cannot prove absence or
+uniqueness: status is `incomplete` unless a conflict already warrants `attention`.
+
+## FORGE-054 — Release version policy
+
+`release version --changes FILE [--target VERSION]` reads a bounded strict JSON change set
+and returns the highest declared compatibility impact, proposed version/tag and input digest.
+Fix is patch; feature/deprecation minor; breaking major; docs/internal alone produce no release.
+The optional exact target check returns blocked/exit 2 on mismatch. A passing result grants no
+publication authority and creates no state or configuration. See [policy](release-version-policy.md).

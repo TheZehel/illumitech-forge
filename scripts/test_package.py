@@ -20,7 +20,7 @@ class WindowsPackage(unittest.TestCase):
             (root / 'Cargo.toml').write_text('[workspace.package]\nversion="0.2.0"\n')
             files = ['LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES/dependency/LICENSE',
                      'docs/dependencies.json', 'docs/quickstart.md', 'docs/operational-parity.md',
-                     'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py',
+                     'docs/contracts.md', 'docs/release-version-policy.md', 'release/changes.json', 'scripts/demo.py', 'scripts/agent-fixtures.py',
                      'scripts/install.ps1', 'scripts/uninstall.ps1','scripts/windows-native-pilot.ps1', 'examples/windows/workflow.ps1',
                      'docs/windows-portability.md']
             for name in files:

@@ -1,11 +1,11 @@
-# Illumitech Forge CLI 1.3.0
+# Illumitech Forge CLI 1.4.0
 
 Evidence-backed release execution, local web workbench and native interactive terminal.
 
 After this candidate is published:
 
 ```sh
-cargo install illumitech-forge-cli --version 1.3.0 --locked
+cargo install illumitech-forge-cli --version 1.4.0 --locked
 forge
 ```
 

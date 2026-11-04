@@ -1,6 +1,7 @@
 //! Versioned contracts, fingerprints and durable orchestration state.
 pub mod duration;
 pub mod manifest;
+pub mod release_version;
 pub mod revision;
 pub mod state;
 pub mod usage;

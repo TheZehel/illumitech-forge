@@ -19,6 +19,57 @@ fn call(args: &[&str], cwd: &Path, success: bool) -> Value {
     serde_json::from_slice(&out.stdout).unwrap()
 }
 
+#[test]
+#[cfg(unix)]
+fn doctor_preserves_invoked_alias_identity_and_marks_partial_scans() {
+    use std::os::unix::{fs::PermissionsExt, fs::symlink};
+    let t = tempfile::tempdir().unwrap();
+    let base = t.path().canonicalize().unwrap();
+    let target = base.join("illumitech-forge");
+    fs::copy(env!("CARGO_BIN_EXE_forge"), &target).unwrap();
+    let alias = base.join("forge");
+    symlink(&target, &alias).unwrap();
+    let old = base.join("old");
+    let empty = base.join("empty");
+    fs::create_dir(&old).unwrap();
+    fs::create_dir(&empty).unwrap();
+    let marker = base.join("executed");
+    fs::write(
+        old.join("forge"),
+        format!("#!/bin/sh\nprintf executed > '{}'\n", marker.display()),
+    )
+    .unwrap();
+    fs::set_permissions(old.join("forge"), fs::Permissions::from_mode(0o700)).unwrap();
+    for truncated in [false, true] {
+        let mut dirs = if truncated {
+            vec![empty.clone(); 128]
+        } else {
+            Vec::new()
+        };
+        dirs.push(old.clone());
+        let out = Command::new(&alias)
+            .args(["--json", "installation", "doctor"])
+            .env("PATH", std::env::join_paths(dirs).unwrap())
+            .output()
+            .unwrap();
+        assert!(out.status.success());
+        let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+        let diag = &v["path_diagnostics"];
+        assert_eq!(diag["truncated"], truncated);
+        assert_eq!(
+            diag["commands"][0]["status"],
+            if truncated { "incomplete" } else { "attention" }
+        );
+        if !truncated {
+            assert_eq!(
+                diag["commands"][0]["selected"]["path_matches_running"],
+                false
+            );
+        }
+        assert!(!marker.exists());
+    }
+}
+
 fn create(base: &Path) -> Value {
     call(
         &[

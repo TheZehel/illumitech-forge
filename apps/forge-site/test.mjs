@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = dirname(fileURLToPath(import.meta.url));
 for (const lang of ['pt','en']) test(`Static ${lang} preview has real install instructions and no local capability`,async()=>{
  const html=await readFile(join(root,'dist',lang,'index.html'),'utf8');
- assert.match(html,/1\.2\.0/);assert.doesNotMatch(html,/1\.1\.1/);assert.match(html,/<html lang=/);assert.match(html,/<main id="main">/);
+ assert.match(html,/1\.4\.0/);assert.doesNotMatch(html,/1\.1\.1/);assert.match(html,/<html lang=/);assert.match(html,/<main id="main">/);
  assert.doesNotMatch(html,/localhost|127\.0\.0\.1|X-Forge-Token|\/api\/|\/Users\/|\/Volumes\/|<script/);
  for(const match of html.matchAll(/(?:href|src)="([^"#]+)"/g)){const href=match[1];if(href.startsWith('https:'))continue;const file=resolve(root,'dist',lang,href);const stat=await import('node:fs/promises').then(fs=>fs.stat(file));assert.ok(stat.isFile()||stat.isDirectory(),href);}
 });

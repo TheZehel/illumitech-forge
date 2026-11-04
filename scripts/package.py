@@ -61,7 +61,7 @@ def package(root, target, binary=None, output=None, forge_binary=None):
     names = ['README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES', 'docs/dependencies.json',
              f'docs/release-v{version}.md',
              'docs/v1-candidate.md', 'docs/native-command.md', 'docs/terminal-chat.md', 'docs/workbench.md', 'docs/token-economy.md', 'docs/duration-estimates.md',
-             'docs/quickstart.md', 'docs/operational-parity.md', 'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py']
+             'docs/release-version-policy.md', 'release/changes.json', 'docs/quickstart.md', 'docs/operational-parity.md', 'docs/contracts.md', 'scripts/demo.py', 'scripts/agent-fixtures.py']
     if windows:
         names += ['scripts/install.ps1', 'scripts/uninstall.ps1', 'scripts/windows-native-pilot.ps1', 'examples/windows', 'docs/windows-portability.md']
     files = {'illumitech-forge.exe' if windows else 'illumitech-forge': binary, forge_name: forge_binary}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "base_version": "1.3.0",
+  "changes": [
+    {
+      "id": "D053-DOCTOR",
+      "kind": "feature",
+      "summary": "Expose installation diagnostics in doctor with per-command status, coverage and recovery guidance."
+    },
+    {
+      "id": "D053-FIX-ALIAS",
+      "kind": "fix",
+      "summary": "Use the invoked alias to detect PATH selection conflicts across different canonical executable names."
+    },
+    {
+      "id": "D053-FIX-PARTIAL",
+      "kind": "fix",
+      "summary": "Report incomplete inspection instead of claiming absence or uniqueness beyond the PATH scan limit."
+    },
+    {
+      "id": "V054-POLICY",
+      "kind": "feature",
+      "summary": "Add a stable semantic-version planner and exact target gate for reviewed change sets."
+    }
+  ]
+}

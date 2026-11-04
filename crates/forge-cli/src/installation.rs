@@ -518,7 +518,7 @@ fn doctor() -> Result<Value> {
         }
     }
     Ok(
-        json!({"schema_version":1,"status":"diagnosed","current_executable":executable,"version":env!("CARGO_PKG_VERSION"),"platform":host(),"path_order":order,"competing_binaries":candidates,"path_diagnostics":paths::inspect(&executable, std::env::var_os("PATH").as_deref(), &std::env::current_dir()?),"provenance":"running binary; publisher unknown","mutation":false,"platform_capability":{"macos":"native host checks only; see validation report","linux":"implemented; native pilot required","windows":"experimental; native pilot required"}}),
+        json!({"schema_version":1,"status":"diagnosed","current_executable":executable,"version":env!("CARGO_PKG_VERSION"),"platform":host(),"path_order":order,"competing_binaries":candidates,"path_diagnostics":paths::inspect(&executable, std::env::var_os("PATH").as_deref(), &std::env::current_dir()?, std::env::args_os().next().as_deref()),"provenance":"running binary; publisher unknown","mutation":false,"platform_capability":{"macos":"native host checks only; see validation report","linux":"implemented; native pilot required","windows":"experimental; native pilot required"}}),
     )
 }
 #[cfg(test)]
