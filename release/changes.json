@@ -1,11 +1,36 @@
 {
   "schema_version": 1,
-  "base_version": "1.4.0",
+  "base_version": "1.4.1",
   "changes": [
     {
-      "id": "R056-SCROLL",
-      "kind": "fix",
-      "summary": "Preserve terminal reading position during streaming and resizing, restore access to overflowed chat via scrolling, and recover usable conversation height."
+      "id": "F058",
+      "kind": "feature",
+      "summary": "Primeira correção guiada"
+    },
+    {
+      "id": "F059",
+      "kind": "feature",
+      "summary": "Continuidade e recuperação"
+    },
+    {
+      "id": "F060",
+      "kind": "feature",
+      "summary": "Métricas e exportação"
+    },
+    {
+      "id": "F061",
+      "kind": "docs",
+      "summary": "Distribuição e documentação"
+    },
+    {
+      "id": "F062",
+      "kind": "docs",
+      "summary": "Kit de piloto"
+    },
+    {
+      "id": "F063",
+      "kind": "docs",
+      "summary": "Aceitação integrada"
     }
   ]
 }

@@ -269,3 +269,88 @@ fn frozen_regression_changes_invalidate_current_evidence() {
     assert!(v["status"] == "blocked" || v["effective_status"] == "blocked");
     assert_eq!(f.calls(), 1);
 }
+
+#[test]
+fn environment_error_is_not_the_guided_bug_baseline() {
+    let f = Fixture::new(false, true);
+    let mut request: Value = serde_json::from_slice(&fs::read(&f.input).unwrap()).unwrap();
+    request["checks"][0]["before_exit"] = json!(42);
+    request["files"]["verify.py"] = json!("raise RuntimeError('fixture environment failure')\n");
+    fs::write(&f.input, serde_json::to_vec(&request).unwrap()).unwrap();
+    let p = f.prepare(true);
+    assert!(!f.start(p["scope_digest"].as_str().unwrap()).0);
+    assert_eq!(f.calls(), 0);
+    let (ok, s) = f.call(f.args("diagnose"));
+    assert!(!ok, "blocked diagnosis must retain a failure exit: {s}");
+    assert_eq!(s["baseline"]["status"], "blocked");
+    assert!(!f.call(f.args("resume")).0);
+    assert_eq!(f.calls(), 0);
+}
+#[test]
+fn export_is_preview_by_default_and_never_includes_project_data() {
+    let f = Fixture::new(false, true);
+    let p = f.prepare(true);
+    assert!(f.start(p["scope_digest"].as_str().unwrap()).0);
+    let (ok, v) = f.call(f.args("export"));
+    assert!(ok, "{v}");
+    assert_eq!(v["status"], "preview");
+    let serialized = v.to_string();
+    for forbidden in [
+        f.repo.to_str().unwrap(),
+        "preserved.txt",
+        "verify.py",
+        "prompt",
+        "stderr",
+        "stdout",
+    ] {
+        assert!(!serialized.contains(forbidden), "{forbidden}");
+    }
+    let out = f.base.join("report-v1.json");
+    let mut args = f.args("export");
+    args.extend([
+        "--output".into(),
+        out.display().to_string(),
+        "--human-minutes".into(),
+        "7".into(),
+    ]);
+    let (ok, v) = f.call(args.clone());
+    assert!(ok, "{v}");
+    assert_eq!(v["report"]["metrics"]["human_minutes"], 7);
+    assert!(out.exists());
+    assert!(!f.call(args).0);
+}
+
+#[test]
+fn rust_and_typescript_external_regressions_fail_before_and_pass_after() {
+    for language in ["rust", "typescript"] {
+        let f = Fixture::new(false, true);
+        let (file, before, after, verifier, argv) = if language == "rust" {
+            ("lib.rs","pub fn add(a:i32,b:i32)->i32{a-b}","pub fn add(a:i32,b:i32)->i32{a+b}",
+             "import pathlib,sys,tempfile,subprocess,json\nr=pathlib.Path(sys.argv[1])\nwith tempfile.TemporaryDirectory() as d:\n p=pathlib.Path(d); src=p/'check.rs'; src.write_text('#[path='+json.dumps(str(r/'lib.rs'))+'] mod subject; fn main(){std::process::exit(if subject::add(1,1)==2 {0}else{42});}')\n c=subprocess.run(['rustc',str(src),'-o',str(p/'check')]); sys.exit(c.returncode if c.returncode else subprocess.run([str(p/'check')]).returncode)\n".to_string(), vec![common::python(),"{checks}/verify.py","{repo}"])
+        } else {
+            ("app.ts","export function add(a:number,b:number):number{return a-b}","export function add(a:number,b:number):number{return a+b}",
+             "import pathlib,sys,subprocess\nr=pathlib.Path(sys.argv[1]);code='import {add} from '+repr((r/'app.ts').as_uri())+';process.exit(add(1,1)===2?0:42)'\nsys.exit(subprocess.run(['node','--input-type=module','-e',code]).returncode)\n".to_string(), vec![common::python(),"{checks}/verify.py","{repo}"])
+        };
+        fs::write(f.repo.join(file), before).unwrap();
+        let client = fs::read_to_string(f.bin.join("codex")).unwrap().replace(
+            "print(json.dumps({'type':'thread.started'",
+            &format!(
+                "Path({file:?}).write_text({after:?})\nprint(json.dumps({{'type':'thread.started'"
+            ),
+        );
+        fs::write(f.bin.join("codex"), client).unwrap();
+        let mut request: Value = serde_json::from_slice(&fs::read(&f.input).unwrap()).unwrap();
+        request["checks"][0]["before_exit"] = json!(42);
+        request["checks"][0]["argv"] = json!(argv);
+        request["files"]["verify.py"] = json!(verifier);
+        fs::write(&f.input, serde_json::to_vec(&request).unwrap()).unwrap();
+        let p = f.prepare(true);
+        let (ok, v) = f.start(p["scope_digest"].as_str().unwrap());
+        assert!(ok, "{language}: {v}");
+        assert_eq!(v["run"]["status"], "passed");
+        assert_eq!(f.calls(), 1);
+        let (ok, s) = f.call(f.args("status"));
+        assert!(ok, "{s}");
+        assert_eq!(s["baseline"]["evidence"]["actual_exit"], 42);
+    }
+}

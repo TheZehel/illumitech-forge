@@ -48,6 +48,9 @@ for line in sys.stdin:
                 text = json.dumps({'schema_version':1,'id':'001-greeting','title':'Greeting','summary':'Observable greeting','tasks':[{'id':'greeting-T01','title':'Implement greeting','dependencies':[],'acceptance':[{'id':'greeting-AC1','description':'Greeting regression passes external gate','command':['cargo','test']}]}]})
             else:
                 text = 'Native fixture reply'
+            if 'Corrigir um bug com regressão externa.' in p['input'][0]['text'] and 'outputSchema' in p:
+                verifier = "import pathlib,sys\np=pathlib.Path(sys.argv[1])/'output.txt'\nsys.exit(0 if p.exists() and p.read_text()=='verified' else 42)\n"
+                text = json.dumps({'schema_version':1,'id':'058-ui-bug','title':'Correct output','summary':'Correct output with frozen external regression','tasks':[{'id':'fix','title':'Correct output','dependencies':[],'acceptance':[{'id':'preserved','description':'Preserve existing file','command':['python3','-c','from pathlib import Path; assert Path("preserved.txt").read_text()=="keep"']}]}], 'bug':{'expected':'output.txt contains verified','reproduction':'read output.txt','filename':'verify.py','content':verifier,'argv':['python3','{checks}/verify.py','{repo}']}})
             if 'INVALID_PLAN' in p['input'][0]['text'] and 'outputSchema' in p:
                 text = '{"schema_version":1,"id":"bad","title":"Bad","summary":"No evidence","tasks":[]}'
             if 'CHANGED_PLAN' in p['input'][0]['text'] and 'outputSchema' in p:

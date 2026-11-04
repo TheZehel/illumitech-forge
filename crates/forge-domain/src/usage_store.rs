@@ -392,3 +392,90 @@ mod tests {
         assert!(usage["observed"]["total_tokens"].is_null());
     }
 }
+
+impl Store {
+    /// Observed stops and completed waits from the full journal, never its UI page.
+    /// Native approval wait and time before initial execution remain outside this counter.
+    pub fn workflow_observations(&self, release: &str) -> Result<Value> {
+        let mut stmt = self.conn.prepare("SELECT CAST((julianday(at)-2440587.5)*86400000 AS INTEGER),kind,body FROM events WHERE release_id=?1 ORDER BY seq")?;
+        let rows = stmt.query_map([release], |r| {
+            Ok((
+                r.get::<_, Option<i64>>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, String>(2)?,
+            ))
+        })?;
+        let mut stops = 0u64;
+        let mut decisions = 0u64;
+        let mut external = 0u64;
+        let mut waiting = None;
+        let mut waited = Some(0u64);
+        let mut started = false;
+        let mut active = false;
+        for row in rows {
+            let (at, kind, body) = row?;
+            let value: Value = serde_json::from_str(&body)?;
+            if kind == "started" {
+                started = true;
+                active = true;
+                if let Some(begin) = waiting.take() {
+                    let elapsed = at
+                        .and_then(|end: i64| end.checked_sub(begin))
+                        .and_then(|n| u64::try_from(n).ok());
+                    waited = waited.zip(elapsed).and_then(|(a, b)| a.checked_add(b));
+                }
+            } else if kind == "stopped" {
+                active = false;
+                match value["status"].as_str() {
+                    Some("paused" | "cancelled" | "awaiting_approval") => {
+                        stops += 1;
+                        decisions += 1;
+                        waiting = at;
+                    }
+                    Some("failed" | "blocked") => {
+                        stops += 1;
+                        external += 1;
+                        waiting = at;
+                    }
+                    Some("passed") => {}
+                    _ => {
+                        waited = None;
+                    }
+                }
+            }
+        }
+        Ok(
+            json!({"observed_stops":if started{Some(stops)}else{None},"decision_stops":if started{Some(decisions)}else{None},"external_stops":if started{Some(external)}else{None},"completed_wait_ms":if started{waited}else{None},"wait_ms":if started && waiting.is_none() && !active{waited}else{None},"open_wait":waiting.is_some(),"active_or_uncertain":active,"scope":"persisted execution stops and waits until explicit resume; native approval and pre-execution wait unknown"}),
+        )
+    }
+}
+
+#[cfg(test)]
+mod workflow_metric_tests {
+    use super::*;
+    #[test]
+    fn wait_is_observed_only_between_persisted_stop_and_resume() {
+        let temp = tempfile::tempdir().unwrap();
+        let mut store = Store::open(&temp.path().join("state.sqlite"), false).unwrap();
+        assert!(store.workflow_observations("sample").unwrap()["wait_ms"].is_null());
+        store
+            .journal_metadata("sample", "started", &json!({}))
+            .unwrap();
+        store
+            .journal_metadata("sample", "stopped", &json!({"status":"paused"}))
+            .unwrap();
+        let open = store.workflow_observations("sample").unwrap();
+        assert!(open["wait_ms"].is_null());
+        assert_eq!(open["observed_stops"], 1);
+        store
+            .journal_metadata("sample", "started", &json!({}))
+            .unwrap();
+        store
+            .journal_metadata("sample", "stopped", &json!({"status":"passed"}))
+            .unwrap();
+        let closed = store.workflow_observations("sample").unwrap();
+        assert!(closed["wait_ms"].as_u64().is_some());
+        assert_eq!(closed["decision_stops"], 1);
+        assert_eq!(closed["external_stops"], 0);
+    }
+}

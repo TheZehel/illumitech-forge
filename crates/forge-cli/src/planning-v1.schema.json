@@ -6,7 +6,8 @@
     "id",
     "title",
     "summary",
-    "tasks"
+    "tasks",
+    "bug"
   ],
   "properties": {
     "schema_version": {
@@ -76,6 +77,51 @@
           }
         }
       }
+    },
+    "bug": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expected",
+            "reproduction",
+            "filename",
+            "content",
+            "argv",
+            "planned_files"
+          ],
+          "properties": {
+            "expected": {
+              "type": "string"
+            },
+            "reproduction": {
+              "type": "string"
+            },
+            "filename": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "argv": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "planned_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

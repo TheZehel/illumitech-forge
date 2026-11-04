@@ -11,6 +11,8 @@ pub struct Action {
     #[serde(default)]
     pub request: Option<Request>,
     #[serde(default)]
+    pub bug_description: Option<String>,
+    #[serde(default)]
     pub scope_digest: Option<String>,
     #[serde(default)]
     pub reconcile: Option<String>,
@@ -34,6 +36,7 @@ impl App {
         guided::external(&self.state.join("workflow-operations"), &self.root)
     }
     fn prepare_workflow(&self, r: Request, apply: bool) -> Result<Value> {
+        let mut planning_metrics = None;
         let call = if let Some(id) = &r.planning_operation {
             ensure!(
                 valid_id(id) && id.len() <= 150,
@@ -58,17 +61,43 @@ impl App {
                     == self.root.to_string_lossy().as_ref(),
                 "planning receipt belongs to another project"
             );
+            if let Some(attempt_id) = value["attempt_id"].as_str() {
+                ensure!(
+                    attempt_id.len() == 64 && attempt_id.bytes().all(|b| b.is_ascii_hexdigit()),
+                    "invalid planning attempt ID"
+                );
+                let receipt: metrics::PlanningMetrics = read_json(
+                    &self
+                        .state
+                        .join("workbench-candidates/attempts")
+                        .join(attempt_id)
+                        .join("finished.json"),
+                )?;
+                ensure!(
+                    receipt.attempt_id == attempt_id && receipt.status == "planned",
+                    "planning attempt mismatch"
+                );
+                planning_metrics = Some(receipt);
+            }
             let usage: forge_domain::usage::TokenUsage =
                 serde_json::from_value(value["token_usage"]["observed"].clone())?;
-            Some(forge_domain::usage::TokenCall{id:format!("workflow-planning:{id}"),task_id:"workflow-planning".into(),attempt:1,phase:"planning".into(),repo_scope:self.root.to_string_lossy().into_owned(),client:"codex".into(),model:None,outcome:"passed".into(),elapsed_ms:None,observation:forge_domain::usage::UsageObservation{units:vec![forge_domain::usage::UsageUnit{key:id.clone(),session:id.clone(),cumulative:true,token_usage:usage}],complete:true,limitations:vec!["Observed planning receipt from the owning local server; model and planning duration not observed here".into()]}})
+            Some(forge_domain::usage::TokenCall{id:format!("workflow-planning:{id}"),task_id:"workflow-planning".into(),attempt:1,phase:"planning".into(),repo_scope:self.root.to_string_lossy().into_owned(),client:"codex".into(),model:None,outcome:"passed".into(),elapsed_ms:None,observation:forge_domain::usage::UsageObservation{units:vec![forge_domain::usage::UsageUnit{key:id.clone(),session:id.clone(),cumulative:true,token_usage:usage}],complete:value["token_usage"]["coverage"] == "complete",limitations:vec!["Observed planning receipt from the owning local server; model and planning duration not observed here".into()]}})
         } else {
             None
         };
-        prepare::prepare_with_receipt(r, &self.root, &self.workflow_ops()?, apply, call)
+        prepare::prepare_with_receipt(
+            r,
+            &self.root,
+            &self.workflow_ops()?,
+            apply,
+            call,
+            planning_metrics,
+        )
     }
     pub async fn workflow_action(self: &Arc<Self>, route: &str, action: Action) -> Result<Value> {
         ensure!(
             [
+                "workflow-bug",
                 "workflow-preview",
                 "workflow-prepare",
                 "workflow-start",
@@ -87,6 +116,13 @@ impl App {
             .contains(&route),
             "unknown workflow action"
         );
+        if route == "workflow-bug" {
+            let description = action.bug_description.context("bug description required")?;
+            let planned = self.action("planning-propose", serde_json::from_value(json!({"operation_id":format!("{}-plan", action.operation_id),"request":format!("Corrigir um bug com regressão externa. {description}")}))?).await?;
+            let proposal = serde_json::from_value(planned["proposal"].clone())?;
+            let request = bug::request(proposal, &description, planned["operation_id"].as_str())?;
+            return self.prepare_workflow(request, true);
+        }
         let _guard = self.forge_control.lock().await;
         if route == "workflow-list" {
             return list(&self.root, &self.workflow_ops()?);

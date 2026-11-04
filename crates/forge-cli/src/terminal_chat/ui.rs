@@ -352,11 +352,69 @@ impl Chat {
                     "/run DIGEST confirma o escopo; /tasks ID diagnostica; /tasks resume ID retoma.",
                 ),
             ];
+            if let Some(request) = self
+                .workflow
+                .get("candidate")
+                .and_then(|c| c.get("request"))
+            {
+                lines.push(title(request["title"].as_str().unwrap_or("Escopo")));
+                let bug = &request["proposal"]["bug"];
+                for (label, value) in [
+                    ("Esperado", &bug["expected"]),
+                    ("Reprodução", &bug["reproduction"]),
+                ] {
+                    if let Some(text) = value.as_str() {
+                        lines.push(Line::from(format!("{label}: {text}")));
+                    }
+                }
+                if let Some(files) = bug["planned_files"].as_array() {
+                    lines.push(Line::from(format!(
+                        "Arquivos previstos: {}",
+                        files
+                            .iter()
+                            .filter_map(serde_json::Value::as_str)
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    )));
+                }
+                lines.push(Line::from(
+                    "Permissão: escrita no projeto pelo cliente nativo. Sem commit ou publicação.",
+                ));
+                if let Some(checks) = request["checks"].as_array() {
+                    for check in checks {
+                        lines.push(Line::from(format!(
+                            "Verificação {}: {}",
+                            check["id"].as_str().unwrap_or(""),
+                            check["argv"]
+                        )));
+                    }
+                }
+                if let Some(files) = request["files"].as_object() {
+                    for (name, body) in files {
+                        lines.push(Line::from(format!("Verificador externo congelado: {name}")));
+                        lines.extend(
+                            body.as_str()
+                                .unwrap_or("")
+                                .lines()
+                                .map(|line| Line::from(line.to_owned())),
+                        );
+                    }
+                }
+                if let Some(digest) = self.workflow["scope_digest"].as_str() {
+                    lines.push(Line::from(format!("Após revisar: /run {digest}")));
+                }
+                lines.push(Line::from("Contrato completo e evidências:"));
+            }
             lines.extend(
                 display(&serde_json::to_string_pretty(&self.workflow).unwrap_or_default())
                     .lines()
                     .map(|s| Line::from(s.to_owned())),
             );
+            for line in &mut lines {
+                for span in &mut line.spans {
+                    span.content = display(&span.content).into();
+                }
+            }
             f.render_widget(
                 Paragraph::new(lines)
                     .wrap(Wrap { trim: false })

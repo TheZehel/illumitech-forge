@@ -5,7 +5,7 @@ use anyhow::Context as _;
 
 pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<Pending>> {
     let command = text.split_whitespace().next().unwrap_or("").to_owned();
-    if !["/plan", "/run", "/tasks", "/report"].contains(&command.as_str()) {
+    if !["/bug", "/plan", "/run", "/tasks", "/report"].contains(&command.as_str()) {
         return Ok(None);
     }
     let args = text
@@ -21,7 +21,7 @@ pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<
     let operation_id = format!("terminal-workflow-{}", forge_domain::digest(&nonce));
     let route = format!("workflow{command}");
     let handle = tokio::spawn(async move {
-        if command == "/plan" {
+        if command == "/plan" || command == "/bug" {
             ensure!(
                 !args.is_empty(),
                 "Use /plan PEDIDO ou /plan @ARQUIVO.json para uma regressão/receita especializada"
@@ -30,16 +30,20 @@ pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<
                 workflow::read_json(Path::new(path))?
             } else {
                 let a: Action = serde_json::from_value(
-                    json!({"operation_id":format!("{operation_id}-proposal"),"request":args}),
+                    json!({"operation_id":format!("{operation_id}-proposal"),"request":if command == "/bug" {format!("Corrigir um bug com regressão externa. {args}")}else{args.clone()}}),
                 )?;
                 let value = app.action("planning-propose", a).await?;
                 let proposal: crate::planning::Proposal =
                     serde_json::from_value(value["proposal"].clone())
                         .context("native structured proposal required")?;
-                let checks=proposal.tasks.iter().flat_map(|t|t.acceptance.iter().map(|a|json!({"id":a.id,"argv":a.command,"timeout_seconds":600,"task_ids":[t.id]}))).collect::<Vec<_>>();
-                serde_json::from_value(
-                    json!({"schema_version":1,"id":proposal.id,"title":proposal.title,"request":args,"recipe":"feature","checks":checks,"proposal":proposal,"planning_operation":value["operation_id"]}),
-                )?
+                if command == "/bug" {
+                    workflow::bug::request(proposal, &args, value["operation_id"].as_str())?
+                } else {
+                    let checks=proposal.tasks.iter().flat_map(|t|t.acceptance.iter().map(|a|json!({"id":a.id,"argv":a.command,"timeout_seconds":600,"task_ids":[t.id]}))).collect::<Vec<_>>();
+                    serde_json::from_value(
+                        json!({"schema_version":1,"id":proposal.id,"title":proposal.title,"request":args,"recipe":"feature","checks":checks,"proposal":proposal,"planning_operation":value["operation_id"]}),
+                    )?
+                }
             };
             let a = serde_json::from_value(json!({"operation_id":operation_id,"request":request}))?;
             return app.workflow_action("workflow-prepare", a).await;
@@ -83,7 +87,14 @@ pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<
         let id = if args.is_empty() { current } else { args };
         ensure!(!id.is_empty(), "Use /tasks ID ou /report ID");
         let a = serde_json::from_value(json!({"operation_id":operation_id,"id":id}))?;
-        app.workflow_action("workflow-status", a).await
+        let mut report = app.workflow_action("workflow-status", a).await?;
+        if command == "/report" {
+            let review = serde_json::from_value(
+                json!({"operation_id":format!("{operation_id}-diff"),"id":id}),
+            )?;
+            report["local_review"] = app.workflow_action("workflow-review", review).await?;
+        }
+        Ok(report)
     });
     Ok(Some(Pending {
         handle,

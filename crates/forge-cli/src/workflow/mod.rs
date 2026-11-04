@@ -1,5 +1,7 @@
 //! A scope grant authorizes a frozen contract, never future acceptance evidence.
+pub(crate) mod bug;
 mod checks;
+pub(crate) mod metrics;
 mod prepare;
 mod recovery;
 pub(crate) mod ui;
@@ -36,6 +38,25 @@ pub enum Command {
         ops_root: PathBuf,
         #[arg(long)]
         approve_scope: String,
+    },
+    /// List local planning attempts, including failures without a workflow.
+    Attempts {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        ops_root: PathBuf,
+    },
+    /// Preview a shareable allowlisted report; --output explicitly writes a new file.
+    Export {
+        id: String,
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        ops_root: PathBuf,
+        #[arg(long)]
+        output: Option<PathBuf>,
+        #[arg(long)]
+        human_minutes: Option<u64>,
     },
     Status {
         id: String,
@@ -159,6 +180,8 @@ pub struct Candidate {
     pub evaluator_sha256: String,
     #[serde(default)]
     pub planning_call: Option<forge_domain::usage::TokenCall>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub planning_metrics: Option<metrics::PlanningMetrics>,
 }
 pub fn read_json<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T> {
     let path = guided::safe_path(path)?;
@@ -249,6 +272,14 @@ pub async fn dispatch(command: &Command) -> Result<Value> {
             ops_root,
             approve_scope,
         } => start(root, ops_root, id, approve_scope).await,
+        Command::Attempts { root, ops_root } => metrics::attempts(root, ops_root),
+        Command::Export {
+            id,
+            root,
+            ops_root,
+            output,
+            human_minutes,
+        } => metrics::export(root, ops_root, id, output.as_deref(), *human_minutes),
         Command::Status { id, root, ops_root } | Command::Diagnose { id, root, ops_root } => {
             recovery::status(root, ops_root, id)
         }
@@ -273,9 +304,39 @@ pub async fn start(root: &Path, ops: &Path, id: &str, approval: &str) -> Result<
         consent_digest(&c)? == approval,
         "scope changed; review the new digest before starting"
     );
+    continue_preparation(dir, c, approval, false).await
+}
+async fn continue_preparation(
+    dir: PathBuf,
+    c: Candidate,
+    approval: &str,
+    resuming: bool,
+) -> Result<Value> {
     let roots = BTreeMap::from([("project".to_owned(), c.root.clone())]);
     let preparation_lock = WorktreeLocks::acquire(&roots)?;
-    {
+    let mut store = Store::open(&dir.join("state/state.sqlite"), false)?;
+    let existing = store.metadata("workflow-scope")?;
+    if resuming {
+        let scope = existing.as_ref().context("scope missing")?;
+        ensure!(
+            scope["digest"] == approval,
+            "scope changed; review a new proposal"
+        );
+        ensure!(
+            scope["preparation_guard"] == recovery::preparation_guard(&c)?,
+            "source changed during preparation; review a new proposal"
+        );
+        ensure!(
+            ["preparing", "prepared"]
+                .iter()
+                .any(|p| scope["phase"] == *p),
+            "preparation phase not recoverable"
+        );
+    } else {
+        ensure!(
+            existing.is_none(),
+            "scope already submitted; inspect status and resume instead of replaying start"
+        );
         ensure!(
             revision(&c.root)? == c.source,
             "project changed after preparation; prepare a fresh reviewed candidate"
@@ -283,50 +344,68 @@ pub async fn start(root: &Path, ops: &Path, id: &str, approval: &str) -> Result<
         for (path, body) in &c.documents {
             guided::check_file(path, body)?;
         }
-        let mut store = Store::open(&dir.join("state/state.sqlite"), false)?;
-        ensure!(
-            store.metadata("workflow-scope")?.is_none(),
-            "scope already submitted; inspect status and resume instead of replaying start"
-        );
-        store.journal_metadata(&c.manifest.release_id,"workflow-scope",&json!({"schema_version":1,"digest":approval,"phase":"preparing","acceptance_granted":false}))?;
-        for (path, body) in &c.documents {
-            guided::create(path, body)?;
-        }
-        let context = engine::Context::load(&dir.join("release.json"), &dir.join("state"))?;
-        // These are the same engine checks used by explicit release inspect and --dry-run.
-        context.inspect()?;
-        ensure!(
-            context.manifest.validate()?.len() == c.manifest.tasks.len(),
-            "invalid workflow DAG"
-        );
-        store.journal_metadata(&c.manifest.release_id,"workflow-scope",&json!({"schema_version":1,"digest":approval,"phase":"prepared","revision":revision(&c.root)?,"acceptance_granted":false}))?;
+        store.journal_metadata(&c.manifest.release_id,"workflow-scope",&json!({"schema_version":1,"digest":approval,"phase":"preparing","preparation_guard":recovery::preparation_guard(&c)?,"acceptance_granted":false}))?;
     }
-    // Baselines are journaled before spawn; unknown outcomes must never be replayed.
-    let mut store = Store::open(&dir.join("state/state.sqlite"), false)?;
+    if let Some(call) = &c.planning_call {
+        store.record_token_call(&c.manifest.release_id, call)?;
+    }
+    for (path, body) in &c.documents {
+        guided::create(path, body)?;
+    }
+    let context = engine::Context::load(&dir.join("release.json"), &dir.join("state"))?;
+    context.inspect()?;
+    let mut grant = store.metadata("workflow-scope")?.context("scope missing")?;
+    grant["phase"] = json!("prepared");
+    store.journal_metadata(&c.manifest.release_id, "workflow-scope", &grant)?;
     for check in &c.checks.checks {
         if let Some(exit) = check.before_exit {
-            store.journal_metadata(
-                &c.manifest.release_id,
-                "workflow-baseline",
-                &json!({"check":check.id,"status":"running"}),
-            )?;
-            let before = revision(&c.root)?;
-            checks::run(&dir.join("checks.json"), &check.id, &c.root, Some(exit)).await?;
+            let key = format!("workflow-baseline:{}", check.id);
+            if let Some(previous) = store.metadata(&key)? {
+                ensure!(
+                    previous["status"] == "passed"
+                        && previous["revision"] == serde_json::to_value(revision(&c.root)?)?,
+                    "baseline outcome uncertain, failed or stale; inspect retained evidence and prepare a new reviewed workflow; no replay"
+                );
+                continue;
+            }
+            // Old state does not prove a per-check checkpoint. Never replay an old unknown process.
             ensure!(
-                revision(&c.root)? == before,
-                "baseline changed project files; inspect before continuing"
+                !resuming
+                    || store
+                        .metadata("workflow-baseline")?
+                        .is_none_or(|v| v["status"] == "passed"),
+                "legacy baseline outcome uncertain; inspect before a fresh workflow"
             );
-            store.journal_metadata(
-                &c.manifest.release_id,
-                "workflow-baseline",
-                &json!({"check":check.id,"status":"passed"}),
-            )?;
+            let running =
+                json!({"check":check.id,"status":"running","revision":revision(&c.root)?});
+            store.journal_metadata(&c.manifest.release_id, &key, &running)?;
+            store.journal_metadata(&c.manifest.release_id, "workflow-baseline", &running)?;
+            let before = revision(&c.root)?;
+            let result =
+                checks::run(&dir.join("checks.json"), &check.id, &c.root, Some(exit)).await;
+            let unchanged = revision(&c.root)? == before;
+            let receipt = match result {
+                Ok(value) if unchanged => {
+                    json!({"check":check.id,"status":"passed","revision":before,"evidence":value})
+                }
+                Ok(_) => {
+                    json!({"check":check.id,"status":"blocked","reason":"baseline changed source"})
+                }
+                Err(e) => {
+                    json!({"check":check.id,"status":"blocked","reason":forge_adapters::process::redact(&e.to_string())})
+                }
+            };
+            store.journal_metadata(&c.manifest.release_id, &key, &receipt)?;
+            store.journal_metadata(&c.manifest.release_id, "workflow-baseline", &receipt)?;
+            ensure!(
+                receipt["status"] == "passed",
+                "reproduction did not establish the expected failure; inspect workflow status before a new proposal"
+            );
         }
     }
     if let Some(call) = &c.planning_call {
         store.record_token_call(&c.manifest.release_id, call)?;
     }
-    let mut grant = store.metadata("workflow-scope")?.context("scope missing")?;
     grant["phase"] = json!("execution_authorized");
     grant["revision"] = serde_json::to_value(revision(&c.root)?)?;
     store.journal_metadata(&c.manifest.release_id, "workflow-scope", &grant)?;
@@ -339,7 +418,7 @@ pub async fn start(root: &Path, ops: &Path, id: &str, approval: &str) -> Result<
         .is_some_and(|c| c == "pause" || c == "cancel")
     {
         return Ok(
-            json!({"schema_version":1,"workflow_id":id,"status":if control==Some(json!("pause")){"paused"}else{"cancelled"},"replayed":false}),
+            json!({"schema_version":1,"workflow_id":c.request.id,"status":if control==Some(json!("pause")){"paused"}else{"cancelled"},"replayed":false}),
         );
     }
     // Initial execution is separate from subsequent explicit resume.
@@ -359,6 +438,15 @@ pub async fn resume(root: &Path, ops: &Path, id: &str, reconcile: Option<String>
         scope["digest"] == consent_digest(&c)?,
         "contract changed; a new scope consent is required"
     );
+    if scope["phase"] == "preparing" || scope["phase"] == "prepared" {
+        ensure!(
+            reconcile.is_none(),
+            "preparation reconciliation needs a fresh proposal; no command replayed"
+        );
+        drop(store);
+        let approval = consent_digest(&c)?;
+        return continue_preparation(dir, c, &approval, true).await;
+    }
     ensure!(
         scope["phase"] == "execution_authorized",
         "preparation/baseline interrupted; inspect files and prepare a fresh reviewed workflow, no command replayed"

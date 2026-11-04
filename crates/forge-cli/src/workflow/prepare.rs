@@ -168,7 +168,7 @@ pub fn prepare(r: Request, root: &Path, ops: &Path, apply: bool) -> Result<Value
         r.planning_operation.is_none(),
         "native planning receipt must be resolved by the owning Workbench/terminal"
     );
-    prepare_with_receipt(r, root, ops, apply, None)
+    prepare_with_receipt(r, root, ops, apply, None, None)
 }
 pub(super) fn prepare_with_receipt(
     mut r: Request,
@@ -176,6 +176,7 @@ pub(super) fn prepare_with_receipt(
     ops: &Path,
     apply: bool,
     planning_call: Option<forge_domain::usage::TokenCall>,
+    planning_metrics: Option<metrics::PlanningMetrics>,
 ) -> Result<Value> {
     let root = guided::root(root)?;
     let ops = guided::external(ops, &root)?;
@@ -347,6 +348,7 @@ pub(super) fn prepare_with_receipt(
         evaluator: evaluator.clone(),
         evaluator_sha256: binary_hash,
         planning_call,
+        planning_metrics,
     };
     let scope = consent_digest(&c)?;
     if apply {

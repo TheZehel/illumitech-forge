@@ -5,6 +5,10 @@ pub(super) struct Command {
 }
 pub(super) const COMMANDS: &[Command] = &[
     Command {
+        name: "bug",
+        description: "Corrigir um bug: descrever, revisar regressão e autorizar /run",
+    },
+    Command {
         name: "plan",
         description: "Planejar PEDIDO ou carregar @JSON; revisar antes de executar",
     },

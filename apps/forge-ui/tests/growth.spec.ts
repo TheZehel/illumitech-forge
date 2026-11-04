@@ -16,8 +16,10 @@ test.beforeAll(async () => {
 });
 test.afterAll(async () => { child?.kill('SIGTERM'); await new Promise<void>(yes => { if (child?.exitCode !== null) yes(); else { child?.once('exit', () => yes()); setTimeout(yes, 6000); } }); if (directory) await rm(directory, { recursive: true, force: true }); });
 test('one scope consent executes, reports and survives reload without replay', async ({ page }) => {
+    test.setTimeout(90000);
     await page.goto(url); await expect(page.getByTestId('connection-state')).toHaveText('Conectado ao nativo');
     await page.getByRole('button', { name: 'Executar uma tarefa', exact: true }).click();
+    await page.getByLabel('Receita', { exact: true }).selectOption('feature');
     await page.getByLabel('Resultado esperado e limites').fill('Create output.txt with verified and preserve preserved.txt.');
     await page.getByText('Verificações e regressão externa', { exact: true }).click();
     await page.getByLabel('Checks (JSON)').fill(JSON.stringify([{ id: 'output', argv: ['python3', '{checks}/verify.py', '{repo}'], timeout_seconds: 10 }]));
@@ -36,4 +38,27 @@ test('one scope consent executes, reports and survives reload without replay', a
     await writeFile(join(app, 'output.txt'), 'stale');
     await page.getByRole('button', { name: 'Atualizar diagnóstico' }).click(); await expect(page.getByText('Estado: blocked', { exact: true })).toBeVisible();
     await page.getByRole('tab', { name: 'Executar', exact: true }).focus(); await page.keyboard.press('Home'); await expect(page.getByRole('tab', { name: 'Plano', exact: true })).toBeFocused();
+});
+
+test('guided bug needs no JSON editing and exposes its frozen verifier before consent', async ({ page }) => {
+    test.setTimeout(90000);
+    await writeFile(join(app, 'output.txt'), 'broken');
+    await page.goto(url);
+    await expect(page.getByTestId('connection-state')).toHaveText('Conectado ao nativo');
+    await page.getByRole('button', { name: 'Executar uma tarefa', exact: true }).click();
+    await page.getByLabel('Resultado esperado e limites').fill('Corrigir output.txt sem alterar preserved.txt');
+    await page.getByLabel('Comportamento esperado', { exact: true }).fill('verified');
+    await page.getByLabel('Como reproduzir, se souber').fill('Ler output.txt');
+    await page.getByRole('button', { name: 'Planejar correção de bug' }).click();
+    await expect(page.getByRole('heading', { name: 'Verificador externo a revisar' })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText('verify.py', { exact: true })).toBeVisible();
+    expect(await readFile(join(app, 'output.txt'), 'utf8')).toBe('broken');
+    const execute = page.getByRole('button', { name: 'Aprovar escopo e executar' });
+    await expect(execute).toBeDisabled();
+    await page.getByLabel('Revisei o plano e os verificadores.').check();
+    await execute.click();
+    await expect(page.getByText('Estado: passed', { exact: true })).toBeVisible({ timeout: 40000 });
+    expect(await readFile(join(app, 'output.txt'), 'utf8')).toBe('verified');
+    await page.getByRole('button', { name: 'Revisar diff e arquivos', exact: true }).click();
+    await expect(page.getByText('Diff local e arquivos não rastreados', { exact: true })).toBeVisible();
 });

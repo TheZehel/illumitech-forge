@@ -26,7 +26,12 @@ fn summary(v: &Value) -> Value {
             .filter_map(|t| t["attempts"].as_u64())
             .sum::<u64>()
     });
-    json!({"outcome":outcome(r),"accepted":accepted,"token_usage":tokens,"observed_total_tokens":total,"tokens_per_accepted_delivery":if accepted{total}else{None},"attempts":attempts,"active_ms":r["run"]["duration"]["observed_active_ms"],"duration":r["duration_comparison"],"failed_or_cancelled_included":true})
+    let execution_active = r["run"]["duration"]["observed_active_ms"].as_u64();
+    let planning_active = v["planning_metrics"]["active_ms"].as_u64();
+    let full_active = execution_active
+        .zip(planning_active)
+        .and_then(|(a, b)| a.checked_add(b));
+    json!({"outcome":outcome(r),"accepted":accepted,"token_usage":tokens,"observed_total_tokens":total,"tokens_per_accepted_delivery":if accepted{total}else{None},"attempts":attempts,"active_ms":full_active,"execution_active_ms":execution_active,"planning_active_ms":planning_active,"planning_attempts":if v["planning_metrics"]["attempt_id"].is_string(){Some(1u64)}else{None},"wait_ms":v["journal_metrics"]["wait_ms"].as_u64(),"interruptions":if v["journal_metrics"]["active_or_uncertain"]==false{v["journal_metrics"]["observed_stops"].as_u64()}else{None},"duration":r["duration_comparison"],"failed_or_cancelled_included":true})
 }
 pub fn compare(a: &Value, b: &Value) -> Result<Value> {
     ensure!(
@@ -51,6 +56,14 @@ pub fn compare(a: &Value, b: &Value) -> Result<Value> {
     }
     let sa = summary(a);
     let sb = summary(b);
+    let a_scope = a["measurement_scope"].as_str();
+    let b_scope = b["measurement_scope"].as_str();
+    if a_scope != Some("planning_and_execution") || a_scope != b_scope {
+        reasons.push("missing or different full-workflow measurement scope".into());
+    }
+    if a["planning_coverage"] != "complete" || b["planning_coverage"] != "complete" {
+        reasons.push("planning coverage incomplete or unknown".into());
+    }
     let compatible = reasons.is_empty();
     let difference = if compatible && sa["accepted"] == true && sb["accepted"] == true {
         sa["observed_total_tokens"].as_u64().zip(sb["observed_total_tokens"].as_u64()).map(|(x,y)|json!({"baseline":x,"candidate":y,"candidate_minus_baseline":i128::from(y)-i128::from(x),"observed_reduction_percent":if x>0{Some((x as f64-y as f64)*100.0/x as f64)}else{None}}))
@@ -92,6 +105,23 @@ mod tests {
         b["evidence_current"] = json!(false);
         assert_eq!(compare(&a, &b).unwrap()["candidate"]["accepted"], false);
         b["effective_status"] = json!("failed");
+        assert!(compare(&a, &b).unwrap()["observed_difference"].is_null());
+    }
+    #[test]
+    fn savings_require_full_planning_coverage_and_matching_conditions() {
+        let mut a = sample();
+        let mut b = sample();
+        b["token_usage"]["total_tokens"] = json!(80);
+        assert!(compare(&a, &b).unwrap()["observed_difference"].is_null());
+        for v in [&mut a, &mut b] {
+            v["measurement_scope"] = json!("planning_and_execution");
+            v["planning_coverage"] = json!("complete");
+        }
+        assert_eq!(
+            compare(&a, &b).unwrap()["observed_difference"]["observed_reduction_percent"],
+            20.0
+        );
+        b["token_usage"]["coverage"] = json!("partial");
         assert!(compare(&a, &b).unwrap()["observed_difference"].is_null());
     }
 }
