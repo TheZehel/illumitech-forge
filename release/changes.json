@@ -1,36 +1,16 @@
 {
   "schema_version": 1,
-  "base_version": "1.4.1",
+  "base_version": "1.5.0",
   "changes": [
     {
-      "id": "F058",
+      "id": "F064",
       "kind": "feature",
-      "summary": "Primeira correção guiada"
+      "summary": "Interactive module selector and scoped feature execution with context handoff"
     },
     {
-      "id": "F059",
+      "id": "F065",
       "kind": "feature",
-      "summary": "Continuidade e recuperação"
-    },
-    {
-      "id": "F060",
-      "kind": "feature",
-      "summary": "Métricas e exportação"
-    },
-    {
-      "id": "F061",
-      "kind": "docs",
-      "summary": "Distribuição e documentação"
-    },
-    {
-      "id": "F062",
-      "kind": "docs",
-      "summary": "Kit de piloto"
-    },
-    {
-      "id": "F063",
-      "kind": "docs",
-      "summary": "Aceitação integrada"
+      "summary": "Reviewed QA execution with observed coverage, external evidence and terminal confirmation"
     }
   ]
 }

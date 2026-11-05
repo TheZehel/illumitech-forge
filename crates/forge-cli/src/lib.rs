@@ -13,6 +13,7 @@ mod importing;
 mod installation;
 mod issue;
 mod launch;
+mod modules;
 mod native;
 mod observability;
 mod operational;
@@ -55,6 +56,11 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
+    /// Execute scoped features and reviewed QA checks.
+    Modules {
+        #[command(subcommand)]
+        command: modules::Command,
+    },
     /// Prepare and execute a reviewed scope; acceptance stays with external gates.
     Workflow {
         #[command(subcommand)]
@@ -494,6 +500,7 @@ pub async fn run() {
 async fn dispatch(cli: &Cli) -> Result<Value> {
     let ctx = |p: &Path| engine::Context::load(p, &cli.state_dir);
     match &cli.command {
+        Command::Modules { command } => modules::dispatch(command, &cli.state_dir).await,
         Command::Workflow { command } => workflow::dispatch(command).await,
         Command::Contracts => Ok(compatibility::contracts()),
         Command::Installation { command } => installation::dispatch(command).await,

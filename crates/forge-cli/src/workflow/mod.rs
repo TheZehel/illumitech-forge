@@ -2,7 +2,7 @@
 pub(crate) mod bug;
 mod checks;
 pub(crate) mod metrics;
-mod prepare;
+pub(crate) mod prepare;
 mod recovery;
 pub(crate) mod ui;
 use crate::{engine, guided};

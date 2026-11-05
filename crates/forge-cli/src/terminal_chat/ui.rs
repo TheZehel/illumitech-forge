@@ -117,9 +117,10 @@ impl Chat {
                     ),
                 ]),
                 Line::from(format!(
-                    "{}  /  {}",
+                    "{}  /  {}  /  {}",
                     display(&root.file_name().unwrap_or_default().to_string_lossy()),
-                    display(model)
+                    display(model),
+                    self.mode.label()
                 )),
             ]),
             chunks[0],
@@ -153,9 +154,9 @@ impl Chat {
             lines.extend([
                 Line::default(),
                 title("Uma ideia. Um plano. Evidências."),
-                Line::from("Descreva o que você quer fazer neste projeto."),
+                Line::from(self.mode.hint()),
                 Line::default(),
-                Line::from("/ comandos  ·  F1 ajuda  ·  Ctrl+R histórico"),
+                Line::from("/ comandos  ·  F1 ajuda  ·  F3 modos  ·  Ctrl+R histórico"),
                 Line::from("Conta e permissões gerenciadas pelo cliente nativo."),
             ]);
             f.render_widget(Paragraph::new(lines).wrap(Wrap { trim: false }), chunks[1]);
@@ -215,7 +216,7 @@ impl Chat {
         let name = if self.panel == Some(Panel::History) {
             "Busca ativa no painel · Esc volta ao rascunho"
         } else {
-            "Mensagem · Enter envia · Ctrl+J nova linha"
+            self.mode.editor_label()
         };
         let paragraph = Paragraph::new(draft)
             .wrap(Wrap { trim: false })
@@ -248,8 +249,17 @@ impl Chat {
                 seconds / 60,
                 seconds % 60
             )
+        } else if self.workflow_running {
+            "Workflow em execução · /tasks diagnostica · /report mostra evidências".into()
         } else {
-            "Pronto · somente leitura · aprovação nativa sob demanda".into()
+            match self.mode {
+                modes::Mode::Feature => "Pronto · Feature · planejar → revisar → executar",
+                modes::Mode::Qa => "Pronto · QA planejamento · nenhum scan executado",
+                modes::Mode::Conversation => {
+                    "Pronto · somente leitura · aprovação nativa sob demanda"
+                }
+            }
+            .into()
         };
         let notice = view.error.as_deref().unwrap_or(&self.notice);
         let usage = session
@@ -344,14 +354,60 @@ impl Chat {
             );
             return;
         }
+        if panel == Panel::Modes {
+            let rows = modes::OPTIONS
+                .iter()
+                .map(|(label, description, mode)| {
+                    ListItem::new(vec![
+                        Line::styled(
+                            *label,
+                            Style::default().fg(if mode.is_some() {
+                                Color::White
+                            } else {
+                                Color::DarkGray
+                            }),
+                        ),
+                        Line::from(*description),
+                    ])
+                })
+                .collect::<Vec<_>>();
+            let mut state = ListState::default().with_selected(Some(self.panel_selection));
+            f.render_stateful_widget(
+                List::new(rows)
+                    .block(block(
+                        "Escolha o modo · ↑/↓ · Enter seleciona · Esc mantém o atual",
+                    ))
+                    .highlight_symbol("› ")
+                    .highlight_style(Style::default().fg(ORANGE).bold()),
+                area,
+                &mut state,
+            );
+            return;
+        }
         if panel == Panel::Workflow {
-            let mut lines = vec![
-                title("Plano, execução e evidências"),
-                Line::from("PgUp/PgDn percorrem o escopo. Esc volta ao editor."),
-                Line::from(
-                    "/run DIGEST confirma o escopo; /tasks ID diagnostica; /tasks resume ID retoma.",
-                ),
-            ];
+            let mut lines = if self.workflow["module"] == "qa" {
+                vec![
+                    title(if self.workflow["status"] == "planned" {
+                        "Planejamento QA legado · não executa"
+                    } else {
+                        "QA · escopo revisado e evidências observadas"
+                    }),
+                    Line::from(
+                        "Revise argv, inputs, cobertura e lacunas. Enter prepara /qa-run; outro Enter executa. /qa-status [ID] consulta. Esc volta ao editor.",
+                    ),
+                ]
+            } else {
+                vec![
+                    title("Plano, execução e evidências"),
+                    Line::from("PgUp/PgDn percorrem o escopo. Esc volta ao editor."),
+                    Line::from(
+                        "/run DIGEST confirma o escopo; /tasks ID diagnostica; /tasks resume ID retoma.",
+                    ),
+                    Line::from(
+                        "Plano preparado: Enter leva a autorização ao editor; outro Enter executa.",
+                    ),
+                ]
+            };
             if let Some(request) = self
                 .workflow
                 .get("candidate")
@@ -377,14 +433,17 @@ impl Chat {
                             .join(", ")
                     )));
                 }
-                lines.push(Line::from(
-                    "Permissão: escrita no projeto pelo cliente nativo. Sem commit ou publicação.",
-                ));
+                lines.push(Line::from(if self.workflow["module"] == "qa" {
+                    "QA: comandos revisados podem escrever. Alteração de fonte bloqueia aceite, sem restauração. Sem chamada nativa ou sandbox somente leitura."
+                } else {
+                    "Permissão: escrita no projeto pelo cliente nativo. Sem commit ou publicação."
+                }));
                 if let Some(checks) = request["checks"].as_array() {
                     for check in checks {
                         lines.push(Line::from(format!(
-                            "Verificação {}: {}",
+                            "Verificação {} · cobertura {}: {}",
                             check["id"].as_str().unwrap_or(""),
+                            check["coverage_id"].as_str().unwrap_or("critério Feature"),
                             check["argv"]
                         )));
                     }
@@ -401,7 +460,12 @@ impl Chat {
                     }
                 }
                 if let Some(digest) = self.workflow["scope_digest"].as_str() {
-                    lines.push(Line::from(format!("Após revisar: /run {digest}")));
+                    let command = if self.workflow["module"] == "qa" {
+                        "qa-run"
+                    } else {
+                        "run"
+                    };
+                    lines.push(Line::from(format!("Após revisar: /{command} {digest}")));
                 }
                 lines.push(Line::from("Contrato completo e evidências:"));
             }
@@ -426,6 +490,9 @@ impl Chat {
         let lines = if panel == Panel::Help {
             let mut lines = vec![
                 title("Ajuda do Forge"),
+                Line::from(
+                    "F3 ou /mode escolhe o modo. Feature planeja; a execução exige revisar e confirmar o plano.",
+                ),
                 Line::from("Esc fecha este painel. Nenhum comando é enviado ao modelo."),
                 Line::default(),
                 title("Conversa e edição"),

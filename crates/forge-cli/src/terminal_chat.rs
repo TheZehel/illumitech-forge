@@ -4,6 +4,7 @@ mod activity_panel;
 mod commands;
 mod editor;
 mod markdown;
+mod modes;
 mod transcript;
 mod ui;
 mod viewport;
@@ -36,6 +37,8 @@ use tokio::task::JoinHandle;
 
 #[derive(Default)]
 struct Chat {
+    mode: modes::Mode,
+    workflow_running: bool,
     selected: String,
     editor: editor::Editor,
     notice: String,
@@ -57,8 +60,62 @@ struct Chat {
     workflow: Value,
     workflow_id: String,
     workflow_digest: String,
+    qa_id: String,
+    qa_digest: String,
 }
 impl Chat {
+    fn workflow_result(&mut self, value: Value) {
+        if value["module"] == "qa" {
+            self.workflow_id.clear();
+            self.workflow_digest.clear();
+            self.qa_id = value["qa_id"].as_str().unwrap_or("").into();
+            self.qa_digest = if value["status"] == "prepared" && value.get("candidate").is_some() {
+                value["scope_digest"].as_str().unwrap_or("").into()
+            } else {
+                String::new()
+            };
+        } else {
+            self.qa_id.clear();
+            self.qa_digest.clear();
+            if let Some(id) = value["workflow_id"].as_str() {
+                self.workflow_id = id.into();
+            }
+            if let Some(digest) = value["scope_digest"].as_str() {
+                self.workflow_digest = digest.into();
+            }
+        }
+        self.workflow = value;
+    }
+    fn reviewed_run_command(&self) -> Option<String> {
+        if self.workflow["status"] != "prepared" || self.workflow.get("candidate").is_none() {
+            return None;
+        }
+        if self.workflow["module"] == "qa" {
+            (!self.qa_digest.is_empty()).then(|| format!("/qa-run {}", self.qa_digest))
+        } else {
+            (!self.workflow_digest.is_empty()).then(|| format!("/run {}", self.workflow_digest))
+        }
+    }
+
+    fn select_mode(&mut self, index: usize, busy: bool) {
+        if busy {
+            self.notice = "Aguarde a operação atual antes de trocar de modo.".into();
+            return;
+        }
+        if let Some((_, _, Some(mode))) = modes::OPTIONS.get(index) {
+            self.mode = *mode;
+            self.panel = None;
+            self.workflow = Value::Null;
+            self.workflow_id.clear();
+            self.workflow_digest.clear();
+            self.qa_id.clear();
+            self.qa_digest.clear();
+            self.notice = mode.hint().into();
+        } else {
+            self.notice =
+                "Este módulo ainda não está disponível. Escolha Feature, QA ou Conversa.".into();
+        }
+    }
     fn history_matches(&self) -> Vec<String> {
         let query = self.history_query.to_lowercase();
         self.transcript
@@ -85,6 +142,7 @@ struct Pending {
     handle: JoinHandle<Result<Value>>,
     route: String,
     draft: String,
+    qa_cancel: Option<tokio::sync::watch::Sender<bool>>,
 }
 struct Restore;
 impl Drop for Restore {
@@ -125,6 +183,7 @@ fn start(app: &Arc<App>, route: &str, mut payload: Action, draft: String) -> Pen
         }),
         route: route.into(),
         draft,
+        qa_cancel: None,
     }
 }
 fn busy_label(route: &str) -> &'static str {
@@ -134,6 +193,11 @@ fn busy_label(route: &str) -> &'static str {
         "sessions" => "Criando conversa…",
         "interrupt" => "Interrompendo resposta…",
         "approval" => "Enviando sua decisão…",
+        "workflow/plan" => "Planejando a funcionalidade…",
+        "workflow/qa" => "Preparando a cobertura QA…",
+        "workflow/qa-run" => "Executando verificações QA…",
+        "workflow/qa-status" => "Consultando evidências QA…",
+        "workflow/run" => "Iniciando o escopo revisado…",
         _ => "Enviando mensagem…",
     }
 }
@@ -158,6 +222,7 @@ pub async fn run(root: &Path, state: &Path, executable: Option<PathBuf>) -> Resu
     execute!(stdout(), EnableBracketedPaste, EnableMouseCapture)?;
     let mut chat = Chat {
         busy: "connect".into(),
+        panel: Some(Panel::Modes),
         ..Default::default()
     };
     let connected_app = app.clone();
@@ -168,14 +233,26 @@ pub async fn run(root: &Path, state: &Path, executable: Option<PathBuf>) -> Resu
         }),
         route: "connect".into(),
         draft: String::new(),
+        qa_cancel: None,
     });
     let result = tokio::select! {
         result = run_loop(&app, &mut terminal, &mut chat, &mut pending) => result,
         _ = shutdown_signal() => Ok(()),
     };
-    if let Some(p) = pending {
-        p.handle.abort();
-        let _ = p.handle.await;
+    if let Some(mut p) = pending {
+        if let Some(cancel) = p.qa_cancel.take() {
+            let _ = cancel.send(true);
+            if tokio::time::timeout(Duration::from_secs(8), &mut p.handle)
+                .await
+                .is_err()
+            {
+                p.handle.abort();
+                let _ = p.handle.await;
+            }
+        } else {
+            p.handle.abort();
+            let _ = p.handle.await;
+        }
     }
     app.stop_forge().await;
     if let Some(n) = app.native.write().await.take() {
@@ -214,13 +291,7 @@ async fn run_loop(
                     }
                     chat.notice.clear();
                     if p.route.starts_with("workflow/") {
-                        if let Some(id) = v["workflow_id"].as_str() {
-                            chat.workflow_id = id.into();
-                        }
-                        if let Some(digest) = v["scope_digest"].as_str() {
-                            chat.workflow_digest = digest.into();
-                        }
-                        chat.workflow = v;
+                        chat.workflow_result(v);
                         chat.open_panel(Panel::Workflow);
                     }
                 }
@@ -239,6 +310,13 @@ async fn run_loop(
         let loaded = session.is_some_and(|s| s.loaded);
         let sessions = view.sessions.keys().cloned().collect::<Vec<_>>();
         drop(view);
+        let workflow_active = app
+            .forge_run
+            .lock()
+            .await
+            .as_ref()
+            .is_some_and(|h| !h.is_finished());
+        chat.workflow_running = workflow_active;
         chat.tick = chat.tick.wrapping_add(1);
         // poll/read are called from this same thread only and never block a native RPC.
         if !event::poll(Duration::ZERO)? {
@@ -336,6 +414,10 @@ async fn run_loop(
                     }
                     continue;
                 }
+                if key.code == KeyCode::F(3) {
+                    chat.open_panel(Panel::Modes);
+                    continue;
+                }
                 if key.code == KeyCode::PageUp || key.code == KeyCode::PageDown {
                     if chat.panel.is_some() {
                         chat.panel_scroll = if key.code == KeyCode::PageDown {
@@ -361,6 +443,36 @@ async fn run_loop(
                 if let Some(panel) = chat.panel {
                     if key.code == KeyCode::Esc {
                         chat.panel = None;
+                        continue;
+                    }
+                    if panel == Panel::Modes {
+                        match key.code {
+                            KeyCode::Up => {
+                                chat.panel_selection = chat.panel_selection.saturating_sub(1)
+                            }
+                            KeyCode::Down => {
+                                chat.panel_selection =
+                                    (chat.panel_selection + 1).min(modes::OPTIONS.len() - 1)
+                            }
+                            KeyCode::Enter => chat.select_mode(
+                                chat.panel_selection,
+                                active
+                                    || workflow_active
+                                    || pending.as_ref().is_some_and(|p| {
+                                        p.route != "connect" && p.route != "reconnect"
+                                    }),
+                            ),
+                            _ => {}
+                        }
+                        continue;
+                    }
+                    if panel == Panel::Workflow
+                        && key.code == KeyCode::Enter
+                        && let Some(command) = chat.reviewed_run_command()
+                    {
+                        chat.editor.set(command);
+                        chat.panel = None;
+                        chat.notice = "Comando preparado. Enter autoriza executar o plano revisado; Ctrl+C cancela o rascunho.".into();
                         continue;
                     }
                     if panel == Panel::Activities {
@@ -490,6 +602,11 @@ async fn run_loop(
                 // Local commands remain available while a native request is pending.
                 if key.code == KeyCode::Enter {
                     match chat.editor.text.trim() {
+                        "/mode" | "/modo" => {
+                            chat.editor.clear();
+                            chat.open_panel(Panel::Modes);
+                            continue;
+                        }
                         "/help" => {
                             chat.editor.clear();
                             chat.open_panel(Panel::Help);
@@ -519,6 +636,13 @@ async fn run_loop(
                         _ => {}
                     }
                 }
+                if let Some(cancel) = pending.as_ref().and_then(|p| p.qa_cancel.as_ref())
+                    && (key.code == KeyCode::Esc || ctrl && key.code == KeyCode::Char('c'))
+                {
+                    let _ = cancel.send(true);
+                    chat.notice = "Cancelando checks QA; aguarde a evidência final.".into();
+                    continue;
+                }
                 if pending.is_some() {
                     if key.code != KeyCode::Enter {
                         chat.editor.edit(key);
@@ -526,9 +650,18 @@ async fn run_loop(
                     continue;
                 }
                 if key.code == KeyCode::Enter {
-                    let text = chat.editor.text.trim().to_owned();
+                    let text = chat.mode.route(chat.editor.text.trim());
                     match workflows::pending(app, chat, &text) {
                         Ok(Some(p)) => {
+                            if ["workflow/plan", "workflow/bug", "workflow/qa"]
+                                .contains(&p.route.as_str())
+                            {
+                                chat.workflow = Value::Null;
+                                chat.workflow_id.clear();
+                                chat.workflow_digest.clear();
+                                chat.qa_id.clear();
+                                chat.qa_digest.clear();
+                            }
                             chat.busy = p.route.clone();
                             chat.editor.clear();
                             *pending = Some(p);
@@ -709,6 +842,61 @@ pub fn choose_project(projects: &[PathBuf]) -> Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn mode_selection_is_local_and_never_reuses_previous_scope() {
+        let mut chat = Chat {
+            workflow_id: "old".into(),
+            workflow_digest: "old-digest".into(),
+            panel: Some(Panel::Modes),
+            ..Default::default()
+        };
+        chat.select_mode(2, false);
+        assert_eq!(chat.mode, modes::Mode::Conversation);
+        assert_eq!(chat.workflow_digest, "old-digest");
+        assert!(chat.panel == Some(Panel::Modes));
+        chat.select_mode(0, true);
+        assert_eq!(chat.mode, modes::Mode::Conversation);
+        chat.select_mode(0, false);
+        assert_eq!(chat.mode, modes::Mode::Feature);
+        assert!(chat.workflow_digest.is_empty() && chat.workflow_id.is_empty());
+        assert!(chat.panel.is_none());
+        assert_eq!(chat.mode.route("add greeting"), "/plan add greeting");
+        assert_eq!(chat.mode.route("/status"), "/status");
+        chat.select_mode(1, false);
+        assert_eq!(
+            chat.mode.route("/private/tmp/my manifest.json"),
+            "/qa /private/tmp/my manifest.json"
+        );
+        assert_eq!(chat.mode.route("/mode"), "/mode");
+        chat.select_mode(4, false);
+        assert_eq!(chat.mode.route("hello"), "hello");
+    }
+    #[test]
+    fn mode_picker_renders_availability_and_narrow_sizes() {
+        for (w, h) in [(100, 30), (42, 16), (20, 5)] {
+            let mut terminal =
+                ratatui::Terminal::new(ratatui::backend::TestBackend::new(w, h)).unwrap();
+            let mut chat = Chat {
+                panel: Some(Panel::Modes),
+                ..Default::default()
+            };
+            terminal
+                .draw(|f| chat.draw(f, &View::default(), Path::new("/project")))
+                .unwrap();
+            if w == 100 {
+                let text = terminal
+                    .backend()
+                    .buffer()
+                    .content
+                    .iter()
+                    .map(|c| c.symbol())
+                    .collect::<String>();
+                for label in ["Escolha o modo", "Feature", "QA", "em breve", "Conversa"] {
+                    assert!(text.contains(label), "{text}");
+                }
+            }
+        }
+    }
     #[test]
     fn narrow_render_never_panics_and_keeps_offline_state_visible() {
         for (w, h) in [(80, 24), (42, 16), (20, 5)] {

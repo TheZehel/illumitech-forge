@@ -17,6 +17,7 @@ As notas e a cobertura ficam em [release 1.2.0](docs/release-v1.2.0.md).
 
 ## O que está implementado
 
+- [Módulos de desenvolvimento](docs/development-modules.md): feature com preparação, execução, validação por tarefa e retomada; QA leve, padrão ou intensivo com comandos revisados e cobertura observada.
 - Estimativas locais de trabalho ativo, com faixa, confiança, histórico e comparação com o realizado.
 - Medição de tokens, contexto seletivo e limites de tempo, tentativas e concorrência.
 - Workbench local: conta gerenciada do Codex, conversas, streaming, decisões, retomada e evidências.

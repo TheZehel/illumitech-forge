@@ -15,7 +15,10 @@
     "installation_path_diagnostics": 1,
     "workflow": 1,
     "delivery_comparison": 1,
-    "sarif_import": 1
+    "sarif_import": 1,
+    "development_module_plan": 1,
+    "feature_module_workflow": 1,
+    "qa_execution": 1
   },
   "compatibility": {
     "readers": "Ignore unknown output fields; reject unsupported schema versions. Input contracts reject unknown fields.",

@@ -15,6 +15,7 @@ See [1.2.0 release notes](docs/release-v1.2.0.md) for validation and operational
 
 ## Features
 
+- [Development modules](docs/development-modules.md): scoped feature preparation, execution, per-task validation and resume; light, standard or intensive QA with explicit reviewed commands and observed coverage.
 Duration ranges/history; measured tokens and bounded context; local native chat and project
 sessions; guided specs and structured DAG proposals; versioned templates; execution controls,
 revision-bound approval, budgets and conservative gate caching; parallel existing worktrees;

@@ -5,6 +5,22 @@ pub(super) struct Command {
 }
 pub(super) const COMMANDS: &[Command] = &[
     Command {
+        name: "mode",
+        description: "Escolher Feature, QA ou Conversa",
+    },
+    Command {
+        name: "qa",
+        description: "Preparar QA: /qa REQUEST; legado: /qa NÍVEL MANIFEST",
+    },
+    Command {
+        name: "qa-run",
+        description: "Confirmar o escopo QA revisado: /qa-run DIGEST",
+    },
+    Command {
+        name: "qa-status",
+        description: "Consultar evidências QA sem executar: /qa-status [ID]",
+    },
+    Command {
         name: "bug",
         description: "Corrigir um bug: descrever, revisar regressão e autorizar /run",
     },
@@ -80,6 +96,7 @@ pub(super) fn matching(text: &str) -> Vec<Command> {
 }
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum Panel {
+    Modes,
     Help,
     Status,
     Sessions,

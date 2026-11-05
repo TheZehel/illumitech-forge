@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "001-greeting",
+  "title": "Add a greeting",
+  "request": "Create greeting.txt with exactly Hello followed by a newline. Preserve all unrelated files.",
+  "recipe": "feature",
+  "proposal": {
+    "schema_version": 1,
+    "id": "001-greeting",
+    "title": "Add a greeting",
+    "summary": "Deliver a small observable feature with an external check.",
+    "tasks": [{
+      "id": "greeting",
+      "title": "Create the greeting",
+      "dependencies": [],
+      "acceptance": [{
+        "id": "greeting-content",
+        "description": "greeting.txt contains exactly Hello and a newline",
+        "command": ["python3", "{checks}/verify.py", "{repo}"]
+      }]
+    }]
+  },
+  "checks": [{
+    "id": "greeting-content",
+    "argv": ["python3", "{checks}/verify.py", "{repo}"],
+    "task_ids": ["greeting"],
+    "timeout_seconds": 10
+  }],
+  "files": {
+    "verify.py": "import pathlib, sys\np = pathlib.Path(sys.argv[1]) / 'greeting.txt'\nsys.exit(0 if p.is_file() and p.read_bytes() == b'Hello\\n' else 1)\n"
+  }
+}

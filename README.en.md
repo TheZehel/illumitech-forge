@@ -5,7 +5,7 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.5.0.** Terminal reading stays anchored during streaming and resizing, with mouse/trackpad scrolling, PgUp/PgDn and Ctrl+Home/End. A compact header, footer and editor leave more room for conversation. See the [release notes](docs/release-v1.5.0.md). Availability and checksums are recorded in [GitHub releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
+**Illumitech Forge 1.6.0.** Terminal reading stays anchored during streaming and resizing, with mouse/trackpad scrolling, PgUp/PgDn and Ctrl+Home/End. A compact header, footer and editor leave more room for conversation. See the [release notes](docs/release-v1.6.0.md). Availability and checksums are recorded in [GitHub releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
@@ -15,6 +15,7 @@ See [1.2.0 release notes](docs/release-v1.2.0.md) for validation and operational
 
 ## Features
 
+- [Development modules](docs/development-modules.md): scoped feature preparation, execution, per-task validation and resume; light, standard or intensive QA with explicit reviewed commands and observed coverage.
 Duration ranges/history; measured tokens and bounded context; local native chat and project
 sessions; guided specs and structured DAG proposals; versioned templates; execution controls,
 revision-bound approval, budgets and conservative gate caching; parallel existing worktrees;
@@ -29,7 +30,7 @@ No paid API fallback or permission bypass is introduced.
 ## Start with the published release
 
 ```sh
-cargo install illumitech-forge-cli --version 1.5.0 --locked
+cargo install illumitech-forge-cli --version 1.6.0 --locked
 forge --version
 forge
 ```
@@ -39,7 +40,7 @@ separately for conversations; its account, model and permissions are preserved. 
 interface needs no `init`, ai-memory, Python or Node. Free chat is read-only; implementation
 execution requires a reviewed manifest.
 
-Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.5.0)
+Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.6.0)
 needs no Rust compiler. The GitHub repository and crate source are public under MIT.
 See the [quickstart](docs/quickstart.md) for installation, version/PATH checks and Workbench.
 

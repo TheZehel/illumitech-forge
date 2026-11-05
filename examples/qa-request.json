@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "065-format-review",
+  "title": "Review Rust formatting with explicit coverage gaps",
+  "level": "light",
+  "checks": [
+    {
+      "id": "rust-format",
+      "coverage_id": "QA-QUALITY",
+      "argv": [
+        "sh",
+        "/operator/qa/quality.sh",
+        "{repo}"
+      ],
+      "timeout_seconds": 60,
+      "inputs": {
+        "/operator/qa/quality.sh": "b0e4f9ad06d89af167856a7c13d2e13061a5a2654b6b18d6c9a3868f6dc2d9e2"
+      },
+      "format": "text"
+    }
+  ]
+}
