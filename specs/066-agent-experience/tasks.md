@@ -14,5 +14,5 @@ Host-pilot limitations and the resolved initial automatic review rejection are d
 in validation.md. Remaining editor pilots are tracked in #12.
 
 - [x] F066-HOST-VSCODE Visual discovery and terminal pilot: approved by the user and observed in an isolated VS Code profile; full model-driven IDE workflow remains untested.
-- [ ] F066-HOST-VSCODE-FLOW Complete model-driven IDE workflow with external checks. Tracks #12.
-- [ ] F066-HOST-CURSOR Visual discovery and main-flow pilot: Cursor is not installed on this machine. Tracks #12.
+- [x] F066-HOST-VSCODE-FLOW A bounded model-driven Feature passed through the Codex extension, with initial/final external gates, current status/checkpoint, exact bytes and preservation readback. Tracks #12.
+- [x] F066-HOST-CURSOR A temporary official Cursor 3.29.9 profile discovered the project skill in the Codex extension and completed the bounded native Feature with two external gates, exact bytes, preservation and current status/checkpoint. Tracks #12; native Cursor/Grok and directory installation remain separate.

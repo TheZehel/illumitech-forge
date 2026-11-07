@@ -71,3 +71,30 @@ state that the IDE extension does not support plugins (https://learn.chatgpt.com
 Directory submissions and Cursor
 acceptance remain separate stages. The remaining model-driven editor pilots are tracked
 in [#12](https://github.com/TheZehel/illumitech-forge/issues/12).
+
+## Post-publication VS Code Feature pilot
+
+The published v1.7.0 macOS binary was operated through the Codex VS Code extension in the
+disposable project. The first pass stopped on PATH attention. A reviewed process-only PATH
+selected the verified binaries and existing native client without changing global settings.
+The next pass found the fixture's missing HEAD; the operator initialized only that disposable
+repository. This gap produced the F067 diagnosis patch.
+
+Preview then passed. Apply initially stopped on the editor's external-directory permission.
+Normal per-command approvals allowed the exact reviewed apply/start scope. The native
+Codex Feature passed in one attempt, with initial and final external greeting checks.
+Independent operator readback confirmed greeting.txt = Hello followed by one newline,
+all eight preservation hashes, unchanged fixture HEAD and current passing Forge evidence.
+Status/checkpoint confirmed completion without replay. This validates a bounded local
+Feature through the IDE; it does not establish every module, platform or directory install.
+
+A signed and notarized official Cursor 3.29.9 build was prepared in a temporary profile.
+The user completed Cursor login and, after unreliable automated window control, the
+extension's initial tour. The Codex selector displayed Illumitech Forge with Project scope.
+The same bounded native Feature then passed in one attempt, including initial/final external
+checks, exact greeting bytes, all eight preservation hashes, unchanged HEAD and current
+passing status/checkpoint. The installed VS Code build was 1.109.2; native Codex CLI was
+0.167.0. Active extension renderer builds were not independently fingerprinted, so the
+receipts retain that version uncertainty. The native Cursor/Grok chat was not used.
+No plugin-directory installation, other operating system or broader module acceptance is
+inferred. Sanitized source/binary/gate bindings are in host-pilots.json.

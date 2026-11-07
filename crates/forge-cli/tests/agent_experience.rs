@@ -91,3 +91,141 @@ fn doctor_distinguishes_missing_client_without_writing_or_inference() {
     assert!(!marker.exists());
     assert!(!repo.join(".forge-state").exists());
 }
+
+#[test]
+#[cfg(unix)]
+fn doctor_requires_a_git_revision_without_committing_or_running_inference() {
+    use std::os::unix::fs::{PermissionsExt, symlink};
+    let tmp = tempfile::tempdir().unwrap();
+    let base = tmp.path().canonicalize().unwrap();
+    let bin = base.join("bin");
+    let repo = base.join("project");
+    fs::create_dir(&bin).unwrap();
+    fs::create_dir(&repo).unwrap();
+    let git = Command::new("which").arg("git").output().unwrap();
+    let git = String::from_utf8(git.stdout).unwrap();
+    let git = git.trim();
+    symlink(git, bin.join("git")).unwrap();
+    for name in ["forge", "illumitech-forge"] {
+        symlink(env!("CARGO_BIN_EXE_forge"), bin.join(name)).unwrap();
+    }
+    let marker = base.join("inference-was-started");
+    fs::write(
+        bin.join("codex"),
+        format!(
+            "#!/bin/sh\ncase \"$*\" in\n'--version') echo 'codex-cli fixture';;\n'login status') echo 'Logged in using ChatGPT';;\n*) /usr/bin/touch '{}'; exit 1;;\nesac\n",
+            marker.display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(bin.join("codex"), fs::Permissions::from_mode(0o700)).unwrap();
+    assert!(
+        Command::new(git)
+            .args(["init", "-q"])
+            .current_dir(&repo)
+            .status()
+            .unwrap()
+            .success()
+    );
+    fs::write(repo.join("preserved.txt"), b"keep\n").unwrap();
+    let diagnose = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_forge"))
+            .args(["--json", "workflow", "doctor", "--root"])
+            .arg(&repo)
+            .env("PATH", &bin)
+            .output()
+            .unwrap();
+        (
+            output.status.code(),
+            serde_json::from_slice::<Value>(&output.stdout).unwrap(),
+        )
+    };
+    let (exit, value) = diagnose();
+    assert_eq!(exit, Some(2));
+    let revision = value["checks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["id"] == "git_revision")
+        .unwrap();
+    assert_eq!(revision["status"], "missing");
+    assert_eq!(revision["passed"], false);
+    assert_eq!(revision["action"]["requires_review"], true);
+    assert!(revision["action"]["argv"].is_null());
+    assert!(
+        revision["action"]["reason"]
+            .as_str()
+            .unwrap()
+            .contains("initial Git commit")
+    );
+    assert!(
+        !Command::new(git)
+            .args(["rev-parse", "--verify", "HEAD"])
+            .current_dir(&repo)
+            .output()
+            .unwrap()
+            .status
+            .success()
+    );
+    assert!(
+        Command::new(git)
+            .args([
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=fixture@example.invalid",
+                "-c",
+                "core.hooksPath=/dev/null",
+                "-c",
+                "commit.gpgSign=false",
+                "commit",
+                "--allow-empty",
+                "-qm",
+                "Initialize disposable fixture"
+            ])
+            .current_dir(&repo)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let (exit, value) = diagnose();
+    assert_eq!(exit, Some(0));
+    assert_eq!(value["status"], "passed");
+    assert!(
+        value["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|c| c["id"] == "git_revision" && c["passed"] == true)
+    );
+    assert_eq!(value["native_inference_calls"], 0);
+    fs::remove_file(bin.join("git")).unwrap();
+    let quoted_git = git.replace('\'', "'\\''");
+    fs::write(
+        bin.join("git"),
+        format!(
+            "#!/bin/sh\ncase \"$*\" in\n'rev-parse --verify --quiet HEAD^{{commit}}') exit 42;;\n*) exec '{quoted_git}' \"$@\";;\nesac\n"
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(bin.join("git"), fs::Permissions::from_mode(0o700)).unwrap();
+    let (exit, value) = diagnose();
+    assert_eq!(exit, Some(2));
+    let revision = value["checks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["id"] == "git_revision")
+        .unwrap();
+    assert_eq!(revision["status"], "unverified");
+    assert!(
+        !revision["action"]["reason"]
+            .as_str()
+            .unwrap()
+            .contains("initial Git commit")
+    );
+    assert!(!marker.exists());
+    assert!(!repo.join(".forge-state").exists());
+    assert!(!repo.join("specs").exists());
+    assert_eq!(fs::read(repo.join("preserved.txt")).unwrap(), b"keep\n");
+}

@@ -16,6 +16,10 @@ FEATURE_ID --root /project --ops-root /ops --approve-scope REVIEWED_DIGEST` unde
 exact-scope authorization. Status/checkpoint read evidence; resume reloads the same journal.
 Prepare/checkpoint text is not execution or acceptance.
 
+An editor sandbox may require its normal per-command approval to write the reviewed external
+ops directory. Request that scoped approval when authorized; do not move evaluators into
+the project or disable the sandbox. A denied or unavailable approval remains a blocker.
+
 For QA, inspect `modules qa discover --root /project`, review suggestions against the actual
 stack, and write a schema-1 request with id, title, level and explicit checks. Each check has
 id, coverage_id, argv, timeout_seconds (1..600), pinned absolute external input hashes and

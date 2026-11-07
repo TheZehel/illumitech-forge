@@ -12,6 +12,11 @@ build or wait for release. Never present an unpublished version as available on 
 The source build is `cargo build --locked -p illumitech-forge-cli --bins`; it does not install.
 Cargo needs Rust 1.94.0. Native Codex is installed and authenticated separately; no model/API fallback.
 
+Feature preparation needs an existing Git project with at least one commit. If the project
+has no HEAD, explain that an initial commit needs the operator's review; do not create one
+implicitly. Published 1.7.0 diagnostics may report the project as available before preparation
+finds this missing revision.
+
 For an existing project:
 
 ```
@@ -20,6 +25,10 @@ forge --json workflow doctor --root /absolute/project
 ```
 
 Inspect each check, installation.path_diagnostics, platform limitations and onboarding paths.
+When PATH attention blocks diagnosis, review the selected paths. For a disposable pilot,
+an explicitly reviewed process-only PATH may select the verified Forge and native client
+without competing installations. Keep global PATH and existing binaries unchanged unless
+the user requested an installation change; never treat a warning as a passed check.
 Do not run candidates found on PATH merely to discover their versions. Doctor does bounded
 native version/login-status checks; it does not run inference, install tools or authenticate.
 

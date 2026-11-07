@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "base_version": "1.6.0",
+  "base_version": "1.7.0",
   "changes": [
     {
-      "id": "F066",
-      "kind": "feature",
-      "summary": "Guided prerequisites, parser-derived command discovery, typed diagnostics, durable continuity and portable agent skill"
+      "id": "F067",
+      "kind": "fix",
+      "summary": "Explain the missing initial Git revision before Feature preparation and align first-run skill guidance"
     }
   ]
 }

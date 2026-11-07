@@ -106,5 +106,6 @@ Version 1.7.0 adds first-run diagnostics, command discovery, operational explana
 continuity shared by the CLI, Workbench and a portable skill.
 [Setup, contracts and pilot limits](docs/agent-experience.md) ·
 [Release notes](docs/release-v1.7.0.md).
-Codex executes agents. Skill discovery was observed in Codex CLI and the Codex VS Code
-extension; the complete model-driven editor workflow and the Cursor pilot remain pending.
+Codex executes agents. The skill was discovered in Codex CLI and the Codex extension in
+VS Code and Cursor. A small Feature passed in each editor with external gates and independent
+preservation checks. Directory installation and other flows need their own evidence.

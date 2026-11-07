@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "observed_date": "2026-11-07",
+  "evaluated_release": "1.7.0",
+  "source_commit": "e0658e10c959ca578c43b0b372a86121c159eb57",
+  "forge_sha256": "08720a46d0206f1861a6f0f3041c84fe46bfd3f682c344d93c85667b13400157",
+  "skill_archive_sha256": "de39cb3fea6711cb6eabbcc05ad61acefc428643eceaa71956daab6a77ef1220",
+  "native_executor": "codex-cli 0.167.0; existing native account/model/permissions",
+  "platform": "macOS ARM64",
+  "hosts": [
+    {
+      "host": "Visual Studio Code",
+      "installed_host_version": "1.109.2",
+      "interface": "OpenAI Codex extension with standalone project skill",
+      "active_extension_version": null,
+      "extension_version_scope": "active renderer build not independently fingerprinted",
+      "status": "passed",
+      "feature_id": "002-vscode-greeting",
+      "attempts": 1,
+      "completed": 1,
+      "evidence_current": true,
+      "preserved_files": 8,
+      "preservation_readback": "passed",
+      "fixture_HEAD_unchanged": true,
+      "status_checkpoint": "passed/completed; no replay",
+      "external_gates": [
+        {
+          "phase": "final",
+          "exit": 0,
+          "log_sha256": "510c4bd43063a175d5b12cbcbc8000983a01f5886e08bf1195d6b93d060615dc"
+        },
+        {
+          "phase": "initial",
+          "exit": 0,
+          "log_sha256": "be80115515432e274e7032c1e8119c542ff29293447615ec72627ba70fde545c"
+        }
+      ],
+      "expected_greeting_hex": "48656c6c6f0a",
+      "observed_greeting_sha256": "66a045b452102c59d840ec097d59d9467e13a3f34f6494e539ffd32c1bb35f18"
+    },
+    {
+      "host": "Cursor",
+      "installed_host_version": "3.29.9",
+      "interface": "OpenAI Codex extension with standalone project skill",
+      "active_extension_version": null,
+      "extension_version_scope": "active renderer build not independently fingerprinted",
+      "status": "passed",
+      "feature_id": "001-cursor-greeting",
+      "attempts": 1,
+      "completed": 1,
+      "evidence_current": true,
+      "preserved_files": 8,
+      "preservation_readback": "passed",
+      "fixture_HEAD_unchanged": true,
+      "status_checkpoint": "passed/completed; no replay",
+      "external_gates": [
+        {
+          "phase": "final",
+          "exit": 0,
+          "log_sha256": "5b457f1063f263ac1411d246f0d591448487ee736e2555b0c250e6372861bf77"
+        },
+        {
+          "phase": "initial",
+          "exit": 0,
+          "log_sha256": "b364750858d066fb64f449ae0f3404ed1c0409e0aaecfaa41512d0da7cbf8f7b"
+        }
+      ],
+      "expected_greeting_hex": "48656c6c6f0a",
+      "observed_greeting_sha256": "66a045b452102c59d840ec097d59d9467e13a3f34f6494e539ffd32c1bb35f18"
+    }
+  ],
+  "user_assistance": [
+    "normal login and extension tour",
+    "operator initialized only the unborn disposable VS Code fixture",
+    "normal per-command approvals for reviewed external ops writes"
+  ],
+  "global_changes": "no global Forge installation, PATH or sandbox configuration changes",
+  "limits": [
+    "bounded local Feature only",
+    "native Cursor/Grok agent not tested",
+    "plugin-directory installation not tested",
+    "no other operating system acceptance",
+    "published 1.7.0 artifacts remain immutable"
+  ]
+}

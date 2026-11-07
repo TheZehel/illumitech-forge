@@ -7,10 +7,13 @@ Packages and successful tests alone do not establish acceptance in every host or
 ## First run / Primeira execução
 
 Inside an existing Git project, run `forge --json workflow doctor --root .`.
-It reports project/Git, native client and authentication prerequisites, the running version,
-PATH attention, platform uncertainty and per-check actions. Checks run only version/login
-status probes, with bounded timeouts; there is no inference, login, installation or state
-creation. `forge installation doctor` never runs other binaries found on PATH.
+It reports project/Git, native client and authentication prerequisites, the Git revision
+needed by Feature preparation, the running version, PATH attention and platform uncertainty.
+An unborn repository needs an initial commit reviewed by its operator; doctor never creates
+that commit. Published version 1.7.0 predates the separate git_revision check and can first
+expose this absence during preparation. Version/login-status and Git revision probes have
+bounded timeouts; there is no inference, login, installation or state creation.
+`forge installation doctor` never runs other binaries found on PATH.
 
 There are two routes. **Demo:** only Git, new directory, then inspect the command arrays
 returned by `forge --json demo create NEW_DIRECTORY`; inspect/dry-run precede execution.
@@ -82,11 +85,20 @@ They must match workspace/plugin versions. Rebuilding identical inputs produces 
 bytes. Existing output directories are refused. The ordinary binary packaging script includes
 these docs and skill source; the skill ZIPs are additional release assets.
 
-Codex CLI discovery and a disposable native Feature workflow passed. A separate VS Code
-pilot observed the project skill in the Codex selector and Forge 1.7.0 in the integrated
-terminal, using an isolated profile. It did not send a model prompt or test a complete
-model-driven IDE workflow or plugin directory installation. Cursor was not installed and
-has no host acceptance. See [release evidence](../specs/066-agent-experience/validation.md).
+Codex CLI discovery and a disposable native Feature workflow passed. The first isolated
+VS Code pilot observed project-skill discovery and terminal access. A post-publication
+pilot then completed a bounded Feature through the Codex extension using the published
+macOS binary: initial and final external gates passed, exact greeting bytes and all eight
+preserved files were independently checked, and status/checkpoint reported current evidence.
+The editor's normal per-command approvals allowed the reviewed external ops directory.
+
+The same bounded flow passed in a temporary Cursor 3.29.9 profile through the Codex extension:
+project-skill discovery, native Feature execution, both external gates, exact bytes,
+preservation and current status/checkpoint. The user completed login and the extension tour.
+Native Cursor chat and the Codex extension are distinct interfaces; the native Cursor/Grok
+agent was not used. Plugin-directory installation was not tested. This evidence covers those
+small local Feature flows, rather than every module or platform. See
+[host evidence](../specs/066-agent-experience/validation.md) and issue #12.
 
 ## Release and feedback
 

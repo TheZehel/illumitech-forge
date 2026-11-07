@@ -131,5 +131,6 @@ A versão 1.7.0 reúne diagnóstico da primeira execução, descoberta de comand
 operacionais e continuidade compartilhada entre CLI, Workbench e uma skill portátil.
 [Instalação, contratos e limites dos pilotos](docs/agent-experience.md) ·
 [Notas da versão](docs/release-v1.7.0.md).
-O Codex executa os agentes. A descoberta da skill foi observada no Codex CLI e na extensão
-Codex do VS Code; o fluxo completo por modelo dentro do editor e o Cursor seguem pendentes.
+O Codex executa os agentes. A skill foi descoberta no Codex CLI e na extensão Codex dos
+editores VS Code e Cursor. Uma Feature pequena passou em cada editor, com gates externos
+e preservação conferida. Instalação por diretório e outros fluxos precisam de evidências próprias.

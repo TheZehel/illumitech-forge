@@ -65,6 +65,43 @@ pub async fn doctor(root: &Path) -> Result<Value> {
         };
         checks.push(json!({"id":id,"passed":passed,"status":status,"reason":reason,"action":action(if passed { "No action required for this prerequisite" } else { guidance },None,!passed)}));
     }
+    let (revision_available, revision_status) = if project.is_ok() {
+        let argv = vec![
+            "git".into(),
+            "rev-parse".into(),
+            "--verify".into(),
+            "--quiet".into(),
+            "HEAD^{commit}".into(),
+        ];
+        match forge_adapters::process::run(&argv, &cwd, 10, signals.receiver.clone()).await {
+            Ok(r) if r.passed() => (true, "available"),
+            Ok(r) if r.code == Some(1) && r.reason == "exited" && !r.truncated => {
+                (false, "missing")
+            }
+            Ok(_) => (false, "unverified"),
+            Err(_) => (false, "unverified"),
+        }
+    } else {
+        (false, "not_run")
+    };
+    let (revision_reason, revision_action) = match revision_status {
+        "available" => (
+            "An existing Git commit is available",
+            "No action required for this prerequisite",
+        ),
+        "missing" => (
+            "Feature preparation requires an existing Git commit",
+            "Review and create the initial Git commit in the intended project before preparing a Feature; Forge will not commit automatically",
+        ),
+        _ => (
+            "The selected project's Git revision was not verified",
+            "Check the selected project and Git access before preparing a Feature; doctor made no changes",
+        ),
+    };
+    checks.push(
+        json!({"id":"git_revision","passed":revision_available,"status":revision_status,
+        "reason":revision_reason,"action":action(revision_action,None,!revision_available)}),
+    );
     let install = installation::dispatch(&installation::Command::Doctor).await?;
     let paths = install["path_diagnostics"]["commands"]
         .as_array()
@@ -84,7 +121,7 @@ pub async fn doctor(root: &Path) -> Result<Value> {
           "reason":"Host detection is not native-account or editor acceptance; consult the release evidence matrix"},
         "onboarding":{"schema_version":1,"paths":[
           {"id":"demo","requirements":["git"],"next_action":"forge demo create NEW_DIRECTORY; inspect the returned command arrays before running them"},
-          {"id":"feature","requirements":["git","project","client","authentication"],"next_action":"Review a Feature request, prepare it, then authorize its exact scope"}],
+          {"id":"feature","requirements":["git","project","git_revision","client","authentication"],"next_action":"Review a Feature request, prepare it, then authorize its exact scope"}],
           "installation":"Choose a verified platform artifact or build from source. Install only when requested; never change native account/model settings."},
         "next_action":if healthy{"Review your workflow before execution"}else{"Resolve each missing prerequisite, then rerun this read-only diagnostic"}});
     if !healthy {
