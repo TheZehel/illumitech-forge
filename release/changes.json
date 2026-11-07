@@ -1,16 +1,11 @@
 {
   "schema_version": 1,
-  "base_version": "1.5.0",
+  "base_version": "1.6.0",
   "changes": [
     {
-      "id": "F064",
+      "id": "F066",
       "kind": "feature",
-      "summary": "Interactive module selector and scoped feature execution with context handoff"
-    },
-    {
-      "id": "F065",
-      "kind": "feature",
-      "summary": "Reviewed QA execution with observed coverage, external evidence and terminal confirmation"
+      "summary": "Guided prerequisites, parser-derived command discovery, typed diagnostics, durable continuity and portable agent skill"
     }
   ]
 }

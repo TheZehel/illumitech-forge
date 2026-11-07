@@ -11,7 +11,7 @@ test.beforeAll(async () => {
     await writeFile(join(app, 'preserved.txt'), 'keep');
     const bin = join(directory, 'bin'); await mkdir(bin);
     await writeFile(join(bin, 'codex'), '#!/usr/bin/env python3\nimport json\nfrom pathlib import Path\nPath("output.txt").write_text("verified")\nprint(json.dumps({"type":"thread.started","thread_id":"fixture"}))\nprint(json.dumps({"type":"turn.completed","usage":{"input_tokens":10,"cached_input_tokens":0,"output_tokens":2}}))\n'); await chmod(join(bin, 'codex'), 0o700);
-    child = spawn(resolve('../../target/debug/forge'), ['--json', '--state-dir', join(directory, 'state'), 'workbench', '--root', app, '--port', '0', '--app-server', resolve('../../crates/forge-cli/tests/fixtures/workbench-native.py')], { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PATH: `${bin}:${process.env.PATH ?? ''}` } });
+    child = spawn(process.env.FORGE_TEST_BINARY || resolve('../../target/debug/forge'), ['--json', '--state-dir', join(directory, 'state'), 'workbench', '--root', app, '--port', '0', '--app-server', resolve('../../crates/forge-cli/tests/fixtures/workbench-native.py')], { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PATH: `${bin}:${process.env.PATH ?? ''}` } });
     url = await new Promise<string>((yes, no) => { let output = ''; const timer = setTimeout(() => no(new Error('startup timeout')), 20000); child.stdout?.on('data', d => { output += String(d); for (const line of output.split('\n')) { try { const v: unknown = JSON.parse(line); if (typeof v === 'object' && v !== null && 'url' in v && typeof v.url === 'string') { clearTimeout(timer); yes(v.url); } } catch { /* wait for a complete frame */ } } }); child.once('exit', code => { clearTimeout(timer); no(new Error(`server exited ${code}`)); }); });
 });
 test.afterAll(async () => { child?.kill('SIGTERM'); await new Promise<void>(yes => { if (child?.exitCode !== null) yes(); else { child?.once('exit', () => yes()); setTimeout(yes, 6000); } }); if (directory) await rm(directory, { recursive: true, force: true }); });
@@ -35,6 +35,7 @@ test('one scope consent executes, reports and survives reload without replay', a
     await page.getByLabel('Retomar tarefa existente').selectOption('001-minha-tarefa');
     await expect(page.getByText('Estado: passed', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Aprovar escopo e executar' })).toBeDisabled();
+    await expect(page.getByLabel('Diagnóstico e continuidade')).toContainText('Create output.txt with verified and preserve preserved.txt.');
     await writeFile(join(app, 'output.txt'), 'stale');
     await page.getByRole('button', { name: 'Atualizar diagnóstico' }).click(); await expect(page.getByText('Estado: blocked', { exact: true })).toBeVisible();
     await page.getByRole('tab', { name: 'Executar', exact: true }).focus(); await page.keyboard.press('Home'); await expect(page.getByRole('tab', { name: 'Plano', exact: true })).toBeFocused();
@@ -61,4 +62,46 @@ test('guided bug needs no JSON editing and exposes its frozen verifier before co
     expect(await readFile(join(app, 'output.txt'), 'utf8')).toBe('verified');
     await page.getByRole('button', { name: 'Revisar diff e arquivos', exact: true }).click();
     await expect(page.getByText('Diff local e arquivos não rastreados', { exact: true })).toBeVisible();
+});
+
+test('prerequisite diagnosis explains a missing client without starting work', async ({ page }) => {
+    await page.goto(url);
+    await expect(page.getByTestId('connection-state')).toHaveText('Conectado ao nativo');
+    await page.getByRole('button', { name: 'Executar uma tarefa', exact: true }).click();
+    await page.route('**/api/workflow-doctor', route => route.fulfill({ json: {
+        status: 'blocked', checks: [{ id: 'client', status: 'missing', action: { reason: 'Install Codex CLI separately' } }],
+        diagnostic: { code: 'prerequisite_unavailable', cause: 'Native client is unavailable', actions: [{ reason: 'Install and authenticate Codex CLI separately' }] },
+        native_inference_calls: 0, mutation: false,
+    } }));
+    await page.getByRole('button', { name: 'Verificar ambiente' }).click();
+    await expect(page.getByLabel('Diagnóstico e continuidade')).toContainText('Native client is unavailable');
+    await expect(page.getByLabel('Diagnóstico e continuidade')).toContainText('Install and authenticate Codex CLI separately');
+    await expect(page.getByRole('button', { name: 'Aprovar escopo e executar' })).toHaveCount(0);
+});
+
+test('a successful state refresh clears a prior query blocker', async ({ page }) => {
+    await page.route('**/api/workflow-list', route => route.fulfill({ json: { workflows: [{ id: '001-recovery', title: 'Recovery' }] } }));
+    await page.route('**/api/workflow-open', route => route.fulfill({ json: {
+        workflow_id: '001-recovery', status: 'prepared', scope_digest: 'review-only',
+        candidate: { request: { id: '001-recovery', title: 'Recovery', request: 'Preserve the existing goal', recipe: 'feature', files: {}, checks: [] } },
+    } }));
+    let reads = 0;
+    await page.route('**/api/workflow-status', route => {
+        reads += 1;
+        return route.fulfill(reads === 1 ? { status: 409, json: {
+            status: 'blocked', error: 'Temporary state read failed',
+            diagnostic: { cause: 'State query unavailable', actions: [{ reason: 'Inspect retained state' }] },
+        } } : { json: {
+            status: 'passed', effective_status: 'passed',
+            continuity: { objective: 'Preserve the existing goal', progress: { completed: 1, total: 1 } },
+            diagnostic: { cause: 'Current evidence is available', actions: [{ reason: 'Review the current report' }] },
+        } });
+    });
+    await page.goto(url);
+    await expect(page.getByTestId('connection-state')).toHaveText('Conectado ao nativo');
+    await page.getByRole('button', { name: 'Executar uma tarefa', exact: true }).click();
+    await page.getByLabel('Retomar tarefa existente').selectOption('001-recovery');
+    await expect(page.getByText('Estado: blocked', { exact: true })).toBeVisible();
+    await expect(page.getByText('Estado: passed', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Temporary state read failed', { exact: true })).toHaveCount(0);
 });

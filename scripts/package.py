@@ -58,7 +58,7 @@ def package(root, target, binary=None, output=None, forge_binary=None):
     out = output or root / 'dist'
     out.mkdir(parents=True, exist_ok=True)
     version = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
-    names = ['README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES', 'docs/dependencies.json',
+    names = ['docs/agent-experience.md', 'skills/illumitech-forge', 'README.md', 'README.en.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'THIRD_PARTY_LICENSES', 'docs/dependencies.json',
              f'docs/release-v{version}.md',
              'docs/v1-candidate.md', 'docs/native-command.md', 'docs/terminal-chat.md', 'docs/workbench.md', 'docs/token-economy.md', 'docs/duration-estimates.md',
              'docs/development-modules.md', 'docs/qa-execution.md', 'examples/qa-request.json', 'examples/qa-quality.sh', 'examples/feature-module.json',

@@ -248,3 +248,10 @@ and returns the highest declared compatibility impact, proposed version/tag and 
 Fix is patch; feature/deprecation minor; breaking major; docs/internal alone produce no release.
 The optional exact target check returns blocked/exit 2 on mismatch. A passing result grants no
 publication authority and creates no state or configuration. See [policy](release-version-policy.md).
+
+
+## F066 — Agent experience (1.7.0 candidate)
+
+Additive command_catalog, diagnostic, continuity and onboarding schema-1 objects are documented
+in [Agent experience](agent-experience.md). Existing fields, manifest/state schemas,
+parse-error behavior and execution/acceptance controls remain compatible.

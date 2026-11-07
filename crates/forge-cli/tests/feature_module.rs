@@ -149,6 +149,13 @@ fn feature_executes_dependency_order_and_checkpoints_without_replay() {
     assert_eq!(v["effective_status"], "passed");
     assert_eq!(v["checkpoint"]["authority"], "none");
     assert_eq!(v["checkpoint"]["automatic_compaction"], false);
+    assert_eq!(v["continuity"]["progress"]["completed"], 2);
+    assert_eq!(v["continuity"]["progress"]["total"], 2);
+    assert_eq!(
+        v["continuity"]["objective"],
+        "Deliver first.txt then second.txt with verified content; preserve preserved.txt"
+    );
+    assert_eq!(v["continuity"]["authority"], "none");
     assert!(
         v["tasks"]
             .as_array()
@@ -217,4 +224,23 @@ fn feature_scope_does_not_grant_declared_human_acceptance() {
     let (_, v) = f.call("status", &[]);
     assert_eq!(v["effective_status"], "awaiting_approval");
     assert_eq!(v["authorization"]["acceptance_granted"], false);
+    assert_eq!(v["diagnostic"]["code"], "human_approval_required");
+}
+
+#[test]
+fn prepared_continuity_is_read_only_and_stale_source_is_explained() {
+    let f = Fixture::new();
+    f.prepare();
+    let state = f.ops.join("workflows/001-feature/state");
+    assert!(!state.exists());
+    let (ok, status) = f.call("status", &[]);
+    assert!(ok, "{status}");
+    assert_eq!(status["diagnostic"]["code"], "scope_approval_required");
+    assert!(!state.exists());
+    fs::write(f.repo.join("unreviewed.txt"), "changed").unwrap();
+    let (ok, stale) = f.call("status", &[]);
+    assert!(!ok, "{stale}");
+    assert_eq!(stale["diagnostic"]["code"], "evidence_stale");
+    assert!(!state.exists());
+    assert_eq!(f.calls(), 0);
 }

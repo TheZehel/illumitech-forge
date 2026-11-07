@@ -295,7 +295,15 @@ async fn run_loop(
                         chat.open_panel(Panel::Workflow);
                     }
                 }
-                Err(e) => chat.notice = format!("{e}. Nenhuma ação reenviada automaticamente."),
+                Err(e) => {
+                    let value = crate::diagnostics::error_value(&e, &p.route);
+                    chat.notice =
+                        crate::diagnostics::human(&value).unwrap_or_else(|| e.to_string());
+                    if p.route.starts_with("workflow/") {
+                        chat.workflow = value;
+                        chat.open_panel(Panel::Workflow);
+                    }
+                }
             }
             chat.busy.clear();
         }

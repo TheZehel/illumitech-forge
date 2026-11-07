@@ -18,7 +18,11 @@
     "sarif_import": 1,
     "development_module_plan": 1,
     "feature_module_workflow": 1,
-    "qa_execution": 1
+    "qa_execution": 1,
+    "command_catalog": 1,
+    "diagnostic": 1,
+    "continuity": 1,
+    "onboarding": 1
   },
   "compatibility": {
     "readers": "Ignore unknown output fields; reject unsupported schema versions. Input contracts reject unknown fields.",

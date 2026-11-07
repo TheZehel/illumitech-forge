@@ -289,7 +289,12 @@ async fn execute_inner(
     let current = revisions(&c.roots)?;
     ensure!(
         expected.is_none_or(|r| r == &current),
-        "approved preparation revision changed before execution; review a new scope"
+        crate::diagnostics::blocked(
+            "source_changed",
+            "approved preparation revision changed before execution; review a new scope",
+            "execution",
+            "Inspect source changes and prepare a new reviewed scope"
+        )
     );
     let old = store.load(&c.manifest.release_id)?;
     let mut run = match old {
@@ -308,7 +313,12 @@ async fn execute_inner(
                     if let Some(pid) = t.pid {
                         ensure!(
                             !process::pid_alive(pid) && !process::group_alive(pid),
-                            "orphan process or owned group still exists; inspect it before reconciliation"
+                            crate::diagnostics::blocked(
+                                "process_active",
+                                "orphan process or owned group still exists; inspect it before reconciliation",
+                                "release resume",
+                                "Inspect the owned process and wait for or explicitly control it before reconciliation"
+                            )
                         );
                     }
                 }
@@ -343,7 +353,12 @@ async fn execute_inner(
             } else {
                 ensure!(
                     !changed && !orphan,
-                    "manifest/worktree/artifact changed or orphan detected; resume --reconcile REASON is required"
+                    crate::diagnostics::blocked(
+                        "reconciliation_required",
+                        "manifest/worktree/artifact changed or orphan detected; resume --reconcile REASON is required",
+                        "release resume",
+                        "Inspect source, artifacts and processes before explicitly reconciling the existing release"
+                    )
                 );
                 ensure!(
                     old.status != "cancelled",

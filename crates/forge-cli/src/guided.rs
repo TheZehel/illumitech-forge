@@ -23,7 +23,15 @@ pub fn safe_path(path: &Path) -> Result<PathBuf> {
 }
 pub fn root(path: &Path) -> Result<PathBuf> {
     let path = safe_path(path)?.canonicalize()?;
-    ensure!(path.join(".git").exists(), "root must be a Git project");
+    ensure!(
+        path.join(".git").exists(),
+        crate::diagnostics::blocked(
+            "project_required",
+            "root must be a Git project",
+            "project",
+            "Choose an existing Git project or create a disposable demo"
+        )
+    );
     Ok(path)
 }
 pub fn external(path: &Path, root: &Path) -> Result<PathBuf> {

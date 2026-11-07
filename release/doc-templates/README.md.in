@@ -123,3 +123,13 @@ Copyright Illumitech. Licença [MIT](LICENSE). Avisos de dependências em
 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES), inventário em [docs/dependencies.json](docs/dependencies.json)
 e origem dos ativos em [provenance.json](docs/assets/provenance.json). Commits e publicações usam
 identidade humana configurada, sem atribuição de autoria a agentes.
+
+
+## Diagnóstico, continuidade e skill — 1.7.0
+
+A versão 1.7.0 reúne diagnóstico da primeira execução, descoberta de comandos, explicações
+operacionais e continuidade compartilhada entre CLI, Workbench e uma skill portátil.
+[Instalação, contratos e limites dos pilotos](docs/agent-experience.md) ·
+[Notas da versão](docs/release-v1.7.0.md).
+O Codex executa os agentes. A descoberta da skill foi observada no Codex CLI e na extensão
+Codex do VS Code; o fluxo completo por modelo dentro do editor e o Cursor seguem pendentes.

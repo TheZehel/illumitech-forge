@@ -5,6 +5,10 @@ pub(super) struct Command {
 }
 pub(super) const COMMANDS: &[Command] = &[
     Command {
+        name: "doctor",
+        description: "Verificar ambiente, instalação e conta nativa sem inferência",
+    },
+    Command {
         name: "mode",
         description: "Escolher Feature, QA ou Conversa",
     },

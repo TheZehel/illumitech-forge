@@ -97,6 +97,7 @@ impl App {
     pub async fn workflow_action(self: &Arc<Self>, route: &str, action: Action) -> Result<Value> {
         ensure!(
             [
+                "workflow-doctor",
                 "workflow-bug",
                 "workflow-preview",
                 "workflow-prepare",
@@ -116,6 +117,9 @@ impl App {
             .contains(&route),
             "unknown workflow action"
         );
+        if route == "workflow-doctor" {
+            return doctor(&self.root).await;
+        }
         if route == "workflow-bug" {
             let description = action.bug_description.context("bug description required")?;
             let planned = self.action("planning-propose", serde_json::from_value(json!({"operation_id":format!("{}-plan", action.operation_id),"request":format!("Corrigir um bug com regressão externa. {description}")}))?).await?;

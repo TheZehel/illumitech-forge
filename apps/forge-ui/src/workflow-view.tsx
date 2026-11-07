@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { api, object, string, list, type ObjectValue } from './api';
+import { DiagnosticView } from './diagnostic-view';
+import { ApiFailure, api, object, string, list, type ObjectValue } from './api';
 
 export function WorkflowView({ connected, proposal }: { connected: boolean; proposal?: ObjectValue }) {
     const [id, setId] = useState('001-minha-tarefa');
@@ -15,6 +16,7 @@ export function WorkflowView({ connected, proposal }: { connected: boolean; prop
     const [report, setReport] = useState<ObjectValue>();
     const [busy, setBusy] = useState('');
     const [error, setError] = useState('');
+    const [diagnosis, setDiagnosis] = useState<ObjectValue>();
     const [requireReview, setRequireReview] = useState(false);
     const [reviewer, setReviewer] = useState('');
     const [confirmed, setConfirmed] = useState(false);
@@ -23,9 +25,9 @@ export function WorkflowView({ connected, proposal }: { connected: boolean; prop
     useEffect(() => { void api('workflow-list', {}).then(v => setSaved(list(object(v).workflows).map(object))).catch(() => {}); }, [candidate]);
     const [reconcile, setReconcile] = useState('');
     const act = async (route: string, body: ObjectValue = {}) => {
-        setError(''); setBusy(route);
+        setError(''); setDiagnosis(undefined); setBusy(route);
         try { return object(await api(route, body)); }
-        catch (e: unknown) { setError(e instanceof Error ? e.message : 'Ação bloqueada. Nenhum comando repetido.'); return undefined; }
+        catch (e: unknown) { if (e instanceof ApiFailure) setDiagnosis(e.details); setError(e instanceof Error ? e.message : 'Ação bloqueada. Nenhum comando repetido.'); return undefined; }
         finally { setBusy(''); }
     };
     useEffect(() => { let cancelled = false; void api('workflow-recipes', {}).then(v => { if (!cancelled) setChecks(JSON.stringify(object(v).checks ?? [], null, 2)); }).catch(() => {}); return () => { cancelled = true; }; }, []);
@@ -33,8 +35,8 @@ export function WorkflowView({ connected, proposal }: { connected: boolean; prop
         if (!candidate || candidate.status !== 'prepared') return;
         let cancelled = false; let timer: ReturnType<typeof setTimeout> | undefined;
         const poll = async () => {
-            try { const v = object(await api('workflow-status', { id: string(candidate.workflow_id) })); if (!cancelled) { setReport(v); setError(''); } }
-            catch (e: unknown) { if (!cancelled) setError(e instanceof Error ? e.message : 'Diagnóstico indisponível; o estado anterior não comprova conclusão.'); }
+            try { const v = object(await api('workflow-status', { id: string(candidate.workflow_id) })); if (!cancelled) { setReport(v); setError(''); setDiagnosis(undefined); } }
+            catch (e: unknown) { if (!cancelled) { if (e instanceof ApiFailure) setDiagnosis(e.details); setError(e instanceof Error ? e.message : 'Diagnóstico indisponível; o estado anterior não comprova conclusão.'); } }
             finally { if (!cancelled) timer = setTimeout(() => void poll(), 2500); }
         };
         void poll();
@@ -50,8 +52,11 @@ export function WorkflowView({ connected, proposal }: { connected: boolean; prop
         } catch (e: unknown) { setError(e instanceof Error ? e.message : 'JSON de verificações inválido.'); }
     }
     const workflowId = string(candidate?.workflow_id);
-    const status = string(report?.effective_status) || string(report?.status) || string(candidate?.status);
+    const status = diagnosis?.status === 'blocked' ? 'blocked' : string(report?.effective_status) || string(report?.status) || string(candidate?.status);
     return <section className="workflow-view" aria-label="Executar uma tarefa">
+        <button disabled={!!busy} onClick={async () => { const result = await act('workflow-doctor'); if (result) setDiagnosis(result); }}>Verificar ambiente</button>
+        <DiagnosticView value={diagnosis}/>
+        {list(diagnosis?.checks).length > 0 && <ul>{list(diagnosis?.checks).map(v => { const c = object(v); return <li key={string(c.id)}>{string(c.id)}: {string(c.status)} — {string(object(c.action).reason)}</li>; })}</ul>}
         <label htmlFor="saved-workflow">Retomar tarefa existente</label><select id="saved-workflow" value="" onChange={async e => { const result = await act('workflow-open', { id: e.target.value }); if (result) { const r = object(object(result.candidate).request); setId(string(r.id)); setTitle(string(r.title)); setRequest(string(r.request)); setRecipe(string(r.recipe)); setRequireReview(list(r.human_gates).length > 0); setChecks(JSON.stringify(r.checks, null, 2)); setFiles(JSON.stringify(r.files, null, 2)); setCandidate(result); setConfirmed(false); } }}><option value="">Selecionar tarefa…</option>{saved.map(s => <option key={string(s.id)} value={string(s.id)}>{string(s.id)} · {string(s.title)}</option>)}</select>
         <span className="badge">DO PEDIDO À ENTREGA</span><h3>Executar uma tarefa</h3>
         <p>Revise o escopo uma vez. O Forge continua nesse limite e verifica o resultado. Permissões nativas e gates humanos continuam independentes.</p>
@@ -73,6 +78,7 @@ export function WorkflowView({ connected, proposal }: { connected: boolean; prop
             {status === 'awaiting_approval' && <><label htmlFor="workflow-reviewer">Seu nome para aceite da revisão avaliada</label><input id="workflow-reviewer" value={reviewer} onChange={e => setReviewer(e.target.value)}/><p>Inspecione o diff e as evidências antes de aprovar. Este aceite é separado da autorização inicial.</p><button onClick={async () => { const v = await act('workflow-review', { id: workflowId }); if (v) setReview(v); }}>Revisar diff e arquivos</button>{review && <pre>{JSON.stringify(review, null, 2)}</pre>}{Object.entries(object(object(report?.report).run && object(object(report?.report).run).tasks)).map(([taskId, value]) => { const task = object(value); const revision = object(task.revision); return list(task.evidence).map(v => { const e = object(v); return e.kind === 'human' && e.outcome !== 'passed' ? <button key={`${taskId}-${string(e.id)}`} disabled={!!busy || !reviewer.trim()} onClick={() => void act('workflow-approve', { id: workflowId, task: taskId, gate: e.id, fingerprint: revision.fingerprint, reviewer })}>Aprovar {taskId} · {string(e.id)}</button> : null; }); })}</>}
             {report && status !== 'prepared' && status !== 'awaiting_approval' && <><button disabled={!!busy} onClick={async () => { const result = await act('workflow-review', { id: workflowId }); if (result) setReview(result); }}>Revisar diff e arquivos</button>{review && <details open><summary>Diff local e arquivos não rastreados</summary><pre>{JSON.stringify(review, null, 2)}</pre></details>}</>}
             <p role="status">Estado: {status || 'não iniciado'}</p>
+            <DiagnosticView value={report}/>
             <p>{string(object(report?.next_action).reason)}</p>{!!report?.last_error && <p role="alert">{string(object(report.last_error).error)}</p>}
             <button disabled={!!busy} onClick={async () => { const v = await act('workflow-status', { id: workflowId }); if (v) setReport(v); }}>Atualizar diagnóstico</button>
             {report && status !== 'prepared' && <><button disabled={!!busy} onClick={() => void act('workflow-pause', { id: workflowId })}>Pausar</button><button disabled={!!busy} onClick={() => void act('workflow-cancel', { id: workflowId })}>Cancelar</button><button disabled={!!busy || status === 'running' || status === 'passed'} onClick={() => void act('workflow-resume', { id: workflowId })}>Retomar com evidências atuais</button><details><summary>Reconciliar mudanças após revisão</summary><label htmlFor="reconcile-reason">Motivo (invalida evidências e aceites anteriores)</label><input id="reconcile-reason" value={reconcile} onChange={e => setReconcile(e.target.value)}/><button disabled={!!busy || !reconcile.trim()} onClick={() => void act('workflow-resume', { id: workflowId, reconcile })}>Reconciliar e retomar</button></details><details><summary>Relatório e evidências</summary><pre>{JSON.stringify(report, null, 2)}</pre></details></>}

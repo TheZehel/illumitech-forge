@@ -190,7 +190,15 @@ pub fn read_json<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T> {
     let mut bytes = vec![];
     f.take(1024 * 1024 + 1).read_to_end(&mut bytes)?;
     ensure!(bytes.len() <= 1024 * 1024, "JSON exceeds 1 MiB");
-    Ok(serde_json::from_slice(&bytes)?)
+    serde_json::from_slice(&bytes).map_err(|e| {
+        crate::diagnostics::blocked(
+            "invalid_input",
+            &format!("Invalid JSON request: {e}"),
+            "read request",
+            "Validate the request fields against the documented schema before preparing it",
+        )
+        .into()
+    })
 }
 pub fn directory(root: &Path, ops: &Path, id: &str) -> Result<PathBuf> {
     ensure!(valid_id(id) && id.len() <= 60, "invalid workflow ID");
@@ -219,18 +227,33 @@ fn load_candidate(
     if integrity {
         ensure!(
             digest(&std::fs::read(guided::safe_path(&c.evaluator)?)?) == c.evaluator_sha256,
-            "workflow evaluator changed"
+            crate::diagnostics::blocked(
+                "evaluator_changed",
+                "workflow evaluator changed",
+                "workflow load",
+                "Restore the reviewed evaluator or prepare a new reviewed scope"
+            )
         );
     }
     ensure!(
         serde_json::to_value(read_json::<Manifest>(&dir.join("release.json"))?)?
             == serde_json::to_value(&c.manifest)?,
-        "prepared manifest changed"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "prepared manifest changed",
+            "workflow load",
+            "Restore the reviewed manifest or prepare a fresh workflow"
+        )
     );
     ensure!(
         serde_json::to_value(read_json::<CheckContract>(&dir.join("checks.json"))?)?
             == serde_json::to_value(&c.checks)?,
-        "prepared check contract changed"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "prepared check contract changed",
+            "workflow load",
+            "Restore the reviewed checks or prepare a fresh workflow"
+        )
     );
     ensure!(
         !c.manifest.automation.enabled
@@ -302,7 +325,12 @@ pub async fn start(root: &Path, ops: &Path, id: &str, approval: &str) -> Result<
     let (dir, c) = load(root, ops, id)?;
     ensure!(
         consent_digest(&c)? == approval,
-        "scope changed; review the new digest before starting"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "scope changed; review the new digest before starting",
+            "workflow start",
+            "Inspect the current candidate and authorize its exact digest"
+        )
     );
     continue_preparation(dir, c, approval, false).await
 }
@@ -431,12 +459,22 @@ async fn continue_preparation(
 pub async fn resume(root: &Path, ops: &Path, id: &str, reconcile: Option<String>) -> Result<Value> {
     let (dir, c) = load(root, ops, id)?;
     let store = Store::open(&dir.join("state/state.sqlite"), true)?;
-    let scope = store
-        .metadata("workflow-scope")?
-        .context("no scope consent; use start")?;
+    let scope = store.metadata("workflow-scope")?.ok_or_else(|| {
+        crate::diagnostics::blocked(
+            "scope_approval_required",
+            "no scope consent; use start",
+            "workflow resume",
+            "Review the candidate and explicitly authorize its digest",
+        )
+    })?;
     ensure!(
         scope["digest"] == consent_digest(&c)?,
-        "contract changed; a new scope consent is required"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "contract changed; a new scope consent is required",
+            "workflow resume",
+            "Prepare and review a new workflow contract"
+        )
     );
     if scope["phase"] == "preparing" || scope["phase"] == "prepared" {
         ensure!(
@@ -449,13 +487,23 @@ pub async fn resume(root: &Path, ops: &Path, id: &str, reconcile: Option<String>
     }
     ensure!(
         scope["phase"] == "execution_authorized",
-        "preparation/baseline interrupted; inspect files and prepare a fresh reviewed workflow, no command replayed"
+        crate::diagnostics::blocked(
+            "outcome_uncertain",
+            "preparation/baseline interrupted; inspect files and prepare a fresh reviewed workflow, no command replayed",
+            "workflow resume",
+            "Inspect the retained journal and processes; prepare a fresh reviewed workflow"
+        )
     );
     let context = engine::Context::load(&dir.join("release.json"), &dir.join("state"))?;
     if store.load(&c.manifest.release_id)?.is_none() {
         ensure!(
             scope["revision"] == serde_json::to_value(revision(&c.root)?)?,
-            "project changed before initial spawn; new scope consent required"
+            crate::diagnostics::blocked(
+                "source_changed",
+                "project changed before initial spawn; new scope consent required",
+                "workflow resume",
+                "Inspect the source changes and prepare a new reviewed workflow"
+            )
         );
         let expected = revisions(&context.roots)?;
         drop(store);
@@ -490,25 +538,5 @@ pub fn list(root: &Path, ops: &Path) -> Result<Value> {
 }
 
 pub async fn doctor(root: &Path) -> Result<Value> {
-    let root = guided::root(root)?;
-    let signal = crate::publication::Signals::new();
-    let mut checks = vec![];
-    let mut auth_kind = "unavailable";
-    for (id, argv) in [
-        ("git", vec!["git".into(), "--version".into()]),
-        ("client", vec!["codex".into(), "--version".into()]),
-        (
-            "authentication",
-            vec!["codex".into(), "login".into(), "status".into()],
-        ),
-    ] {
-        match forge_adapters::process::run(&argv,&root,10,signal.receiver.clone()).await{
-   Ok(result)=>{if id=="authentication"&&result.passed(){auth_kind=if format!("{}{}",result.stdout,result.stderr).to_lowercase().contains("chatgpt"){"subscription"}else{"native_configured"};}checks.push(json!({"id":id,"passed":result.passed(),"reason":result.reason}));},
-   Err(_)=>checks.push(json!({"id":id,"passed":false,"reason":"not available; install/authenticate the native client separately"}))
-  }
-    }
-    let healthy = checks.iter().all(|c| c["passed"] == true);
-    Ok(
-        json!({"schema_version":1,"status":if healthy{"passed"}else{"blocked"},"checks":checks,"authentication_kind":auth_kind,"installation":crate::installation::dispatch(&crate::installation::Command::Doctor).await?,"model":"native configuration unchanged; not inferred by this diagnostic","native_inference_calls":0,"mutation":false,"memory":"optional","next_action":if healthy{"Review your workflow before execution"}else{"Resolve the reported prerequisite, then rerun this read-only diagnostic. No installation, login flow or configuration change was attempted."}}),
-    )
+    crate::onboarding::doctor(root).await
 }

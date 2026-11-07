@@ -156,6 +156,8 @@ fn preview_discovery_and_exact_once_observed_coverage() {
     let (code, status) = f.invoke("status", &[]);
     assert_eq!(code, 0, "{status}");
     assert_eq!(status["status"], "passed");
+    assert_eq!(status["continuity"]["progress"]["completed"], 3);
+    assert_eq!(status["continuity"]["authority"], "none");
     assert_eq!(
         retained_before,
         retained_snapshot(&f.ops),
@@ -199,7 +201,16 @@ fn coverage_gaps_absent_executables_and_all_checks_required() {
         assert_eq!(v["status"], expected, "{v}");
         let row = if kind == "gap" { 1 } else { 0 };
         assert_eq!(v["coverage"][row]["status"], coverage_status, "{v}");
-        assert_eq!(f.invoke("status", &[]).0, 2);
+        let (code, status) = f.invoke("status", &[]);
+        assert_eq!(code, 2);
+        assert_eq!(
+            status["diagnostic"]["code"],
+            if expected == "failed" {
+                "validation_failed"
+            } else {
+                "coverage_incomplete"
+            }
+        );
     }
 }
 #[test]

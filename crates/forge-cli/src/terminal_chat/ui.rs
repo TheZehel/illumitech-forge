@@ -470,9 +470,14 @@ impl Chat {
                 lines.push(Line::from("Contrato completo e evidências:"));
             }
             lines.extend(
-                display(&serde_json::to_string_pretty(&self.workflow).unwrap_or_default())
-                    .lines()
-                    .map(|s| Line::from(s.to_owned())),
+                display(&format!(
+                    "{}\n{}\n{}",
+                    crate::continuity::human(&self.workflow).unwrap_or_default(),
+                    crate::diagnostics::human(&self.workflow).unwrap_or_default(),
+                    serde_json::to_string_pretty(&self.workflow).unwrap_or_default()
+                ))
+                .lines()
+                .map(|s| Line::from(s.to_owned())),
             );
             for line in &mut lines {
                 for span in &mut line.spans {

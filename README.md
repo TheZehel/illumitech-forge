@@ -5,7 +5,7 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.6.0.** A leitura no terminal permanece ancorada durante streaming e redimensionamento, com rolagem por mouse/trackpad, PgUp/PgDn e Ctrl+Home/End. Cabeçalho, rodapé e editor compactos deixam mais espaço para a conversa. Veja as [notas](docs/release-v1.6.0.md). Disponibilidade e checksums constam nas [releases do GitHub](https://github.com/TheZehel/illumitech-forge/releases); compilar esta árvore não atualiza seu binário instalado.
+**Illumitech Forge 1.7.0.** A leitura no terminal permanece ancorada durante streaming e redimensionamento, com rolagem por mouse/trackpad, PgUp/PgDn e Ctrl+Home/End. Cabeçalho, rodapé e editor compactos deixam mais espaço para a conversa. Veja as [notas](docs/release-v1.7.0.md). Disponibilidade e checksums constam nas [releases do GitHub](https://github.com/TheZehel/illumitech-forge/releases); compilar esta árvore não atualiza seu binário instalado.
 
 [English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
@@ -33,7 +33,7 @@ somente leitura; a implementação usa um manifest revisado. A resposta do chat 
 ## Começar com a versão publicada
 
 ```sh
-cargo install illumitech-forge-cli --version 1.6.0 --locked
+cargo install illumitech-forge-cli --version 1.7.0 --locked
 forge --version
 forge
 ```
@@ -43,7 +43,7 @@ separadamente para conversar; conta, modelo e permissões continuam nativos. Nã
 rodar `init`, configurar memória, instalar Python ou Node para abrir a interface. A conversa
 livre é somente leitura; executar uma implementação exige um manifest revisado.
 
-Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.6.0)
+Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.0)
 dispensa Rust. O repositório GitHub e o código dos crates são públicos sob MIT.
 [Início rápido](docs/quickstart.md): instalação, verificação de versão, PATH e Workbench.
 
@@ -123,3 +123,13 @@ Copyright Illumitech. Licença [MIT](LICENSE). Avisos de dependências em
 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES), inventário em [docs/dependencies.json](docs/dependencies.json)
 e origem dos ativos em [provenance.json](docs/assets/provenance.json). Commits e publicações usam
 identidade humana configurada, sem atribuição de autoria a agentes.
+
+
+## Diagnóstico, continuidade e skill — 1.7.0
+
+A versão 1.7.0 reúne diagnóstico da primeira execução, descoberta de comandos, explicações
+operacionais e continuidade compartilhada entre CLI, Workbench e uma skill portátil.
+[Instalação, contratos e limites dos pilotos](docs/agent-experience.md) ·
+[Notas da versão](docs/release-v1.7.0.md).
+O Codex executa os agentes. A descoberta da skill foi observada no Codex CLI e na extensão
+Codex do VS Code; o fluxo completo por modelo dentro do editor e o Cursor seguem pendentes.

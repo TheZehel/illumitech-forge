@@ -6,6 +6,7 @@ use anyhow::Context as _;
 pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<Pending>> {
     let command = text.split_whitespace().next().unwrap_or("").to_owned();
     if ![
+        "/doctor",
         "/bug",
         "/plan",
         "/run",
@@ -37,6 +38,9 @@ pub(super) fn pending(app: &Arc<App>, chat: &Chat, text: &str) -> Result<Option<
     let operation_id = format!("terminal-workflow-{}", forge_domain::digest(&nonce));
     let route = format!("workflow{command}");
     let handle = tokio::spawn(async move {
+        if command == "/doctor" {
+            return crate::workflow::doctor(&app.root).await;
+        }
         if command == "/qa-run" {
             ensure!(
                 !qa_id.is_empty() && !qa_digest.is_empty() && args == qa_digest,

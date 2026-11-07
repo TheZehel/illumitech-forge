@@ -1,0 +1,4 @@
+interface:
+  display_name: "Illumitech Forge"
+  short_description: "Plan, verify and resume development with Forge"
+  default_prompt: "Use $illumitech-forge to inspect my project and prepare a verified development workflow."

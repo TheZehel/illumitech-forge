@@ -242,7 +242,12 @@ fn load(root: &Path, ops: &Path, id: &str) -> Result<(PathBuf, Candidate)> {
     let request: Request = workflow::read_json(&dir.join("request.json"))?;
     ensure!(
         serde_json::to_value(request)? == serde_json::to_value(&c.request)?,
-        "QA request contract changed"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "QA request contract changed",
+            "qa",
+            "Inspect the retained scope and prepare a new reviewed QA request"
+        )
     );
     Ok((dir, c))
 }
@@ -253,12 +258,22 @@ fn current(c: &Candidate) -> Result<()> {
     );
     ensure!(
         revision(&c.root)? == c.source,
-        "QA source changed; new reviewed scope required"
+        crate::diagnostics::blocked(
+            "source_changed",
+            "QA source changed; new reviewed scope required",
+            "qa",
+            "Inspect the retained scope and prepare a new reviewed QA request"
+        )
     );
     ensure!(
         std::env::current_exe()?.canonicalize()? == c.evaluator
             && hash_file(&c.evaluator)? == c.evaluator_sha256,
-        "QA evaluator changed; new reviewed scope required"
+        crate::diagnostics::blocked(
+            "evaluator_changed",
+            "QA evaluator changed; new reviewed scope required",
+            "qa",
+            "Inspect the retained scope and prepare a new reviewed QA request"
+        )
     );
     inputs(&c.request, &c.root)
 }
@@ -514,12 +529,22 @@ pub async fn start(
     let (dir, c) = load(&root, ops, id)?;
     ensure!(
         scope(&c)? == approval,
-        "QA scope digest mismatch; review the prepared scope"
+        crate::diagnostics::blocked(
+            "scope_changed",
+            "QA scope digest mismatch; review the prepared scope",
+            "qa start",
+            "Review the exact prepared QA digest"
+        )
     );
     current(&c)?;
     ensure!(
         !dir.join("intent.json").try_exists()? && !dir.join("result.json").try_exists()?,
-        "QA scope already submitted; inspect status and prepare a new ID; no replay"
+        crate::diagnostics::blocked(
+            "outcome_uncertain",
+            "QA scope already submitted; inspect status and prepare a new ID; no replay",
+            "qa start",
+            "Inspect retained QA observations and use a fresh reviewed ID for another execution"
+        )
     );
     ensure!(!*cancel.borrow(), "QA cancelled before execution");
     let intent = json!({"schema_version":1,"qa_id":id,"scope_digest":approval,"status":"running","owner_pid":std::process::id(),"source":c.source});
@@ -691,6 +716,26 @@ pub fn status(root: &Path, ops: &Path, id: &str) -> Result<Value> {
     }
     value["mutation"] = json!(false);
     value["replayed"] = json!(false);
+    crate::continuity::attach(
+        &mut value,
+        crate::continuity::Context {
+            kind: "qa",
+            id,
+            objective: &c.request.title,
+            inspect_argv: vec![
+                "forge".into(),
+                "modules".into(),
+                "qa".into(),
+                "status".into(),
+                id.into(),
+                "--root".into(),
+                root.to_string_lossy().into_owned(),
+                "--ops-root".into(),
+                ops.to_string_lossy().into_owned(),
+            ],
+            references: json!({"root":root,"ops_root":ops,"candidate":dir.join("candidate.json"),"scope_digest":scope(&c)?,"prepared_source":c.source,"evaluator_sha256":c.evaluator_sha256}),
+        },
+    );
     Ok(value)
 }
 fn read_result(path: &Path) -> Result<Value> {

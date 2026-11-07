@@ -107,3 +107,9 @@ Native `demo create`, both-name PATH diagnostics and opt-in memory initializatio
 in {{published}}. The demo uses the real engine and a hash-pinned external native evaluator, makes
 no model calls and never overwrites an existing demo directory. Status/report return 2
 when evidence is stale; the historical JSON snapshot remains available for diagnosis.
+
+
+## Próxima experiência / Next experience
+
+[Diagnóstico, contratos, continuidade e skill da versão 1.7.0](agent-experience.md).
+As instruções de instalação acima continuam vinculadas à versão publicada.

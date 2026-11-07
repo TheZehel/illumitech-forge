@@ -16,6 +16,40 @@ pub fn status(root: &Path, ops: &Path, id: &str) -> Result<Value> {
     value["stop_reason"] = json!(reason);
     let digest = value["scope_digest"].clone();
     value["authorization"] = json!({"scope_granted":!value["scope"].is_null(),"digest_current":!digest.is_null() && value["scope"]["digest"]==digest,"phase":value["scope"]["phase"],"acceptance_granted":false});
+    if value["source_current"] == false {
+        value["effective_status"] = json!("blocked");
+    }
+    let (dir, candidate) = load_projection(root, ops, id)?;
+    let argv = vec![
+        "forge".into(),
+        "workflow".into(),
+        "status".into(),
+        id.into(),
+        "--root".into(),
+        root.to_string_lossy().into_owned(),
+        "--ops-root".into(),
+        ops.to_string_lossy().into_owned(),
+    ];
+    if value["tasks"].is_null() && value["report"]["run"].is_null() {
+        value["tasks"] = json!(
+            candidate
+                .manifest
+                .tasks
+                .iter()
+                .map(|task| json!({"id":task.id,"status":"not_run","evidence":[]}))
+                .collect::<Vec<_>>()
+        );
+    }
+    crate::continuity::attach(
+        &mut value,
+        crate::continuity::Context {
+            kind: "workflow",
+            id,
+            objective: &candidate.request.request,
+            inspect_argv: argv,
+            references: json!({"root":root,"ops_root":ops,"candidate":dir.join("candidate.json"),"scope_digest":consent_digest(&candidate)?,"prepared_source":candidate.source,"manifest":dir.join("release.json"),"evaluator_sha256":candidate.evaluator_sha256,"proposal":candidate.request.proposal}),
+        },
+    );
     Ok(value)
 }
 fn project_status(root: &Path, ops: &Path, id: &str) -> Result<Value> {

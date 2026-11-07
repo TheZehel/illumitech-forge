@@ -1,10 +1,13 @@
 mod budget;
+mod command_catalog;
 mod comparison;
 mod compatibility;
 mod context;
+mod continuity;
 mod daemon;
 mod dashboard;
 mod demo;
+mod diagnostics;
 mod duration;
 mod engine;
 mod findings;
@@ -16,6 +19,7 @@ mod launch;
 mod modules;
 mod native;
 mod observability;
+mod onboarding;
 mod operational;
 mod parallel;
 mod planning;
@@ -67,7 +71,11 @@ enum Command {
         command: workflow::Command,
     },
     /// Describe versioned public contracts without opening state or a native client.
-    Contracts,
+    Contracts {
+        /// Describe one public command path, for example "workflow prepare".
+        #[arg(long)]
+        command: Option<String>,
+    },
     /// Diagnose or explicitly update a task-local installation (preview by default).
     Installation {
         #[command(subcommand)]
@@ -93,10 +101,12 @@ enum Command {
         #[command(subcommand)]
         command: ReviewCommand,
     },
+    /// Inspect and apply explicitly selected project templates.
     Templates {
         #[command(subcommand)]
         command: templates::Command,
     },
+    /// Inspect execution budgets without changing limits.
     Budget {
         #[command(subcommand)]
         command: BudgetCommand,
@@ -119,10 +129,12 @@ enum Command {
         #[arg(long)]
         app_server: Option<PathBuf>,
     },
+    /// Preview or create reviewed feature documents.
     Feature {
         #[command(subcommand)]
         command: FeatureCommand,
     },
+    /// Validate or import structured planning candidates.
     Plan {
         #[command(subcommand)]
         command: PlanCommand,
@@ -140,6 +152,7 @@ enum Command {
         #[arg(long, default_value_t = 0)]
         port: u16,
     },
+    /// Supervise an explicitly selected release queue.
     Daemon {
         #[arg(long)]
         releases_dir: PathBuf,
@@ -150,10 +163,12 @@ enum Command {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Inspect or explicitly control the selected queue.
     DaemonControl {
         #[command(subcommand)]
         command: DaemonControl,
     },
+    /// Create optional project scaffolding; memory routing is opt-in.
     Init {
         #[arg(default_value = ".")]
         path: PathBuf,
@@ -161,18 +176,21 @@ enum Command {
         #[arg(long)]
         memory_workspace: Option<String>,
     },
+    /// Inspect installation and bounded native client capabilities.
     Doctor,
+    /// Validate existing specification documents.
     Spec {
         #[command(subcommand)]
         command: SpecCommand,
     },
+    /// Inspect, execute and explicitly publish reviewed release contracts.
     Release {
         #[command(subcommand)]
         command: ReleaseCommand,
     },
-    Status {
-        manifest: PathBuf,
-    },
+    /// Inspect current release state and evidence freshness.
+    Status { manifest: PathBuf },
+    /// Read retained evidence, events and usage for a release.
     Report {
         manifest: PathBuf,
         #[arg(long, default_value_t = 100)]
@@ -180,29 +198,32 @@ enum Command {
         #[arg(long, default_value_t = 0)]
         offset: u64,
     },
+    /// Inspect selective context assembly for a task.
     Context {
         #[command(subcommand)]
         command: ContextCommand,
     },
-    Pause {
-        manifest: PathBuf,
-    },
-    Cancel {
-        manifest: PathBuf,
-    },
+    /// Request pause at the current execution boundary.
+    Pause { manifest: PathBuf },
+    /// Request cancellation of the selected run.
+    Cancel { manifest: PathBuf },
+    /// Explicitly resume or reconcile an existing release.
     Resume {
         manifest: PathBuf,
         #[arg(long)]
         reconcile: Option<String>,
     },
+    /// Read optional scoped memory capabilities or context.
     Memory {
         #[command(subcommand)]
         command: MemoryCommand,
     },
+    /// Inspect or explicitly apply selected toolkit recipes.
     Tools {
         #[command(subcommand)]
         command: ToolsCommand,
     },
+    /// Run explicit evaluation manifests or compare observations.
     Eval {
         #[command(subcommand)]
         command: EvalCommand,
@@ -474,10 +495,7 @@ pub async fn run() {
             };
             (v, code)
         }
-        Err(e) => (
-            json!({"schema_version":1,"status":"blocked","error_code":"operation_blocked","error":process::redact(&format!("{e:#}"))}),
-            2,
-        ),
+        Err(e) => (diagnostics::error_value(&e, "cli"), 2),
     };
     let value = compatibility::envelope(value);
     if let Some(logs) = logs {
@@ -490,6 +508,12 @@ pub async fn run() {
     } else if cli.json {
         println!("{}", serde_json::to_string(&value).unwrap());
     } else {
+        if let Some(summary) = continuity::human(&value) {
+            println!("{summary}");
+        }
+        if let Some(summary) = diagnostics::human(&value) {
+            println!("{summary}");
+        }
         if let Some(summary) = duration::human(&value) {
             println!("{summary}");
         }
@@ -502,7 +526,12 @@ async fn dispatch(cli: &Cli) -> Result<Value> {
     match &cli.command {
         Command::Modules { command } => modules::dispatch(command, &cli.state_dir).await,
         Command::Workflow { command } => workflow::dispatch(command).await,
-        Command::Contracts => Ok(compatibility::contracts()),
+        Command::Contracts { command } => {
+            let mut value = compatibility::contracts();
+            value["command_catalog"] =
+                command_catalog::catalog(Cli::command(), command.as_deref())?;
+            Ok(value)
+        }
         Command::Installation { command } => installation::dispatch(command).await,
         Command::Demo { command } => demo::dispatch(command).await,
         Command::State { command } => snapshots::dispatch(command, &cli.state_dir),
