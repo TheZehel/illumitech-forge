@@ -1,6 +1,13 @@
-# illumitech-forge-adapters
+# illumitech-forge-adapters 1.7.1
 
-Part of [Illumitech Forge](https://github.com/TheZehel/illumitech-forge), an evidence-backed agent execution toolkit.
+Native process, memory and telemetry adapters for
+[Illumitech Forge](https://github.com/TheZehel/illumitech-forge): a toolkit to plan, execute,
+verify and resume development with external checks.
 
-Version 1.4.1. Consult registry and GitHub receipts for the effectively published revision.
-MIT licensed. See LICENSE and THIRD_PARTY_NOTICES. External agent clients and ai-memory are not bundled.
+For installation and end-user workflows, use
+[illumitech-forge-cli 1.7.1](https://crates.io/crates/illumitech-forge-cli/1.7.1).
+See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.1)
+for notes and checksums.
+
+MIT licensed. LICENSE, THIRD_PARTY_NOTICES and the dependency inventory accompany this
+package. External agent clients and optional ai-memory are not bundled.

@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import tarfile
 import tempfile
+from documentation import render
 
 ROOT = Path(__file__).resolve().parents[1]
 ORDER = tuple('illumitech-forge-' + n for n in ('domain', 'adapters', 'catalog', 'cli'))
@@ -73,11 +74,18 @@ def verify_notices(root, packages):
                 raise ValueError('missing or stale dependency notice')
 
 
+def verify_readme(source, stem, expected):
+    member = source.extractfile(stem + '/README.md')
+    if member is None or member.read() != expected:
+        raise ValueError('packaged README differs from current generated documentation: ' + stem)
+
+
 def run(mode, output=None):
     if output is not None:
         output = output.resolve()
         if output.exists():
             raise ValueError('candidate output must be fresh; never overwrite prior packages')
+    render(ROOT)
     packages = inventory(ROOT)
     verify_notices(ROOT, packages)
     package_files = {}
@@ -120,6 +128,8 @@ def run(mode, output=None):
                         raise ValueError('unexpected archive entry')
                     files.append('/'.join(parts[1:]))
                 validate_files(files, ui=name == ORDER[-1])
+                directory = Path(packages[name]['manifest_path']).parent
+                verify_readme(source, stem, (directory / packages[name]['readme']).read_bytes())
                 source.extractall(extracted, filter='data')
             members.append(stem)
         patches = '\n'.join(f'{name} = {{ path = "{stem}" }}' for name, stem in zip(ORDER, members))
@@ -142,7 +152,7 @@ def run(mode, output=None):
             for name in hashes:
                 shutil.copyfile(temp / 'target/package' / name, output / name)
             (output / 'SHA256SUMS').write_text(''.join(f'{sha}  {name}\n' for name, sha in sorted(hashes.items())))
-        print(json.dumps({'archive_sha256': hashes, 'extracted_build': 'passed',
+        print(json.dumps({'archive_sha256': hashes, 'extracted_build': 'passed', 'packaged_readmes': 'passed',
                           'resolution': 'temporary local patches, not live registry',
                           'upload': 'not_performed', 'registry_ownership_auth': 'pending',
                           'cargo_publish_dry_run': registry_dry_run}))

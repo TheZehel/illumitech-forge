@@ -1,54 +1,81 @@
-# Illumitech Forge CLI 1.4.1
+# Illumitech Forge CLI 1.7.1
 
-Evidence-backed release execution, local web workbench and native interactive terminal.
+**Plan, execute, verify and resume development with Codex and external checks.**
+Illumitech Forge combines a CLI, interactive terminal and local web Workbench with durable
+workflow state. A portable skill helps assistants use the same commands and evidence.
 
-After this candidate is published:
+Forge supports Feature planning, implementation and QA; guided bug investigation; dependency
+remediation; release execution; and recovery. Completion depends on declared checks and
+current artifacts. Agent messages alone do not prove that work is complete.
+
+## Install and start
+
+Requires Rust 1.94 or newer to install from Cargo, and Git for projects and execution.
 
 ```sh
-cargo install illumitech-forge-cli --version 1.4.1 --locked
-forge
+cargo install illumitech-forge-cli --version 1.7.1 --locked
+forge --version
+forge --json workflow doctor --root /path/to/your-project
 ```
 
-`forge` opens the terminal conversation in your Git project; outside a project it offers an
-explicit project picker. `forge --root PATH` selects another project. State defaults to an
-external per-project directory. `illumitech-forge` remains available for existing scripts.
+Doctor checks the selected project, initial Git revision, client, authentication and PATH
+without inference or login. It explains missing prerequisites and suggests a next route.
+An initial commit requires your review; diagnosis does not create one.
 
-The terminal includes an ASCII identity, Markdown, `/` command menu, F1 help, `/status`,
-Ctrl+R session history, readline editing and native permission decisions. F2 or
-`/activities` opens per-call and per-file details; arrows select, Enter/Space toggle
-and Esc returns to the preserved draft. MCP failure indicators and file identities
-survive bounded output truncation. Managed native
-Codex authentication is preserved; Forge does not silently switch accounts, models or APIs.
-ai-memory is optional. Chat text is not gate evidence, and publication is always explicit.
+Both `forge` and `illumitech-forge` are native executables. If you already use another
+product named `forge`, install only the longer name with `--bin illumitech-forge` and use
+it in the commands below. `forge installation doctor` helps inspect executable selection.
 
-See the repository README for manifests, workbench, installation, support limits and credits.
-Windows and Claude remain experimental; this release's binary package targets macOS ARM64.
-Code is MIT; third-party notices and dependency inventory accompany the packages.
+With the native Codex client installed and authenticated, open the terminal or Workbench
+in your Git project:
 
-## First execution without an agent
+```sh
+forge --root /path/to/your-project
+forge workbench --root /path/to/your-project --port 0
+```
+
+Forge preserves native account, model and tool permissions. The Workbench uses loopback;
+keep its capability URL private. State is external and isolated by project. ai-memory is
+optional. Free conversation is read-only; implementation requires reviewed workflow scope.
+
+## Try an execution without an agent
 
 ```sh
 forge demo create /path/to/a-new-directory
 ```
 
-Creation prepares an example, without running it. The response includes inspect, dry-run,
-run and report commands using the same external state directory. Only Git is needed; the
-native evaluator is pinned by SHA-256 and verifies an artifact and preserved file.
+This prepares a small example and prints its inspect, dry-run, run and report commands.
+Follow those commands with the same external state directory. The demo needs Git, without
+an agent account; its pinned native evaluator checks the greeting and a preserved file.
+Creation itself does not run the example.
 
-`init` creates no memory routing by default. Explicit `init --memory-workspace ID` is opt-in
-and preserves existing configuration. `installation doctor` inspects both executable names
-without running unknown candidates. Status/report return 2 for stale evidence even if the
-historical run snapshot remains passed. See the release verification for support limits.
+## Use workflows and the portable skill
 
-## Integrated workflows in 1.2.0
+- **Diagnose and discover:** `forge --json workflow doctor --root .` and
+  `forge --json contracts --command "modules feature prepare"` expose prerequisites and
+  actual parser arguments, defaults and conservative operation effects.
+- **Plan and verify:** Feature and QA workflows record objectives, tasks, coverage gaps,
+  external gates and artifacts. Scope consent and final human approval are separate.
+- **Resume:** status, reports and checkpoints carry continuity. Stale or uncertain evidence
+  requires review before replay. Errors include supported explanations and next steps.
+- **Use the skill:** download the standalone skill ZIP from the
+  [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.1),
+  verify its checksums and follow the
+  [installation guide](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/agent-experience.md#portable-skill-and-packages).
+  The CLI remains usable independently of the skill.
 
-`/plan REQUEST` prepares structured work through the native client. Review the scope digest
-and use `/run DIGEST` to authorize that scope. `/tasks` and `/report ID` expose state and evidence.
-The Workbench offers the same workflow. Native permissions and declared final human gates
-remain separate; scope consent never approves completion.
+Codex is the native executor. Bounded macOS ARM64 pilots observed project-skill discovery
+and one model-driven Feature workflow through the Codex extension in VS Code and Cursor.
+These pilots do not establish directory/marketplace installation or support for every
+workflow. The IDE extension uses standalone skills. Plugin archives are separate candidates.
 
-CLI automation includes `workflow prepare|start|status|diagnose|resume|list|recipes|findings`
-and read-only `eval compare`. Bug regressions are frozen outside the project; dependency
-remediation requires SARIF rescan plus project checks. Unknown usage stays unknown; the small
-native pilot did not demonstrate token savings. Public GitHub uses MIT. The PT/EN website
-remains a local preview, with no deployment, telemetry or native bridge.
+## Documentation and support
+
+- [Quickstart](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/quickstart.md)
+- [Commands, diagnostics and continuity](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/agent-experience.md)
+- [Release notes](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/release-v1.7.1.md)
+- [Source and issues](https://github.com/TheZehel/illumitech-forge)
+
+Prebuilt binaries target macOS ARM64. Native Linux acceptance remains deferred; Windows
+and Claude remain experimental. No new telemetry is added. Publication is always explicit.
+MIT licensed, with third-party notices and dependency inventory included in the package.

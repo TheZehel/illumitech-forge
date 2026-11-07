@@ -6,6 +6,11 @@
       "id": "F067",
       "kind": "fix",
       "summary": "Explain the missing initial Git revision before Feature preparation and align first-run skill guidance"
+    },
+    {
+      "id": "F068",
+      "kind": "fix",
+      "summary": "Synchronize registry READMEs and product description with the current release and verify packaged documentation"
     }
   ]
 }

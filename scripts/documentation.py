@@ -5,7 +5,9 @@ import json
 import re
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = ('README.md', 'README.en.md', 'docs/quickstart.md', 'apps/forge-site/src/content.ts', 'apps/forge-site/build.mjs')
+TARGETS = ('README.md', 'README.en.md', 'docs/quickstart.md', 'apps/forge-site/src/content.ts', 'apps/forge-site/build.mjs',
+           'crates/forge-cli/README.md', 'crates/forge-domain/README.md',
+           'crates/forge-adapters/README.md', 'crates/forge-catalog/README.md')
 def render(root, write=False):
     current = json.loads((root / 'release/current.json').read_text())
     version = current['published']

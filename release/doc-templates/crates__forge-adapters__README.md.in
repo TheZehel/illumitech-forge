@@ -1,0 +1,13 @@
+# illumitech-forge-adapters {{published}}
+
+Native process, memory and telemetry adapters for
+[Illumitech Forge](https://github.com/TheZehel/illumitech-forge): a toolkit to plan, execute,
+verify and resume development with external checks.
+
+For installation and end-user workflows, use
+[illumitech-forge-cli {{published}}](https://crates.io/crates/illumitech-forge-cli/{{published}}).
+See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v{{published}})
+for notes and checksums.
+
+MIT licensed. LICENSE, THIRD_PARTY_NOTICES and the dependency inventory accompany this
+package. External agent clients and optional ai-memory are not bundled.

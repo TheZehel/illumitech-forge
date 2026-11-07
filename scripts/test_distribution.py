@@ -1,10 +1,12 @@
 import json
+import io
 from pathlib import Path
 import subprocess
+import tarfile
 import tempfile
 from unittest.mock import patch
 import unittest
-from distribution import ORDER, validate_files, validate_graph
+from distribution import ORDER, validate_files, validate_graph, verify_readme
 from public_readiness import scan, forbidden_path, audit
 
 
@@ -42,6 +44,24 @@ class DistributionContract(unittest.TestCase):
                 validate_files(files + [bad])
         with self.assertRaises(ValueError):
             validate_files(['src/lib.rs'])
+
+    def test_archive_readme_must_match_current_generated_source(self):
+        current = b'# Illumitech Forge CLI 1.7.1\ncurrent installation\n'
+        for body in (current, b'# Illumitech Forge CLI 1.4.1\nobsolete installation\n'):
+            with self.subTest(body=body):
+                archive = io.BytesIO()
+                stem = 'illumitech-forge-cli-1.7.1'
+                with tarfile.open(fileobj=archive, mode='w') as packed:
+                    member = tarfile.TarInfo(stem + '/README.md')
+                    member.size = len(body)
+                    packed.addfile(member, io.BytesIO(body))
+                archive.seek(0)
+                with tarfile.open(fileobj=archive) as packed:
+                    if body == current:
+                        verify_readme(packed, stem, current)
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'packaged README differs'):
+                            verify_readme(packed, stem, current)
 
     def test_standalone_ui_allowlist_stays_narrow(self):
         files = ['Cargo.toml', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'dependencies.json',

@@ -1,0 +1,81 @@
+# Illumitech Forge CLI {{published}}
+
+**Plan, execute, verify and resume development with Codex and external checks.**
+Illumitech Forge combines a CLI, interactive terminal and local web Workbench with durable
+workflow state. A portable skill helps assistants use the same commands and evidence.
+
+Forge supports Feature planning, implementation and QA; guided bug investigation; dependency
+remediation; release execution; and recovery. Completion depends on declared checks and
+current artifacts. Agent messages alone do not prove that work is complete.
+
+## Install and start
+
+Requires Rust 1.94 or newer to install from Cargo, and Git for projects and execution.
+
+```sh
+cargo install illumitech-forge-cli --version {{published}} --locked
+forge --version
+forge --json workflow doctor --root /path/to/your-project
+```
+
+Doctor checks the selected project, initial Git revision, client, authentication and PATH
+without inference or login. It explains missing prerequisites and suggests a next route.
+An initial commit requires your review; diagnosis does not create one.
+
+Both `forge` and `illumitech-forge` are native executables. If you already use another
+product named `forge`, install only the longer name with `--bin illumitech-forge` and use
+it in the commands below. `forge installation doctor` helps inspect executable selection.
+
+With the native Codex client installed and authenticated, open the terminal or Workbench
+in your Git project:
+
+```sh
+forge --root /path/to/your-project
+forge workbench --root /path/to/your-project --port 0
+```
+
+Forge preserves native account, model and tool permissions. The Workbench uses loopback;
+keep its capability URL private. State is external and isolated by project. ai-memory is
+optional. Free conversation is read-only; implementation requires reviewed workflow scope.
+
+## Try an execution without an agent
+
+```sh
+forge demo create /path/to/a-new-directory
+```
+
+This prepares a small example and prints its inspect, dry-run, run and report commands.
+Follow those commands with the same external state directory. The demo needs Git, without
+an agent account; its pinned native evaluator checks the greeting and a preserved file.
+Creation itself does not run the example.
+
+## Use workflows and the portable skill
+
+- **Diagnose and discover:** `forge --json workflow doctor --root .` and
+  `forge --json contracts --command "modules feature prepare"` expose prerequisites and
+  actual parser arguments, defaults and conservative operation effects.
+- **Plan and verify:** Feature and QA workflows record objectives, tasks, coverage gaps,
+  external gates and artifacts. Scope consent and final human approval are separate.
+- **Resume:** status, reports and checkpoints carry continuity. Stale or uncertain evidence
+  requires review before replay. Errors include supported explanations and next steps.
+- **Use the skill:** download the standalone skill ZIP from the
+  [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v{{published}}),
+  verify its checksums and follow the
+  [installation guide](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/agent-experience.md#portable-skill-and-packages).
+  The CLI remains usable independently of the skill.
+
+Codex is the native executor. Bounded macOS ARM64 pilots observed project-skill discovery
+and one model-driven Feature workflow through the Codex extension in VS Code and Cursor.
+These pilots do not establish directory/marketplace installation or support for every
+workflow. The IDE extension uses standalone skills. Plugin archives are separate candidates.
+
+## Documentation and support
+
+- [Quickstart](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/quickstart.md)
+- [Commands, diagnostics and continuity](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/agent-experience.md)
+- [Release notes](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/release-v{{published}}.md)
+- [Source and issues](https://github.com/TheZehel/illumitech-forge)
+
+Prebuilt binaries target macOS ARM64. Native Linux acceptance remains deferred; Windows
+and Claude remain experimental. No new telemetry is added. Publication is always explicit.
+MIT licensed, with third-party notices and dependency inventory included in the package.
