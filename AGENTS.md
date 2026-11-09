@@ -23,3 +23,9 @@ Use `release version --changes release/changes.json` to determine the highest co
 and require its `--target VERSION` check as an external release gate. Follow `docs/release-version-policy.md`;
 fix-only changes use patch, compatible features/deprecations minor, breaking contracts major.
 Validate workspace/package/tag coherence separately; computed versions never authorize publication.
+
+Keep every project-maintained README current with each delivery: root translations, crates and
+apps. Update release templates and run `python3 scripts/documentation.py --write` followed by
+its read-only check. Register new first-party READMEs in that inventory. Verify README bytes
+inside the actual crate/archive and registry readback during publication. Preserve upstream
+third-party texts and intentional historical release evidence.

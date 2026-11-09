@@ -18,6 +18,8 @@ Cursor as a Forge executor. Keep the chosen host and the execution harness disti
 2. This skill requires Forge >=1.7.0 and <2.0.0, command_catalog schema 1 and continuity schema 1.
    Read [setup](references/setup.md) for missing/incompatible versions. Do not run execution
    commands with unsupported contracts. A missing binary is a setup state, not a failed task.
+   Recoverable release-publication retries additionally require `contracts.release_publication=1`.
+   If absent, inspect provider state read-only and use manual operator recovery; never repeat create.
 3. Use `--json contracts --command "COMMAND PATH"` to inspect syntax before constructing argv.
    Use `--help` for conditions not represented in the catalogue. Effects marked review_required
    are not known to be read-only. Unknown fields may be ignored; unsupported schema versions
@@ -29,7 +31,7 @@ Cursor as a Forge executor. Keep the chosen host and the execution harness disti
 
 ## Choose the flow
 
-- Installation, missing native client, PATH or first use: [setup](references/setup.md).
+- Project ZIP/source installation, first use and voluntary feedback: [setup](references/setup.md).
 - Feature or QA: [development](references/development.md). Feature and QA consent are distinct.
 - A stopped workflow, block, report or handoff: [continuity](references/continuity.md).
 - Explicit manifest/release, tools, imports, snapshots or advanced operation:

@@ -1,16 +1,26 @@
 {
   "schema_version": 1,
-  "base_version": "1.7.0",
+  "base_version": "1.7.1",
   "changes": [
     {
-      "id": "F067",
+      "id": "F069",
       "kind": "fix",
-      "summary": "Explain the missing initial Git revision before Feature preparation and align first-run skill guidance"
+      "summary": "Recover interrupted GitHub release publication from provider state without duplicate writes or unverified public assets"
     },
     {
-      "id": "F068",
+      "id": "F070",
+      "kind": "feature",
+      "summary": "Verify and install the public project skill from a checksummed release archive with CLI compatibility and preservation checks"
+    },
+    {
+      "id": "F071",
       "kind": "fix",
-      "summary": "Synchronize registry READMEs and product description with the current release and verify packaged documentation"
+      "summary": "Update bundled SQLite to the corrected release and refresh the exact dependency inventory and notices"
+    },
+    {
+      "id": "README-180",
+      "kind": "docs",
+      "summary": "Synchronize all seven project READMEs and require registration of future app/crate READMEs in generated release documentation"
     }
   ]
 }

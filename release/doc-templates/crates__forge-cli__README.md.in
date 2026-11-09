@@ -69,6 +69,20 @@ and one model-driven Feature workflow through the Codex extension in VS Code and
 These pilots do not establish directory/marketplace installation or support for every
 workflow. The IDE extension uses standalone skills. Plugin archives are separate candidates.
 
+## Verified skill installation and release recovery
+
+The matching binary archive includes `scripts/install_agent_skill.py` (Python 3.11+).
+It requires a trusted whole-ZIP SHA-256 and an explicitly selected compatible Forge CLI,
+previews by default and preserves existing installs. Follow the
+[skill tutorial](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/skill-getting-started.md).
+Codex CLI and its extension in VS Code or Cursor use the Codex skill loader.
+
+Release recovery is available when `forge --json contracts` reports
+`contracts.release_publication=1`. With current evidence and human approval, it reconciles
+partial provider state and downloaded asset bytes before further writes. See the
+[recovery guide](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/release-recovery.md).
+Older binaries without this capability require manual inspection or a reviewed upgrade.
+
 ## Documentation and support
 
 - [Quickstart](https://github.com/TheZehel/illumitech-forge/blob/v{{published}}/docs/quickstart.md)

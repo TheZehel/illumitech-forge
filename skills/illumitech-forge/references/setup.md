@@ -1,5 +1,73 @@
 # Setup and first run
 
+## Install one project skill
+
+The CLI and this skill are independent. Requires Python 3.11+, Git, an existing selected
+Git root and an explicitly selected Forge >=1.7.0,<2.0.0 with command_catalog/continuity
+schema 1. Installation runs only that binary's `--version` and `--json contracts`, plus
+a bounded Git root query. It never executes a Feature or authenticates a native client.
+
+Use `scripts/install_agent_skill.py` from a verified binary archive (included starting
+with 1.8.0), or from reviewed source. Older 1.7.0/1.7.1 binary archives predate this
+installer. A candidate checkout may precede publication: confirm the intended release
+and artifacts exist first.
+
+Download `illumitech-forge-v1.8.0-skill.zip` and its whole-file digest from the same
+[pinned release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.8.0).
+Verify the download/source through a trusted release channel; a caller-supplied checksum
+is integrity evidence, not a publisher signature. Replace the digest placeholder below.
+
+```sh
+python3 /reviewed/scripts/install_agent_skill.py \
+  --archive /downloads/illumitech-forge-v1.8.0-skill.zip \
+  --sha256 TRUSTED_64_HEX_DIGEST --root /absolute/project \
+  --host codex --forge-binary /verified/illumitech-forge
+```
+
+This is a read-only JSON preview. Review its target and file hashes, then repeat the
+same arguments with `--apply` to create `.agents/skills/illumitech-forge`. `--host` selects
+the skill loader. Use `--host codex` for Codex CLI or the Codex extension in either VS Code
+or Cursor. `--host cursor` targets the native Cursor Agent loader at
+`.cursor/skills/illumitech-forge`; it does not select the Codex extension inside Cursor.
+Choose one copy; if the catalog route already installed `.agents/skills/illumitech-forge`,
+inspect that installation instead of adding a duplicate under `.cursor`.
+Every argument shown is required. No force, overwrite, global or automatic CLI lookup exists.
+Exit 2 with a JSON diagnostic on stderr means setup is blocked. Missing/incompatible CLI,
+wrong/plugin ZIP, incomplete hashes, extra/duplicate/corrupt files and symlink ancestors
+are rejected before target writes. Existing targets (including empty directories and dangling
+links) are preserved; review them manually rather than expecting an upgrade in place.
+Limits: 8 MiB archive, 32 entries, 1 MiB per file, 4 MiB expanded, 10 seconds and 512 KiB
+per output stream for each probe. Apply requires Unix no-follow directory descriptors;
+other platforms fail closed. Windows remains experimental without a native pilot.
+
+The operator observed source/catalog file installation with skills CLI 1.7.6 and public
+`v1.7.1` (commit `0391aeb275f1e0d2e18842cff1e26c31000513e5`) in separate disposable Codex
+and Cursor projects. Both `--agent codex` and `--agent cursor` installed the single public
+skill at `.agents/skills/illumitech-forge`; this CLI does not use the ZIP installer's
+Cursor layout. The fourteen installed resource hashes and preservation sentinels passed.
+Review the pinned third-party tool and run only the chosen alternative from the project root:
+
+```sh
+# Codex project, reviewed source tag; project scope is the skills CLI default.
+npx skills@1.7.6 add https://github.com/TheZehel/illumitech-forge/tree/v1.7.1/skills/illumitech-forge --skill illumitech-forge --agent codex --copy --yes
+# Alternative target for the same pinned public source, in a separate project:
+npx skills@1.7.6 add https://github.com/TheZehel/illumitech-forge/tree/v1.7.1/skills/illumitech-forge --skill illumitech-forge --agent cursor --copy --yes
+```
+
+For a local-source alternative, verify the checkout at the intended release tag or exact
+commit and retain the explicit single skill/agent options. Review
+[skills CLI 1.7.6 options](https://github.com/vercel-labs/skills/blob/v1.7.6/docs/commands.md) and
+availability of the pinned CLI before running it. It has its own network, lockfile and
+telemetry behavior and does not inherit this installer's preservation guarantees. Use a
+fresh disposable project for any new proof. Never select `skills/core`/`forge-workflow`,
+all skills, all agents or global scope. Catalog file installation, directory submission and
+native editor execution are separate proofs. Cursor's [skill directory documentation](https://cursor.com/docs/skills)
+accepts both `.agents/skills` and `.cursor/skills`; avoid duplicate copies. Refresh the selected
+host and inspect discovery. These observations establish file installation, not editor/model
+acceptance or marketplace submission. These observations used the historical public skill, not the new ZIP installer.
+
+## Diagnose and try a small Feature
+
 Check the selected executable's path and `--version`. If absent, inspect OS/architecture and
 Git availability using the host's read-only tools. Present the verified release artifact or
 Cargo build option. Official source: https://github.com/TheZehel/illumitech-forge . Download
@@ -41,3 +109,19 @@ preserved unrelated file. This synthetic demo does not prove native account or e
 For a real first Feature, use the development reference and the bundled feature-request.json
 in a disposable Git project. Its Python check requires Python 3; it is an example dependency,
 not a requirement for opening Forge. Keep operations/request files outside the project.
+Review preview, scope and external checks before apply/start; preserve the existing Codex
+account, model and permissions. Status/checkpoint and independent checks supply evidence.
+
+The operator's public v1.7.1 first-use evidence passed workflow doctor after a reviewed
+fixture commit, the no-agent demo, and one Codex CLI greeting Feature through the installed
+skill. The Feature produced exact `Hello` plus newline, preserved nine protected resource,
+lock and sentinel hashes and fixture HEAD, and added only the greeting and three planning
+files. Independent checks and status/checkpoint passed without replay. These are public
+v1.7.1 CLI observations, not acceptance of the new installer or a new editor/model pilot.
+
+Feedback is voluntary: report CLI version, skill release tag/hash, selected host/version,
+module, sanitized steps, expected/observed behavior and the point of difficulty through
+[feedback form](https://github.com/TheZehel/illumitech-forge/issues/new?template=forge-feedback.yml). Review before posting;
+omit credentials, personal paths, private code, account/session data and raw journals.
+There is no Forge feedback upload or new telemetry. Local file tests do not establish
+new IDE, model, native-account or platform acceptance.

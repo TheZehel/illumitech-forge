@@ -5,7 +5,7 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.7.1.** Terminal reading stays anchored during streaming and resizing, with mouse/trackpad scrolling, PgUp/PgDn and Ctrl+Home/End. A compact header, footer and editor leave more room for conversation. See the [release notes](docs/release-v1.7.1.md). Availability and checksums are recorded in [GitHub releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
+**Illumitech Forge 1.8.0.** Recoverable release publication, verified project-skill installation and evidence-backed continuity. The CLI and Workbench remain independent of the skill. See the [current release notes](docs/release-v1.8.0.md), [skill guide](docs/skill-getting-started.md) and [recovery guide](docs/release-recovery.md). Artifacts and checksums are in [releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
 
 ![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
 
@@ -30,7 +30,7 @@ No paid API fallback or permission bypass is introduced.
 ## Start with the published release
 
 ```sh
-cargo install illumitech-forge-cli --version 1.7.1 --locked
+cargo install illumitech-forge-cli --version 1.8.0 --locked
 forge --version
 forge
 ```
@@ -40,7 +40,7 @@ separately for conversations; its account, model and permissions are preserved. 
 interface needs no `init`, ai-memory, Python or Node. Free chat is read-only; implementation
 execution requires a reviewed manifest.
 
-Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.1)
+Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.8.0)
 needs no Rust compiler. The GitHub repository and crate source are public under MIT.
 See the [quickstart](docs/quickstart.md) for installation, version/PATH checks and Workbench.
 
@@ -105,7 +105,21 @@ The PT/EN website is a local preview; no domain, telemetry or deployment is enab
 Version 1.7.0 adds first-run diagnostics, command discovery, operational explanations and
 continuity shared by the CLI, Workbench and a portable skill.
 [Setup, contracts and pilot limits](docs/agent-experience.md) ·
+[Skill tutorial and voluntary feedback](docs/skill-getting-started.md) ·
 [Release notes](docs/release-v1.7.0.md).
 Codex executes agents. The skill was discovered in Codex CLI and the Codex extension in
 VS Code and Cursor. A small Feature passed in each editor with external gates and independent
 preservation checks. Directory installation and other flows need their own evidence.
+
+## Distribution and recovery in 1.8.0
+
+Binary archives include `scripts/install_agent_skill.py`, which verifies the standalone
+ZIP and selected CLI and previews without writes. `--apply` installs one project copy
+while preserving existing installations. Codex CLI and its extension in VS Code/Cursor
+use `--host codex`; `--host cursor` selects the native Cursor Agent loader.
+
+Recovering `release publish` requires `contracts.release_publication=1`, current evidence
+and revision-bound human approval. It reconciles provider state, verifies bytes and reuses
+valid assets; uncertain results and conflicts never authorize overwrites. Feedback is
+voluntary with no automatic upload. Historical pilots retain their evaluated versions;
+they do not establish new IDE acceptance for this release.

@@ -9,5 +9,7 @@ For installation and end-user workflows, use
 See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v{{published}})
 for notes and checksums.
 
+Release-publication intent is recorded separately from draft PRs; existing state and manifest schemas remain version 1.
+
 MIT licensed. LICENSE, THIRD_PARTY_NOTICES and the dependency inventory accompany this
 package. External agent clients and optional ai-memory are not bundled.

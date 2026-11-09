@@ -9,5 +9,7 @@ For installation and end-user workflows, use
 See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v{{published}})
 for notes and checksums.
 
+Native commands preserve the configured account/model and bounded process controls. Agents are never accepted as their own result verifier.
+
 MIT licensed. LICENSE, THIRD_PARTY_NOTICES and the dependency inventory accompany this
 package. External agent clients and optional ai-memory are not bundled.

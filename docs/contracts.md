@@ -65,13 +65,45 @@ the complete event/usage journal. Legacy log paths remain untouched. Keep state 
 archived state directories under the operator's retention policy.
 
 `release run` never publishes. `release publish` requires current passing evidence, at least one
-human gate, a clean evaluated commit, matching GitHub origin, a private target and an existing remote
+human gate, a clean evaluated commit, matching GitHub origin, the expected visibility (PRIVATE by
+default; PUBLIC must be explicit) and an existing remote
 tag resolving to that commit. Memory is required only when `memory.required: true` is declared.
 Tags and assets are project-independent: SHA256SUMS must list every uploaded asset with two spaces
 between digest and plain filename. Symlinks, traversal, missing or extra assets and mismatched hashes
 block publication. Per-archive `.sha256` sidecars are allowed but not uploaded. Notes and assets resolve
 from the caller's working directory. Dry-run performs local checks only; it does not verify remote state.
 Operators remain responsible for reviewing manifest coverage and package provenance.
+
+The following recovery protocol requires `contracts.release_publication=1` from the selected
+executable's `--json contracts`. Published 1.7.0/1.7.1 do not implement it. If the capability is
+absent or unsupported, preserve state, inspect provider state read-only and use manual operator
+recovery; do not repeat the nonrecoverable publisher or create a replacement release.
+
+Publication persists a separate `release-publication:RELEASE_ID` journal in the external state
+database before any remote mutation. It binds the manifest, source fingerprints, task evidence,
+repository, tag, visibility, notes and every asset's size and SHA-256 (including SHA256SUMS).
+The provider protocol creates an asset-free draft, uploads each missing asset, verifies downloaded
+binary files, and publishes only the complete verified draft. GitHub CLI calls pin `github.com`,
+including API reads, regardless of GH_HOST. Collection reads are complete and paginated; transport
+errors never establish that a release is absent. Commands retain bounded output, timeout and
+SIGINT/SIGTERM cancellation. Downloaded files are isolated outside source.
+
+After a timeout, cancellation or uncertain response, retain the state directory and explicitly
+repeat the same `release publish` command with the original inputs. Recovery reads the release and
+asset inventory, downloads existing assets and uploads only missing expected assets. It never reruns
+implementation tasks. Only an empty `starter` asset linked to this candidate's prior upload intent
+may be removed; conflicting or unexpected assets are preserved. Changed inputs, stale human
+approval, remote notes/title/tag/visibility/inventory or downloaded bytes block recovery. A
+previously verified asset that disappears or changes identity also blocks recovery.
+Source identity is the mandatory resolved remote tag (peeled for annotated tags), checked against
+the evaluated commit. GitHub's `target_commitish` is unused for an existing tag and may remain
+`main`; it is neither compared to that commit nor resolved instead of the tag.
+
+An already published matching release, even without a prior local publication journal, is
+verified through fresh downloads and reported with
+`published: true` and `readback: verified`, with no remote writes. A successful command response
+alone never creates the final completion receipt. See [recovery procedure](release-recovery.md)
+for operator handoffs and conflict handling.
 
 ## Operational automation (0.2)
 

@@ -1048,11 +1048,11 @@
     },
     {
       "name": "libsqlite3-sys",
-      "version": "0.38.2",
+      "version": "0.39.1",
       "license": "MIT",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
-        "libsqlite3-sys-0.38.2/LICENSE"
+        "libsqlite3-sys-0.39.1/LICENSE"
       ]
     },
     {
@@ -1549,11 +1549,11 @@
     },
     {
       "name": "rusqlite",
-      "version": "0.40.2",
+      "version": "0.41.0",
       "license": "MIT",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
       "notices": [
-        "rusqlite-0.40.2/LICENSE"
+        "rusqlite-0.41.0/LICENSE"
       ]
     },
     {
@@ -2661,7 +2661,7 @@
   ],
   "missing_notices": [],
   "frontend": {
-    "lock_sha256": "0c1fbe277b88fc110f6f88cea14293b2a9dca705b106fb8c18a053b9a5126f31",
+    "lock_sha256": "0b6d0134ce70c6c864200d29cf9f846e2745efbc0002c4a69af9e9d51ee285a4",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",
@@ -5155,7 +5155,7 @@
     ]
   },
   "site_frontend": {
-    "lock_sha256": "c03548c1930d42cc07805c47edeb5611cf0c56a7a1d1e311dc7cfdef237c9c4c",
+    "lock_sha256": "b7cd1253173261b25522f7c3598de70d14e32cd10ac800f7f6ada646fc7670ce",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",

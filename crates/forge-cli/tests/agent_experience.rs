@@ -22,6 +22,7 @@ fn discovery_and_invalid_requests_have_no_execution_side_effects() {
     );
     assert_eq!(code, 0);
     assert_eq!(catalog["contracts"]["continuity"], 1);
+    assert_eq!(catalog["contracts"]["release_publication"], 1);
     assert_eq!(
         catalog["command_catalog"]["commands"][0]["effect"],
         "execution_requires_review"

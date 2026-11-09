@@ -55,6 +55,8 @@ jobs:
       - run: python scripts/test_distribution.py
       - run: python scripts/distribution.py list
       - run: python scripts/test_package.py
+      - name: Verify standalone skill packages and project installer
+        run: python -m unittest discover -s scripts -p "test_*agent_skill.py"
       - run: python scripts/licenses.py
       - name: Package binary and notices
         run: python scripts/package.py ${{ matrix.target }}

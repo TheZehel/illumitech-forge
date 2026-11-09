@@ -260,7 +260,7 @@ fn render(
             ))
         });
     }
-    let conn = Connection::open_with_flags(
+    let mut conn = Connection::open_with_flags(
         db,
         OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
     )?;

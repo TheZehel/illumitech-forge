@@ -1,0 +1,83 @@
+{
+  "name": "Forge usage feedback",
+  "description": "Report a reproducible difficulty with setup, commands, blockers or continuity.",
+  "title": "Feedback: ",
+  "body": [
+    {
+      "type": "markdown",
+      "attributes": {
+        "value": "Share a small reproducible example. Remove credentials, private source, personal paths and session URLs before posting."
+      }
+    },
+    {
+      "type": "dropdown",
+      "id": "difficulty",
+      "attributes": {
+        "label": "Where did you get stuck?",
+        "options": [
+          "Getting started or installing",
+          "Choosing commands or arguments",
+          "Understanding a blocker",
+          "Resuming or handing off work",
+          "Other"
+        ]
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "versions",
+      "attributes": {
+        "label": "Versions and interface",
+        "description": "Include CLI/skill version and interface if known; missing or unknown is a valid answer.",
+        "placeholder": "Forge: 1.8.0 / not installed / unknown\nSkill tag or ZIP hash:\nInterface: Codex CLI / Codex extension in VS Code / Codex extension in Cursor / Cursor Agent / other\nOS and architecture:"
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "dropdown",
+      "id": "module",
+      "attributes": {
+        "label": "Workflow",
+        "options": [
+          "Setup or skill installation",
+          "Feature",
+          "QA",
+          "Release publication",
+          "Status or recovery",
+          "Terminal or Workbench",
+          "Other"
+        ]
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "reproduction",
+      "attributes": {
+        "label": "Small reproduction",
+        "description": "Give the reviewed command or minimal steps with placeholders for private data."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "expected_observed",
+      "attributes": {
+        "label": "Expected and observed result",
+        "description": "Describe the result, blocker or next step you expected and what Forge showed instead."
+      },
+      "validations": {
+        "required": true
+      }
+    }
+  ]
+}

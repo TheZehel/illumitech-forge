@@ -5,7 +5,7 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.7.1.** A leitura no terminal permanece ancorada durante streaming e redimensionamento, com rolagem por mouse/trackpad, PgUp/PgDn e Ctrl+Home/End. Cabeçalho, rodapé e editor compactos deixam mais espaço para a conversa. Veja as [notas](docs/release-v1.7.1.md). Disponibilidade e checksums constam nas [releases do GitHub](https://github.com/TheZehel/illumitech-forge/releases); compilar esta árvore não atualiza seu binário instalado.
+**Illumitech Forge 1.8.0.** Publicação recuperável de releases, instalação verificada da skill por projeto e continuidade com evidências. O CLI e o Workbench continuam independentes da skill. Veja as [notas desta versão](docs/release-v1.8.0.md), o [guia da skill](docs/skill-getting-started.md) e o [guia de recuperação](docs/release-recovery.md). Artefatos e checksums ficam nas [releases](https://github.com/TheZehel/illumitech-forge/releases); compilar este código não atualiza um binário já instalado.
 
 [English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
@@ -33,7 +33,7 @@ somente leitura; a implementação usa um manifest revisado. A resposta do chat 
 ## Começar com a versão publicada
 
 ```sh
-cargo install illumitech-forge-cli --version 1.7.1 --locked
+cargo install illumitech-forge-cli --version 1.8.0 --locked
 forge --version
 forge
 ```
@@ -43,7 +43,7 @@ separadamente para conversar; conta, modelo e permissões continuam nativos. Nã
 rodar `init`, configurar memória, instalar Python ou Node para abrir a interface. A conversa
 livre é somente leitura; executar uma implementação exige um manifest revisado.
 
-Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.1)
+Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.8.0)
 dispensa Rust. O repositório GitHub e o código dos crates são públicos sob MIT.
 [Início rápido](docs/quickstart.md): instalação, verificação de versão, PATH e Workbench.
 
@@ -130,7 +130,21 @@ identidade humana configurada, sem atribuição de autoria a agentes.
 A versão 1.7.0 reúne diagnóstico da primeira execução, descoberta de comandos, explicações
 operacionais e continuidade compartilhada entre CLI, Workbench e uma skill portátil.
 [Instalação, contratos e limites dos pilotos](docs/agent-experience.md) ·
+[Tutorial da skill e feedback voluntário](docs/skill-getting-started.md) ·
 [Notas da versão](docs/release-v1.7.0.md).
 O Codex executa os agentes. A skill foi descoberta no Codex CLI e na extensão Codex dos
 editores VS Code e Cursor. Uma Feature pequena passou em cada editor, com gates externos
 e preservação conferida. Instalação por diretório e outros fluxos precisam de evidências próprias.
+
+## Distribuição e recuperação na 1.8.0
+
+O instalador `scripts/install_agent_skill.py` acompanha o pacote binário, verifica o ZIP
+standalone e o CLI selecionado e faz prévia sem escrever. `--apply` instala uma cópia por
+projeto, preservando instalações existentes. Codex CLI e sua extensão no VS Code/Cursor
+usam `--host codex`; `--host cursor` seleciona o carregador do Cursor Agent.
+
+A recuperação de `release publish` exige `contracts.release_publication=1`, evidência
+atual e aprovação humana da revisão. Reconcilia o provedor, verifica bytes e reutiliza
+ativos válidos; resultados incertos e conflitos não autorizam sobrescrita. O formulário
+de feedback é voluntário e não envia dados automaticamente. Os pilotos históricos
+continuam vinculados às versões avaliadas; não são novo aceite desta versão em IDEs.

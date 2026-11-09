@@ -7,12 +7,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = ('README.md', 'README.en.md', 'docs/quickstart.md', 'apps/forge-site/src/content.ts', 'apps/forge-site/build.mjs',
            'crates/forge-cli/README.md', 'crates/forge-domain/README.md',
-           'crates/forge-adapters/README.md', 'crates/forge-catalog/README.md')
+           'crates/forge-adapters/README.md', 'crates/forge-catalog/README.md',
+           'docs/skill-getting-started.md', 'skills/illumitech-forge/references/setup.md',
+           'apps/forge-ui/README.md')
 def render(root, write=False):
     current = json.loads((root / 'release/current.json').read_text())
     version = current['published']
     if not re.fullmatch(r'[1-9][0-9]*\.[0-9]+\.[0-9]+', version):
         raise ValueError('invalid published version')
+    readmes = {name for name in TARGETS if Path(name).name.startswith('README')}
+    discovered = {p.relative_to(root).as_posix() for pattern in
+                  ('README*.md', 'crates/*/README*.md', 'apps/*/README*.md')
+                  for p in root.glob(pattern) if p.is_file()}
+    if discovered - readmes:
+        raise ValueError('unmanaged project README: ' + ', '.join(sorted(discovered - readmes)))
     for name in TARGETS:
         template = root / 'release/doc-templates' / (name.replace('/', '__') + '.in')
         body = template.read_text().replace('{{published}}', version)
@@ -29,7 +37,7 @@ def render(root, write=False):
             raise ValueError('stale generated current documentation: ' + name)
     if not (root / f'docs/release-v{version}.md').is_file():
         raise ValueError('missing published release notes')
-    return {'status': 'passed', 'published_version': version, 'current_documents': list(TARGETS),
+    return {'status': 'passed', 'published_version': version, 'current_documents': list(TARGETS), 'project_readmes': sorted(readmes),
             'historical_scope': 'docs/release-v*.md, specs and historical evidence retain their original versions'}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)

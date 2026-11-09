@@ -9,6 +9,8 @@ use std::{
 };
 use tokio::sync::watch;
 
+mod recovery;
+
 /// Expected remote visibility is a check, never a request to change it.
 #[derive(Clone, Copy, Debug, Default, clap::ValueEnum)]
 #[value(rename_all = "UPPER")]
@@ -244,58 +246,19 @@ async fn release_inner(
             json!({"schema_version":1,"status":"passed","dry_run":true,"expected_visibility":visibility.as_str(),"remote_visibility_checked":false,"repository":repo,"tag":tag,"assets":files,"notes":notes}),
         );
     }
-    let info: Value = serde_json::from_str(
-        &gh(
-            root,
-            &["repo", "view", repo, "--json", "visibility"],
-            cancel,
-        )
-        .await?,
-    )?;
-    visibility.check(&info)?;
-    let refs = command(
-        root,
-        vec![
-            "git".into(),
-            "ls-remote".into(),
-            "origin".into(),
-            format!("refs/tags/{tag}"),
-            format!("refs/tags/{tag}^{{}}"),
-        ],
+    recovery::publish(
+        c,
+        &run,
+        recovery::Inputs {
+            repo,
+            tag,
+            assets,
+            notes: &notes,
+            visibility,
+        },
         cancel,
     )
-    .await?;
-    let expected = &run.revisions.values().next().unwrap().commit;
-    let actual = refs
-        .lines()
-        .find(|l| l.ends_with("^{}"))
-        .or_else(|| refs.lines().next())
-        .and_then(|l| l.split_whitespace().next());
-    ensure!(
-        actual == Some(expected.as_str()),
-        "remote tag must identify the evaluated commit"
-    );
-    let mut argv = vec![
-        "gh".into(),
-        "release".into(),
-        "create".into(),
-        tag.into(),
-        "--repo".into(),
-        format!("github.com/{repo}"),
-        "--verify-tag".into(),
-        "--title".into(),
-        format!("{} {tag}", repo.split('/').next_back().unwrap()),
-        "--notes-file".into(),
-        notes.display().to_string(),
-    ];
-    argv.extend(files.iter().map(|p| p.display().to_string()));
-    let url = command(root, argv, cancel).await?;
-    Store::open(&c.db, false)?.save(
-        &run,
-        "published",
-        &json!({"repository":repo,"tag":tag,"url":url,"expected_visibility":visibility.as_str()}),
-    )?;
-    Ok(json!({"schema_version":1,"published":true,"url":url}))
+    .await
 }
 
 pub fn draft_preflight(c: &Context, config: &DraftPr) -> Result<()> {
@@ -690,30 +653,33 @@ pub fn traceability(c: &Context) -> Result<Value> {
     let read = || -> Result<Value> {
         if !c.db.exists() {
             return Ok(
-                json!({"status":"not_run","publication_journal":null,"evidence":null,
+                json!({"status":"not_run","publication_journal":null,"release_publication_journal":null,"evidence":null,
                 "independent_review":{"status":"not_run","acceptance":"unchanged"}}),
             );
         }
         let store = Store::open(&c.db, true)?;
         let journal = store.metadata(&format!("draft-pr:{}", c.manifest.release_id))?;
+        let release_journal =
+            store.metadata(&format!("release-publication:{}", c.manifest.release_id))?;
         let evidence = store.load(&c.manifest.release_id)?.map(|run| {
             json!({"manifest_hash":run.manifest_hash,"evaluated_revisions":run.revisions,"status":run.status,
                 "tasks":run.tasks.iter().map(|(id,t)|json!({"id":id,"status":t.status,"revision":t.revision,"evidence":t.evidence})).collect::<Vec<_>>()})
         });
         Ok(
-            json!({"status":"available","publication_journal":journal,"evidence":evidence,"independent_review":crate::review::latest(c)?}),
+            json!({"status":"available","publication_journal":journal,"release_publication_journal":release_journal,"evidence":evidence,"independent_review":crate::review::latest(c)?}),
         )
     };
     // Inspection must retain the duration/budget contracts for legacy/corrupt stores.
     // Unavailable readback conveys no approval or publication; mutations still fail closed.
     let snapshot = read().unwrap_or_else(|error| json!({"status":"unavailable","reason":error.to_string(),
-        "publication_journal":null,"evidence":null,"independent_review":{"status":"unavailable","acceptance":"unchanged"}}));
+        "publication_journal":null,"release_publication_journal":null,"evidence":null,"independent_review":{"status":"unavailable","acceptance":"unchanged"}}));
     Ok(
         json!({"operational_readback":{"status":snapshot["status"],"reason":snapshot["reason"]},
         "evidence":snapshot["evidence"],"issue":c.manifest.source,
         "specs":c.manifest.repos.iter().map(|(id,r)|json!({"repo":id,"specs":r.specs})).collect::<Vec<_>>(),
         "tasks":c.manifest.tasks.iter().map(|t|t.id.clone()).collect::<Vec<_>>(),"current_revisions":revisions(&c.roots)?,
         "independent_review":snapshot["independent_review"],"publication_journal":snapshot["publication_journal"],
+        "release_publication_journal":snapshot["release_publication_journal"],
         "commit_pr_link":"only verified journal entries attest publication; current local commit may precede this demand"}),
     )
 }

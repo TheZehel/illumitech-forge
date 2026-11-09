@@ -1,4 +1,4 @@
-# Illumitech Forge workbench
+# Illumitech Forge Workbench 1.8.0
 
 React/TypeScript/Vite frontend for the same-origin Rust bridge. No browser access to
 native credentials or arbitrary projects. Native configuration and managed authentication
@@ -9,7 +9,7 @@ npm ci --ignore-scripts
 npm run typecheck
 npm run build
 cd ../..
-cargo build -p illumitech-forge-cli
+cargo build --locked -p illumitech-forge-cli
 ```
 
 `npm run build` copies production assets and dependency licenses into
@@ -44,3 +44,16 @@ Runtime React, React DOM and Scheduler are MIT; their full licenses ship in the 
 `THIRD_PARTY_LICENSES.txt`. TypeScript (Apache-2.0), Vite (MIT), Playwright (Apache-2.0) and
 Node/React type declarations are build/test tools only. Exact transitive packages and
 integrity hashes are recorded in package-lock.json; upstream license files remain installed.
+
+## Current release and skill integration
+
+This frontend is distributed with Forge 1.8.0; see the [current release notes](../../docs/release-v1.8.0.md).
+Forge uses the existing native Codex account/model. The optional [project skill](../../docs/skill-getting-started.md)
+guides the assistant through the CLI; Codex CLI and its extension in VS Code/Cursor
+use the same `.agents/skills` loader. Installing files does not prove model execution.
+
+The CLI supports verified skill installation and [release-publication recovery](../../docs/release-recovery.md)
+when the reported capability is present. Those operations keep their explicit scope,
+external evidence and approval requirements; opening Workbench does not trigger them.
+A voluntary [feedback form](https://github.com/TheZehel/illumitech-forge/issues/new?template=forge-feedback.yml)
+collects reproducible setup, argument, blocker and continuity difficulties without automatic uploads.

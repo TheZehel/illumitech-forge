@@ -67,12 +67,15 @@ Build two reproducible packages in a fresh output directory:
 python3 scripts/package_agent_skill.py --output /absolute/new-artifacts
 ```
 
-The standalone archive contains an illumitech-forge folder. For local development, copy that
-folder into `.agents/skills` in a Codex project (also available to its VS Code extension),
-or `.cursor/skills` in a Cursor project. Do not overwrite an existing installation. Reopen
-or refresh the host and check discovery. This local setup is distinct from marketplace
-installation. The Codex IDE extension supports standalone skills but does not support
-plugins. For source-repository skill installers, select only `illumitech-forge`.
+The standalone archive contains an illumitech-forge folder. The F070 candidate adds a
+stdlib-only project installer: [preview/apply tutorial and feedback](skill-getting-started.md),
+with detailed [setup](../skills/illumitech-forge/references/setup.md). It requires an explicit
+archive hash, Git root, one host and compatible CLI path, and preserves existing installs.
+It is shipped in newly built binary archives; published 1.7.1 binary archives predate it.
+Public source/catalog installation remains an operator proof, separate from local ZIP tests,
+directory submission and native editor execution. Select only `illumitech-forge` and one
+project host; internal `forge-workflow` is not a public install. Refresh the host and check
+discovery. The Codex IDE extension supports standalone skills, not plugin archives.
 
 The plugin archive has root plugin.json plus skills/illumitech-forge and MIT. OpenAI metadata
 marks local execution required. It has no MCP server, hooks, binaries, credentials or automatic

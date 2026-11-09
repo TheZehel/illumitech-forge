@@ -22,6 +22,7 @@
     "command_catalog": 1,
     "diagnostic": 1,
     "continuity": 1,
+    "release_publication": 1,
     "onboarding": 1
   },
   "compatibility": {

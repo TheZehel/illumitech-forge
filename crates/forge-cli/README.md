@@ -1,4 +1,4 @@
-# Illumitech Forge CLI 1.7.1
+# Illumitech Forge CLI 1.8.0
 
 **Plan, execute, verify and resume development with Codex and external checks.**
 Illumitech Forge combines a CLI, interactive terminal and local web Workbench with durable
@@ -13,7 +13,7 @@ current artifacts. Agent messages alone do not prove that work is complete.
 Requires Rust 1.94 or newer to install from Cargo, and Git for projects and execution.
 
 ```sh
-cargo install illumitech-forge-cli --version 1.7.1 --locked
+cargo install illumitech-forge-cli --version 1.8.0 --locked
 forge --version
 forge --json workflow doctor --root /path/to/your-project
 ```
@@ -59,9 +59,9 @@ Creation itself does not run the example.
 - **Resume:** status, reports and checkpoints carry continuity. Stale or uncertain evidence
   requires review before replay. Errors include supported explanations and next steps.
 - **Use the skill:** download the standalone skill ZIP from the
-  [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.7.1),
+  [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.8.0),
   verify its checksums and follow the
-  [installation guide](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/agent-experience.md#portable-skill-and-packages).
+  [installation guide](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/agent-experience.md#portable-skill-and-packages).
   The CLI remains usable independently of the skill.
 
 Codex is the native executor. Bounded macOS ARM64 pilots observed project-skill discovery
@@ -69,11 +69,25 @@ and one model-driven Feature workflow through the Codex extension in VS Code and
 These pilots do not establish directory/marketplace installation or support for every
 workflow. The IDE extension uses standalone skills. Plugin archives are separate candidates.
 
+## Verified skill installation and release recovery
+
+The matching binary archive includes `scripts/install_agent_skill.py` (Python 3.11+).
+It requires a trusted whole-ZIP SHA-256 and an explicitly selected compatible Forge CLI,
+previews by default and preserves existing installs. Follow the
+[skill tutorial](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/skill-getting-started.md).
+Codex CLI and its extension in VS Code or Cursor use the Codex skill loader.
+
+Release recovery is available when `forge --json contracts` reports
+`contracts.release_publication=1`. With current evidence and human approval, it reconciles
+partial provider state and downloaded asset bytes before further writes. See the
+[recovery guide](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/release-recovery.md).
+Older binaries without this capability require manual inspection or a reviewed upgrade.
+
 ## Documentation and support
 
-- [Quickstart](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/quickstart.md)
-- [Commands, diagnostics and continuity](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/agent-experience.md)
-- [Release notes](https://github.com/TheZehel/illumitech-forge/blob/v1.7.1/docs/release-v1.7.1.md)
+- [Quickstart](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/quickstart.md)
+- [Commands, diagnostics and continuity](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/agent-experience.md)
+- [Release notes](https://github.com/TheZehel/illumitech-forge/blob/v1.8.0/docs/release-v1.8.0.md)
 - [Source and issues](https://github.com/TheZehel/illumitech-forge)
 
 Prebuilt binaries target macOS ARM64. Native Linux acceptance remains deferred; Windows

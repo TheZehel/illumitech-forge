@@ -139,28 +139,7 @@ impl Rig {
             std::fs::set_permissions(bin.join("git"), std::fs::Permissions::from_mode(0o755))
                 .unwrap();
         }
-        let fake = r#"#!/usr/bin/env python3
-import sys,json,pathlib,subprocess
-r=pathlib.Path(__file__).resolve().parent.parent;a=sys.argv[1:]
-with (r/'gh-calls.jsonl').open('a') as f:f.write(json.dumps(a)+'\n')
-if a[:2]==['repo','view']:print(json.dumps({'visibility':(r/'visibility').read_text() if (r/'visibility').exists() else 'PRIVATE'}))
-elif a[:2]==['pr','list']:
- if (r/'block-list').exists():
-  import time
-  (r/'list-waiting').touch();time.sleep(60)
- print((r/'pr.json').read_text() if (r/'pr.json').exists() else '[]')
-elif a[:2]==['pr','create']:
- p={'url':'https://github.com/fixture/project/pull/1','state':'OPEN','isDraft':True,'baseRefName':'main','headRefOid':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'headRefName':'forge/pilot','headRepository':{'nameWithOwner':'fixture/project'},'title':a[a.index('--title')+1],'body':pathlib.Path(a[a.index('--body-file')+1]).read_text()}
- (r/'pr.json').write_text(json.dumps([p]))
- if (r/'fail-create').exists():
-  print('HTTP 504 after provider persisted draft',file=sys.stderr);sys.exit(3)
- print(p['url'])
-elif a[:2]==['release','create']:
- assert pathlib.Path(a[a.index('--notes-file')+1]).is_absolute()
- assert all(pathlib.Path(x).is_absolute() for x in a[a.index('--notes-file')+2:])
- print('https://github.com/fixture/project/releases/tag/'+a[2])
-else:sys.exit(4)
-"#;
+        let fake = include_str!("fixtures/parity-github.py");
         std::fs::write(bin.join("gh"), fake).unwrap();
         #[cfg(unix)]
         {
@@ -190,6 +169,94 @@ else:sys.exit(4)
             bin,
         }
     }
+    fn release_candidate() -> Self {
+        let r = Self::new();
+        r.automate(true);
+        r.change(|m| m["automation"]["enabled"] = json!(false));
+        r.change(|m| {
+            m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
+            m["tasks"][0]["acceptance"]
+                .as_array_mut()
+                .unwrap()
+                .push(json!({"kind":"human","id":"owner"}));
+        });
+        git(
+            &r.repo,
+            &["tag", "-a", "-m", "Human fixture release", "v2.3.4"],
+        );
+        git(
+            &r.repo,
+            &[
+                "push",
+                r.root.join("remote.git").to_str().unwrap(),
+                "refs/tags/v2.3.4",
+            ],
+        );
+        let (_, v) = r.release("run");
+        assert_eq!(v["run"]["status"], "awaiting_approval");
+        let fingerprint = v["run"]["tasks"]["work"]["revision"]["fingerprint"]
+            .as_str()
+            .unwrap();
+        assert!(
+            r.call(&[
+                "release",
+                "approve",
+                r.manifest.to_str().unwrap(),
+                "--task",
+                "work",
+                "--gate",
+                "owner",
+                "--reviewer",
+                "Human Fixture",
+                "--fingerprint",
+                fingerprint
+            ])
+            .0
+        );
+        assert!(r.call(&["resume", r.manifest.to_str().unwrap()]).0);
+        let assets = r.root.join("assets");
+        std::fs::create_dir(&assets).unwrap();
+        std::fs::write(assets.join("widget.bin"), b"example\0\xff\x80\n").unwrap();
+        std::fs::write(
+            assets.join("SHA256SUMS"),
+            format!(
+                "{}  widget.bin\n",
+                forge_domain::digest(b"example\0\xff\x80\n")
+            ),
+        )
+        .unwrap();
+        std::fs::write(r.root.join("notes.md"), "Human release notes").unwrap();
+        r
+    }
+    fn publish(&self) -> (bool, Value) {
+        self.call(&[
+            "release",
+            "publish",
+            self.manifest.to_str().unwrap(),
+            "--repository",
+            "fixture/project",
+            "--tag",
+            "v2.3.4",
+            "--assets",
+            "assets",
+            "--notes",
+            "notes.md",
+        ])
+    }
+    fn writes(&self) -> Value {
+        let path = self.root.join("release-writes.json");
+        if path.exists() {
+            serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap()
+        } else {
+            json!([])
+        }
+    }
+    fn remote_release(&self, change: impl FnOnce(&mut Value)) {
+        let path = self.root.join("release.json");
+        let mut value: Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        change(&mut value);
+        std::fs::write(path, serde_json::to_vec(&value).unwrap()).unwrap();
+    }
     fn change(&self, f: impl FnOnce(&mut Value)) {
         let mut m: Value = serde_json::from_slice(&std::fs::read(&self.manifest).unwrap()).unwrap();
         f(&mut m);
@@ -209,6 +276,7 @@ else:sys.exit(4)
         let mut path = vec![self.bin.clone()];
         path.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap()));
         c.env("PATH", std::env::join_paths(path).unwrap());
+        c.env("GH_HOST", "wrong-host.invalid");
         c
     }
     fn call(&self, args: &[&str]) -> (bool, Value) {
@@ -379,56 +447,8 @@ fn draft_pr_refuses_agent_authorship_and_base_checkout() {
 
 #[test]
 fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
-    let r = Rig::new();
-    r.automate(true);
-    r.change(|m| m["automation"]["enabled"] = json!(false));
-    r.change(|m| {
-        m["tasks"][0]["executor"]["argv"] = json!(common::command("true"));
-        m["tasks"][0]["acceptance"]
-            .as_array_mut()
-            .unwrap()
-            .push(json!({"kind":"human","id":"owner"}));
-    });
-    git(&r.repo, &["tag", "v2.3.4"]);
-    git(
-        &r.repo,
-        &[
-            "push",
-            r.root.join("remote.git").to_str().unwrap(),
-            "refs/tags/v2.3.4",
-        ],
-    );
-    let (_, v) = r.release("run");
-    assert_eq!(v["run"]["status"], "awaiting_approval");
-    let fingerprint = v["run"]["tasks"]["work"]["revision"]["fingerprint"]
-        .as_str()
-        .unwrap();
-    assert!(
-        r.call(&[
-            "release",
-            "approve",
-            r.manifest.to_str().unwrap(),
-            "--task",
-            "work",
-            "--gate",
-            "owner",
-            "--reviewer",
-            "Human Fixture",
-            "--fingerprint",
-            fingerprint
-        ])
-        .0
-    );
-    assert!(r.call(&["resume", r.manifest.to_str().unwrap()]).0);
+    let r = Rig::release_candidate();
     let assets = r.root.join("assets");
-    std::fs::create_dir(&assets).unwrap();
-    std::fs::write(assets.join("widget.bin"), "example").unwrap();
-    std::fs::write(
-        assets.join("SHA256SUMS"),
-        format!("{}  widget.bin\n", forge_domain::digest(b"example")),
-    )
-    .unwrap();
-    std::fs::write(r.root.join("notes.md"), "Human release notes").unwrap();
     let args = [
         "release",
         "publish",
@@ -460,11 +480,43 @@ fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     assert!(!r.call(&args).0);
     let after = std::fs::read_to_string(r.root.join("gh-calls.jsonl")).unwrap();
     assert!(!after[before.len()..].contains("create"));
-    assert!(r.call(&public).0);
-    assert!(
-        !std::fs::read_to_string(r.root.join("gh-calls.jsonl"))
-            .unwrap()
-            .contains("edit")
+    // Recovery cannot change the bound visibility contract, even with explicit selection.
+    assert!(!r.call(&public).0);
+    assert_eq!(
+        r.writes(),
+        json!([
+            "create",
+            "upload:widget.bin",
+            "upload:SHA256SUMS",
+            "publish"
+        ])
+    );
+    let public_rig = Rig::release_candidate();
+    std::fs::write(public_rig.root.join("visibility"), "PUBLIC").unwrap();
+    let (ok, result) = public_rig.call(&[
+        "release",
+        "publish",
+        public_rig.manifest.to_str().unwrap(),
+        "--repository",
+        "fixture/project",
+        "--tag",
+        "v2.3.4",
+        "--assets",
+        "assets",
+        "--notes",
+        "notes.md",
+        "--expected-visibility",
+        "PUBLIC",
+    ]);
+    assert!(ok, "{result}");
+    assert_eq!(
+        public_rig.writes(),
+        json!([
+            "create",
+            "upload:widget.bin",
+            "upload:SHA256SUMS",
+            "publish"
+        ])
     );
     // Public selection still requires the exact approved revision.
     std::fs::write(r.repo.join("changed.txt"), "new revision").unwrap();
@@ -472,6 +524,341 @@ fn generic_release_publish_is_memory_optional_and_resolves_relative_paths() {
     std::fs::remove_file(r.repo.join("changed.txt")).unwrap();
     std::fs::write(assets.join("widget.bin"), "tampered").unwrap();
     assert!(!r.call(&args).0);
+}
+
+#[test]
+fn release_publication_recovers_uncertain_mutations_and_repeats_read_only() {
+    for point in [
+        "create_before",
+        "create_after",
+        "upload_before",
+        "upload_after",
+        "starter",
+        "publish_before",
+        "publish_after",
+    ] {
+        let r = Rig::release_candidate();
+        std::fs::write(r.root.join("release-unrelated"), "").unwrap();
+        std::fs::write(r.root.join("release-fail"), point).unwrap();
+        let (ok, result) = r.publish();
+        assert!(!ok, "{point}: {result}");
+        let writes = r.writes();
+        assert!(
+            !writes.as_array().unwrap().iter().any(|v| v == "publish") || point == "publish_after"
+        );
+        let store = forge_domain::Store::open(&r.state.join("state.sqlite"), true).unwrap();
+        let journal = store
+            .metadata("release-publication:pilot")
+            .unwrap()
+            .unwrap();
+        assert_eq!(journal["complete"], false);
+        assert!(journal["intent"].is_object());
+        assert!(store.metadata("draft-pr:pilot").unwrap().is_none());
+        assert!(
+            !store
+                .events("pilot")
+                .unwrap()
+                .iter()
+                .any(|v| v["kind"] == "published")
+        );
+        let (ok, result) = r.publish();
+        assert!(ok, "{point}: {result}");
+        let expected = if point == "starter" {
+            json!([
+                "create",
+                "upload:widget.bin",
+                "delete:widget.bin",
+                "upload:widget.bin",
+                "upload:SHA256SUMS",
+                "publish"
+            ])
+        } else {
+            json!([
+                "create",
+                "upload:widget.bin",
+                "upload:SHA256SUMS",
+                "publish"
+            ])
+        };
+        assert_eq!(r.writes(), expected, "{point}");
+        let (ok, report) = r.call(&["report", r.manifest.to_str().unwrap()]);
+        assert!(ok, "{report}");
+        assert_eq!(
+            report["traceability"]["release_publication_journal"]["complete"],
+            true
+        );
+        let events = store.events("pilot").unwrap();
+        let (ok, result) = r.publish();
+        assert!(ok, "{point}: {result}");
+        assert_eq!(r.writes(), expected);
+        assert_eq!(
+            store.events("pilot").unwrap(),
+            events,
+            "completed retry changed publication evidence"
+        );
+        assert_eq!(
+            std::fs::read(r.root.join("release-files/widget.bin")).unwrap(),
+            b"example\0\xff\x80\n"
+        );
+        // Keep length and advertised size unchanged to require hashing actual binary bytes.
+        std::fs::write(
+            r.root.join("release-files/widget.bin"),
+            b"example\0\xfe\x80\n",
+        )
+        .unwrap();
+        let (ok, result) = r.publish();
+        assert!(!ok, "{point}: {result}");
+        assert!(result.to_string().contains("checksum mismatch"), "{result}");
+        assert_eq!(r.writes(), expected);
+        assert!(git(&r.repo, &["status", "--porcelain"]).is_empty());
+    }
+}
+
+#[test]
+fn release_publication_accepts_symbolic_target_and_preexisting_publication_without_journal() {
+    for draft in [true, false] {
+        let r = Rig::release_candidate();
+        let store = forge_domain::Store::open(&r.state.join("state.sqlite"), true).unwrap();
+        assert!(
+            store
+                .metadata("release-publication:pilot")
+                .unwrap()
+                .is_none()
+        );
+        // The branch has moved; only the peeled, approved remote tag establishes source.
+        let base = r.root.join("base");
+        std::fs::write(base.join("later.txt"), "Later branch revision").unwrap();
+        git(&base, &["add", "."]);
+        git(&base, &["commit", "-qm", "Later branch revision"]);
+        git(
+            &base,
+            &["push", r.root.join("remote.git").to_str().unwrap(), "main"],
+        );
+        assert_ne!(
+            git(&base, &["rev-parse", "HEAD"]),
+            git(&r.repo, &["rev-parse", "HEAD"])
+        );
+        let files = r.root.join("release-files");
+        std::fs::create_dir(&files).unwrap();
+        let mut assets = Vec::new();
+        for (index, name) in ["widget.bin", "SHA256SUMS"].iter().enumerate() {
+            let bytes = std::fs::read(r.root.join("assets").join(name)).unwrap();
+            std::fs::write(files.join(name), &bytes).unwrap();
+            assets.push(json!({"id":index + 1,"name":name,"size":bytes.len(),"state":"uploaded"}));
+        }
+        std::fs::write(
+            r.root.join("release.json"),
+            serde_json::to_vec(&json!({"id":1,"tag_name":"v2.3.4","name":"project v2.3.4",
+                "body":"Human release notes","draft":draft,"prerelease":false,
+                "target_commitish":"main","assets":assets,
+                "html_url":"https://github.com/fixture/project/releases/tag/v2.3.4"}))
+            .unwrap(),
+        )
+        .unwrap();
+        let remote_before = std::fs::read(r.root.join("release.json")).unwrap();
+        let (ok, result) = r.publish();
+        assert!(ok, "draft={draft}: {result}");
+        assert_eq!(result["published"], true);
+        assert_eq!(result["readback"], "verified");
+        let expected = if draft { json!(["publish"]) } else { json!([]) };
+        assert_eq!(r.writes(), expected);
+        if !draft {
+            assert_eq!(
+                std::fs::read(r.root.join("release.json")).unwrap(),
+                remote_before
+            );
+        }
+        let journal = store
+            .metadata("release-publication:pilot")
+            .unwrap()
+            .unwrap();
+        assert_eq!(journal["complete"], true);
+        let events = store.events("pilot").unwrap();
+        let (ok, result) = r.publish();
+        assert!(ok, "{result}");
+        assert_eq!(r.writes(), expected);
+        assert_eq!(store.events("pilot").unwrap(), events);
+        assert!(git(&r.repo, &["status", "--porcelain"]).is_empty());
+    }
+}
+
+#[test]
+fn release_publication_sigterm_cancels_provider_and_preserves_intent() {
+    let r = Rig::release_candidate();
+    std::fs::write(r.root.join("release-fail"), "create_after").unwrap();
+    assert!(!r.publish().0);
+    let before = r.writes();
+    std::fs::write(r.root.join("release-block-read"), "").unwrap();
+    let mut child = ChildGuard(
+        r.command(&[
+            "release",
+            "publish",
+            r.manifest.to_str().unwrap(),
+            "--repository",
+            "fixture/project",
+            "--tag",
+            "v2.3.4",
+            "--assets",
+            "assets",
+            "--notes",
+            "notes.md",
+        ])
+        .stdout(Stdio::null())
+        .spawn()
+        .unwrap(),
+    );
+    wait_until(|| r.root.join("release-read-waiting").exists());
+    common::interrupt(child.id());
+    wait_until(|| child.try_wait().unwrap().is_some());
+    assert!(!child.wait().unwrap().success());
+    assert_eq!(r.writes(), before);
+    std::fs::remove_file(r.root.join("release-block-read")).unwrap();
+    let (ok, result) = r.publish();
+    assert!(ok, "{result}");
+    assert_eq!(
+        r.writes(),
+        json!([
+            "create",
+            "upload:widget.bin",
+            "upload:SHA256SUMS",
+            "publish"
+        ])
+    );
+}
+
+#[test]
+fn release_publication_preserves_conflicting_remote_state_and_stale_approval() {
+    for conflict in [
+        "notes",
+        "title",
+        "remote_tag",
+        "prerelease",
+        "identity",
+        "extra",
+        "starter",
+        "size",
+        "state",
+        "duplicate",
+        "clean_revision",
+    ] {
+        let r = Rig::release_candidate();
+        std::fs::write(r.root.join("release-fail"), "create_after").unwrap();
+        assert!(!r.publish().0);
+        let before = r.writes();
+        if conflict == "clean_revision" {
+            // Clean source at a different commit still cannot transfer human acceptance.
+            std::fs::write(r.repo.join("changed.txt"), "changed").unwrap();
+            git(&r.repo, &["add", "."]);
+            git(&r.repo, &["commit", "-qm", "Changed revision"]);
+        } else if conflict == "remote_tag" {
+            r.remote_release(|v| v["target_commitish"] = json!("main"));
+            // Keep local evaluated source and tag untouched; tamper only with the remote tag.
+            let base = r.root.join("base");
+            std::fs::write(base.join("later.txt"), "Wrong tag revision").unwrap();
+            git(&base, &["add", "."]);
+            git(&base, &["commit", "-qm", "Wrong tag revision"]);
+            git(
+                &base,
+                &["push", r.root.join("remote.git").to_str().unwrap(), "main"],
+            );
+            let wrong = git(&base, &["rev-parse", "HEAD"]);
+            git(
+                &r.root.join("remote.git"),
+                &["update-ref", "refs/tags/v2.3.4", &wrong],
+            );
+        } else {
+            r.remote_release(|v| match conflict {
+                "notes" => v["body"] = json!("Remote operator edit"),
+                "title" => v["name"] = json!("Remote title"),
+                "prerelease" => v["prerelease"] = json!(true),
+                "identity" => v["html_url"] = json!("https://other.invalid/release"),
+                "extra" => v["assets"] = json!([{"id":99,"name":"foreign.txt","size":1,"state":"uploaded"}]),
+                "starter" => v["assets"] = json!([{"id":99,"name":"widget.bin","size":0,"state":"starter"}]),
+                "size" => v["assets"] = json!([{"id":99,"name":"widget.bin","size":99,"state":"uploaded"}]),
+                "state" => v["assets"] = json!([{"id":99,"name":"widget.bin","size":11,"state":"unknown"}]),
+                "duplicate" => v["assets"] = json!([{"id":99,"name":"widget.bin","size":11,"state":"uploaded"},{"id":99,"name":"widget.bin","size":11,"state":"uploaded"}]),
+                _ => unreachable!(),
+            });
+        }
+        let (ok, result) = r.publish();
+        assert!(!ok, "{conflict}: {result}");
+        if conflict == "remote_tag" {
+            assert!(
+                result
+                    .to_string()
+                    .contains("remote tag must identify the evaluated commit"),
+                "{result}"
+            );
+        }
+        assert_eq!(r.writes(), before, "{conflict}");
+    }
+}
+
+#[test]
+fn release_publication_binds_inputs_and_never_guesses_remote_absence() {
+    for conflict in [
+        "notes",
+        "asset",
+        "manifest",
+        "unknown_read",
+        "missing_download",
+        "extra_download",
+        "missing_verified",
+        "replaced_verified",
+    ] {
+        let r = Rig::release_candidate();
+        std::fs::write(r.root.join("release-fail"), "upload_after").unwrap();
+        assert!(!r.publish().0);
+        // This retry verifies the first upload, then stops before the next upload.
+        std::fs::write(r.root.join("release-fail"), "upload_before").unwrap();
+        assert!(!r.publish().0);
+        let before = r.writes();
+        match conflict {
+            "notes" => std::fs::write(r.root.join("notes.md"), "Different notes").unwrap(),
+            "asset" => {
+                std::fs::write(r.root.join("assets/widget.bin"), b"changed").unwrap();
+                std::fs::write(
+                    r.root.join("assets/SHA256SUMS"),
+                    format!("{}  widget.bin\n", forge_domain::digest(b"changed")),
+                )
+                .unwrap();
+            }
+            "manifest" => r.change(|v| v["tasks"][0]["description"] = json!("Changed contract")),
+            "unknown_read" => std::fs::write(r.root.join("release-read-error"), "").unwrap(),
+            "missing_download" => std::fs::write(r.root.join("release-omit-download"), "").unwrap(),
+            "extra_download" => std::fs::write(r.root.join("release-extra-download"), "").unwrap(),
+            "missing_verified" => r.remote_release(|v| v["assets"] = json!([])),
+            "replaced_verified" => r.remote_release(|v| v["assets"][0]["id"] = json!(99)),
+            _ => unreachable!(),
+        }
+        let (ok, result) = r.publish();
+        assert!(!ok, "{conflict}: {result}");
+        assert_eq!(r.writes(), before, "{conflict}");
+    }
+}
+
+#[test]
+fn release_publication_reconciles_uncertain_starter_delete() {
+    for point in ["delete_before", "delete_after"] {
+        let r = Rig::release_candidate();
+        std::fs::write(r.root.join("release-fail"), "starter").unwrap();
+        assert!(!r.publish().0);
+        std::fs::write(r.root.join("release-fail"), point).unwrap();
+        assert!(!r.publish().0);
+        let (ok, result) = r.publish();
+        assert!(ok, "{point}: {result}");
+        assert_eq!(
+            r.writes(),
+            json!([
+                "create",
+                "upload:widget.bin",
+                "delete:widget.bin",
+                "upload:widget.bin",
+                "upload:SHA256SUMS",
+                "publish"
+            ])
+        );
+    }
 }
 
 #[test]
