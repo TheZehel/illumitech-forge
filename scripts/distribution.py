@@ -56,6 +56,11 @@ def validate_files(files, *, ui=False):
             name in required | {'Cargo.toml.orig', 'Cargo.lock', '.cargo_vcs_info.json'}
             or p.parts[0] in {'src', 'tests', 'THIRD_PARTY_LICENSES'}
             or (ui and re.fullmatch(r'ui-dist/assets/[A-Za-z0-9_-]+\.(js|css)', name))
+            or (ui and name in {
+                'ui-dist/brand/illumitech-logo.svg', 'ui-dist/brand/illumitech-logo-white.svg',
+                'ui-dist/brand/IllumiDisplay-Regular.ttf', 'ui-dist/brand/IllumiDisplay-Bold.ttf',
+                'ui-dist/brand/IllumiMono-Regular.ttf', 'ui-dist/brand/LICENSE.txt',
+                'ui-dist/brand/provenance.json'})
         ) or any(x.startswith('.env') or x in {'credentials.json', 'auth.json'} for x in p.parts):
             raise ValueError('forbidden package file (content withheld)')
 

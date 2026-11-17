@@ -2554,3 +2554,20 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+=== Illumi typefaces / IllumiTech brand use ===
+ILLUMI — CONDIÇÕES DE USO DESTA ENTREGA
+IllumiTech / 2026
+
+Arquivos destinados aos sites, aplicativos, documentos, materiais de marca,
+protótipos e arquivos de design da IllumiTech, incluindo trabalho executado por
+seus fornecedores autorizados. A incorporação em sites e aplicativos da marca,
+inclusive hospedagem dos arquivos web necessários, integra esse uso.
+
+A entrega não estabelece uma licença aberta de redistribuição da família para
+uso por terceiros. Publicação em catálogos de fontes e cessão a terceiros devem
+ter condições definidas pela IllumiTech antes da distribuição.
+
+Os contornos foram construídos a partir das coordenadas e fontes editáveis
+incluídas neste pacote. Não foram importados contornos de outra família.
+Dependências das ferramentas de construção mantêm suas próprias licenças.

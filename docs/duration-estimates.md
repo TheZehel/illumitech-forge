@@ -20,7 +20,13 @@ continuam utilizáveis com histórico ausente, legado ou corrompido, indicando a
 Status/report sem execução retornam `not_run` e a previsão do plano. Um banco ilegível ou snapshot
 inválido produz erro explícito em status/report, sem tentar reparar o estado.
 
-A saída humana inclui a faixa em segundos e a incerteza. JSON preserva o envelope
+O Forge se comunica em português: **“O tempo estimado para finalização é de: 10 minutos e
+30 segundos.”** Para durações maiores, usa **“1 dia, 10 horas e 30 minutos”**; singular e plural
+são automáticos. Unidades zeradas são omitidas, exceto “0 segundos”. Quando os limites
+coincidem, apresenta um único valor; quando diferem, mantém a faixa, por exemplo
+**“9 segundos a 6 minutos e 40 segundos”**. Arredonda os limites para fora (inferior para
+baixo, superior para cima). Confiança, trabalho ativo e espera condicional continuam explícitos. Um dia equivale a
+24 horas de trabalho ativo; a mensagem não prevê data ou hora de calendário. JSON preserva o envelope
 `schema_version: 1` e acrescenta `duration_estimate`, também com versão 1. O mesmo cálculo
 alimenta inspect, dry-run, execução, status e report. A execução apresenta a prévia em stderr
 antes de iniciar os subprocessos; stdout JSON continua sendo um único envelope.

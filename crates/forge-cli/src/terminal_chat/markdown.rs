@@ -5,8 +5,8 @@ use ratatui::{
     text::{Line, Span},
 };
 
-pub(super) const ORANGE: Color = Color::Rgb(255, 154, 82);
-pub(super) const TEAL: Color = Color::Rgb(126, 204, 181);
+pub(super) const ORANGE: Color = Color::Rgb(255, 122, 26);
+pub(super) const CREAM: Color = Color::Rgb(255, 250, 240);
 fn flush(lines: &mut Vec<Line<'static>>, spans: &mut Vec<Span<'static>>) {
     if !spans.is_empty() {
         lines.push(Line::from(std::mem::take(spans)));
@@ -39,7 +39,7 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
                     Tag::CodeBlock(kind) => {
                         flush(&mut lines, &mut spans);
                         code = true;
-                        style = style.fg(TEAL).bg(Color::Rgb(19, 29, 30));
+                        style = style.fg(CREAM).bg(Color::Rgb(37, 37, 37));
                         let language = match kind {
                             pulldown_cmark::CodeBlockKind::Fenced(v) => v.to_string(),
                             _ => String::new(),
@@ -53,7 +53,7 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
                                     format!(" · {language}")
                                 }
                             ),
-                            Style::default().fg(TEAL),
+                            Style::default().fg(CREAM),
                         ));
                     }
                     Tag::List(start) => lists.push(start),
@@ -73,16 +73,18 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
                             prefix
                         )));
                     }
-                    Tag::BlockQuote(_) => spans.push(Span::styled("│ ", Style::default().fg(TEAL))),
+                    Tag::BlockQuote(_) => {
+                        spans.push(Span::styled("│ ", Style::default().fg(CREAM)))
+                    }
                     Tag::Link { dest_url, .. } => {
-                        style = style.fg(TEAL).add_modifier(Modifier::UNDERLINED);
+                        style = style.fg(CREAM).add_modifier(Modifier::UNDERLINED);
                         destinations.push(
                             (dest_url.starts_with("https://") || dest_url.starts_with("http://"))
                                 .then(|| dest_url.to_string()),
                         );
                     }
                     Tag::Image { .. } => {
-                        spans.push(Span::styled("Imagem: ", Style::default().fg(TEAL)))
+                        spans.push(Span::styled("Imagem: ", Style::default().fg(CREAM)))
                     }
                     Tag::TableHead | Tag::TableRow => flush(&mut lines, &mut spans),
                     _ => {}
@@ -110,8 +112,10 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
                     }
                     TagEnd::Link => {
                         if let Some(Some(url)) = destinations.pop() {
-                            spans
-                                .push(Span::styled(format!(" ({url})"), Style::default().fg(TEAL)));
+                            spans.push(Span::styled(
+                                format!(" ({url})"),
+                                Style::default().fg(CREAM),
+                            ));
                         }
                     }
                     TagEnd::TableCell => spans.push(Span::raw(" │ ")),
@@ -136,7 +140,7 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
             }
             Event::Code(text) => spans.push(Span::styled(
                 text.into_string(),
-                style.fg(TEAL).bg(Color::Rgb(19, 29, 30)),
+                style.fg(CREAM).bg(Color::Rgb(37, 37, 37)),
             )),
             Event::SoftBreak if !code => spans.push(Span::raw(" ")),
             Event::SoftBreak | Event::HardBreak => flush(&mut lines, &mut spans),
@@ -144,7 +148,7 @@ pub(super) fn render(text: &str) -> Vec<Line<'static>> {
                 flush(&mut lines, &mut spans);
                 lines.push(Line::styled(
                     "────────────────────────",
-                    Style::default().fg(Color::DarkGray),
+                    Style::default().fg(Color::Rgb(185, 178, 165)),
                 ));
             }
             Event::TaskListMarker(checked) => {

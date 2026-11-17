@@ -1,6 +1,6 @@
 use super::*;
 use commands::{COMMANDS, matching};
-use markdown::{ORANGE, TEAL};
+use markdown::{CREAM, ORANGE};
 use ratatui::{
     layout::Rect,
     text::Span,
@@ -17,7 +17,7 @@ pub(super) const ASCII: &[&str] = &[
 pub(super) fn banner() -> Vec<Line<'static>> {
     let mut lines = vec![Line::styled(
         "ILLUMITECH FORGE",
-        Style::default().fg(TEAL).bold(),
+        Style::default().fg(CREAM).bold(),
     )];
     lines.extend(
         ASCII
@@ -32,9 +32,9 @@ fn title(text: &str) -> Line<'static> {
 fn block(name: &str) -> Block<'static> {
     Block::default()
         .borders(Borders::ALL)
-        .border_type(BorderType::Rounded)
+        .border_type(BorderType::Plain)
         .title(name.to_owned())
-        .border_style(Style::default().fg(TEAL))
+        .border_style(Style::default().fg(CREAM))
 }
 fn metric(value: &Value) -> String {
     value
@@ -45,6 +45,10 @@ fn metric(value: &Value) -> String {
 impl Chat {
     pub(super) fn draw(&mut self, f: &mut Frame, view: &View, root: &Path) {
         let area = f.area();
+        f.render_widget(
+            Block::default().style(Style::default().bg(Color::Rgb(37, 37, 37)).fg(CREAM)),
+            area,
+        );
         if area.width < 40 || area.height < 16 {
             f.render_widget(
                 Paragraph::new("FORGE · Amplie para 40 × 16. Ctrl+Q sai.")
@@ -274,7 +278,7 @@ impl Chat {
                 } else {
                     status
                 },
-                Style::default().fg(TEAL),
+                Style::default().fg(CREAM),
             ),
             Line::styled(
                 format!("PgUp/PgDn · rolagem do mouse · F1 ajuda · Ctrl+Q sai · {usage}"),
@@ -364,7 +368,7 @@ impl Chat {
                             Style::default().fg(if mode.is_some() {
                                 Color::White
                             } else {
-                                Color::DarkGray
+                                Color::Rgb(185, 178, 165)
                             }),
                         ),
                         Line::from(*description),

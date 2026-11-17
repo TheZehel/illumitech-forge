@@ -810,14 +810,14 @@ pub fn choose_project(projects: &[PathBuf]) -> Result<PathBuf> {
                         Line::from("Escolha um projeto para conversar."),
                     ]
                 })
-                .style(Style::default().fg(Color::Rgb(255, 154, 82))),
+                .style(Style::default().fg(markdown::ORANGE)),
                 chunks[0],
             );
             let mut state = ListState::default().with_selected(Some(selected));
             f.render_stateful_widget(
                 List::new(rows)
                     .highlight_symbol("› ")
-                    .highlight_style(Style::default().fg(Color::Rgb(255, 154, 82)).bold()),
+                    .highlight_style(Style::default().fg(markdown::ORANGE).bold()),
                 chunks[1],
                 &mut state,
             );

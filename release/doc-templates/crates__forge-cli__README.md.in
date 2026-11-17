@@ -93,3 +93,11 @@ Older binaries without this capability require manual inspection or a reviewed u
 Prebuilt binaries target macOS ARM64. Native Linux acceptance remains deferred; Windows
 and Claude remain experimental. No new telemetry is added. Publication is always explicit.
 MIT licensed, with third-party notices and dependency inventory included in the package.
+
+
+## Duration messages and visual identity
+
+The CLI and Workbench communicate in Portuguese with days, hours, minutes and seconds,
+using natural singular/plural and retaining range bounds (for example,
+`10 minutos e 30 segundos`); machine-readable estimates retain seconds. The IllumiTech presentation
+uses the Construct Companion cream/graphite/orange palette. See the release notes and checksums for distribution and validation evidence.

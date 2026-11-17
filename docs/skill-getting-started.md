@@ -12,8 +12,8 @@ loader: use `codex` for Codex CLI and the Codex extension in VS Code or Cursor, 
 `.agents/skills/illumitech-forge`. `cursor` selects the native Cursor Agent loader at
 `.cursor/skills/illumitech-forge`, not the Codex extension hosted in Cursor. Choose one copy.
 
-Obtain the standalone `illumitech-forge-v1.8.0-skill.zip` and matching whole-archive
-SHA-256 from the [pinned public release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.8.0).
+Obtain the standalone `illumitech-forge-v1.9.0-skill.zip` and matching whole-archive
+SHA-256 from the [pinned public release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0).
 Check the release source/channel; checksums do not authenticate an untrusted download.
 The plugin ZIP is a different format and is refused by the project installer.
 
@@ -30,7 +30,7 @@ Replace the paths and trusted digest, then run:
 
 ```sh
 python3 /reviewed/scripts/install_agent_skill.py \
-  --archive /downloads/illumitech-forge-v1.8.0-skill.zip \
+  --archive /downloads/illumitech-forge-v1.9.0-skill.zip \
   --sha256 TRUSTED_64_HEX_DIGEST --root /absolute/project \
   --host codex --forge-binary /verified/illumitech-forge
 ```

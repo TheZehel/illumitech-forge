@@ -1,4 +1,4 @@
-# Illumitech Forge Workbench 1.8.0
+# Illumitech Forge Workbench 1.9.0
 
 React/TypeScript/Vite frontend for the same-origin Rust bridge. No browser access to
 native credentials or arbitrary projects. Native configuration and managed authentication
@@ -47,7 +47,7 @@ integrity hashes are recorded in package-lock.json; upstream license files remai
 
 ## Current release and skill integration
 
-This frontend is distributed with Forge 1.8.0; see the [current release notes](../../docs/release-v1.8.0.md).
+This frontend is distributed with Forge 1.9.0; see the [current release notes](../../docs/release-v1.9.0.md).
 Forge uses the existing native Codex account/model. The optional [project skill](../../docs/skill-getting-started.md)
 guides the assistant through the CLI; Codex CLI and its extension in VS Code/Cursor
 use the same `.agents/skills` loader. Installing files does not prove model execution.
@@ -57,3 +57,11 @@ when the reported capability is present. Those operations keep their explicit sc
 external evidence and approval requirements; opening Workbench does not trigger them.
 A voluntary [feedback form](https://github.com/TheZehel/illumitech-forge/issues/new?template=forge-feedback.yml)
 collects reproducible setup, argument, blocker and continuity difficulties without automatic uploads.
+
+
+## Duration messages and visual identity
+
+The CLI and Workbench communicate in Portuguese with days, hours, minutes and seconds,
+using natural singular/plural and retaining range bounds (for example,
+`10 minutos e 30 segundos`); machine-readable estimates retain seconds. The IllumiTech presentation
+uses the Construct Companion cream/graphite/orange palette. See the release notes and checksums for distribution and validation evidence.

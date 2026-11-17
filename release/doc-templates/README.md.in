@@ -1,19 +1,35 @@
-<p align="center"><img src="docs/assets/logo.webp" width="108" alt="Logo Illumitech"></p>
+<p align="left"><img src="docs/brand/illumitech-logo-white.svg" width="231" alt="IllumiTech" /></p>
 
 # Illumitech Forge
 
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge {{published}}.** Publicação recuperável de releases, instalação verificada da skill por projeto e continuidade com evidências. O CLI e o Workbench continuam independentes da skill. Veja as [notas desta versão](docs/release-v{{published}}.md), o [guia da skill](docs/skill-getting-started.md) e o [guia de recuperação](docs/release-recovery.md). Artefatos e checksums ficam nas [releases](https://github.com/TheZehel/illumitech-forge/releases); compilar este código não atualiza um binário já instalado.
+**Illumitech Forge {{published}}.** Estimativas de finalização em português, com dias, horas, minutos e segundos, e identidade visual IllumiTech alinhada ao Construct Companion. O CLI e o Workbench continuam independentes da skill. Veja as [notas desta versão](docs/release-v{{published}}.md), o [guia da skill](docs/skill-getting-started.md) e o [guia de recuperação](docs/release-recovery.md). Artefatos e checksums ficam nas [releases](https://github.com/TheZehel/illumitech-forge/releases); compilar este código não atualiza um binário já instalado.
 
 [English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
-![Uma peça laranja atravessa checkpoints até uma estrutura verde-petróleo sobre fundo grafite](docs/assets/cover.webp)
+![IllumiTech Forge](docs/readme/apresentacao-pt.png)
 
 A série **1.1** oferece o comando Rust nativo `forge` e uma experiência de terminal
 com identidade ASCII, Markdown, ajuda, menu de comandos e histórico pesquisável.
 As notas e a cobertura ficam em [release 1.2.0](docs/release-v1.2.0.md).
+
+
+**Novidades da versão {{published}}.**
+
+A identidade visual acompanha o Construct Companion: creme, grafite, laranja, fontes Illumi
+e logo oficial. CLI, terminal, Workbench e site compartilham a mesma direção.
+
+![Fluxo com controle](docs/readme/fluxo-pt.png)
+
+![Tempo em segundos, minutos e horas](docs/readme/tempo-pt.png)
+
+O Forge informa: **“O tempo estimado para finalização é de: 10 minutos e 30 segundos.”**
+Durações maiores usam, por exemplo, **“1 dia, 10 horas e 30 minutos”**. Faixas usam
+“9 segundos a 6 minutos e 40 segundos”. O JSON mantém segundos. Confiança, incerteza e
+espera por aprovação continuam explícitas. [Pranchas editáveis e atualização](docs/readme/ATUALIZAR.md).
+
 
 ## O que está implementado
 

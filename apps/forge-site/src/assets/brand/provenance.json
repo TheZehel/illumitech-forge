@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source": "Construct Companion approved IllumiTech assets; byte-identical copies",
+  "usage": "Embedded IllumiTech product typography and branding; fonts retain their supplied conditions of use",
+  "assets": {
+    "illumitech-logo-white.svg": "dd08024d186eb8fc9d42ce7cd3030b41ec69b988acb7a211a840f952236ef5ed",
+    "IllumiDisplay-Regular.ttf": "8be4d4de5f206a107f08eb3bb57df139b9effa8e82f3931930d1d4d4400c51c2",
+    "illumitech-logo.svg": "fe04e97fb9cccd0fbe0cd6625b3d7c9cb135779d6f03ee3e6259ade11c54abcd",
+    "IllumiMono-Regular.ttf": "648cc9dde652499e31edf92f7ee2fe28bbe2acf91851f38e985c74993c55a3b2",
+    "LICENSE.txt": "6c4d05b97e8887aa54d242c655ad950f5573aca9818e6b83a0281b6224e8f576",
+    "IllumiDisplay-Bold.ttf": "cab2ccfb1e77fdacceb98c9bf287c49146571c0141562ffe0c0ee8250bfc4c6b"
+  }
+}

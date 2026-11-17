@@ -158,7 +158,7 @@ fn render(session: Option<&Session>, details: bool) -> Vec<Line<'static>> {
                         " · Ctrl+O para detalhes"
                     }
                 ),
-                Style::default().fg(markdown::TEAL),
+                Style::default().fg(markdown::CREAM),
             ));
             if details {
                 lines.extend(
@@ -173,7 +173,7 @@ fn render(session: Option<&Session>, details: bool) -> Vec<Line<'static>> {
             label.to_owned(),
             Style::default()
                 .fg(if label == "Você" {
-                    markdown::TEAL
+                    markdown::CREAM
                 } else {
                     markdown::ORANGE
                 })

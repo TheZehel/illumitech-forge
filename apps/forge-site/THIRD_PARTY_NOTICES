@@ -5,3 +5,5 @@ Instrument Sans: Copyright 2022 The Instrument Sans Project Authors. Licensed un
 Illumitech official logos: exported unmodified from the owner-provided Figma file, nodes 75:7, 75:73 and 75:84. Brand ownership remains Illumitech.
 
 Asset hashes and permanent Figma node references: src/assets/provenance.json.
+
+F074 identity: IllumiDisplay and IllumiMono are incorporated under IllumiTech brand-use conditions; see src/assets/brand/LICENSE.txt. Official SVG logos copied unchanged from Construct Companion; hashes in src/assets/brand/provenance.json. Existing Instrument Sans files remain with their OFL notices as historical assets.

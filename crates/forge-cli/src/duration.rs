@@ -111,6 +111,29 @@ pub fn comparison(run: &Run) -> Value {
         "metrics_scope":"active execution through the last checkpoint, including measured local engine overhead; idle and human waiting excluded",
         "accuracy_target":null})
 }
+/// Human display only. Callers round range bounds outwards; JSON retains seconds.
+fn readable_seconds(seconds: f64) -> String {
+    let total = seconds.max(0.0) as u64;
+    let units = [
+        (total / 86400, "dia", "dias"),
+        (total % 86400 / 3600, "hora", "horas"),
+        (total % 3600 / 60, "minuto", "minutos"),
+        (total % 60, "segundo", "segundos"),
+    ];
+    let mut parts: Vec<String> = units
+        .into_iter()
+        .filter(|(value, _, _)| *value > 0)
+        .map(|(value, singular, plural)| {
+            format!("{value} {}", if value == 1 { singular } else { plural })
+        })
+        .collect();
+    match parts.pop() {
+        None => "0 segundos".into(),
+        Some(last) if parts.is_empty() => last,
+        Some(last) => format!("{} e {last}", parts.join(", ")),
+    }
+}
+
 pub fn human(value: &Value) -> Option<String> {
     let e = &value["duration_estimate"];
     if e.is_null() {
@@ -120,22 +143,34 @@ pub fn human(value: &Value) -> Option<String> {
         e["remaining_seconds"]["lower"].as_f64(),
         e["remaining_seconds"]["upper"].as_f64(),
     ) {
+        let lower = readable_seconds(lo.floor());
+        let upper = readable_seconds(hi.ceil());
+        let duration = if lower == upper {
+            lower
+        } else {
+            format!("{lower} a {upper}")
+        };
+        let confidence = match e["confidence"].as_str().unwrap_or("low") {
+            "low" => "baixa",
+            "medium" => "média",
+            "high" => "alta",
+            other => other,
+        };
         Some(format!(
-            "Estimated active work remaining: {lo:.1}–{hi:.1} seconds; confidence: {}. {}{}",
-            e["confidence"].as_str().unwrap_or("low"),
+            "O tempo estimado para finalização é de: {duration}. Confiança: {confidence}. {}{}",
             if e["conditional"].as_bool() == Some(true) {
-                "Conditional on approval/resumption; waiting duration unknown. "
+                "Depende da aprovação ou retomada; o tempo de espera é desconhecido. "
             } else {
                 ""
             },
-            "Range is uncertain, not a deadline; concurrency follows the inspected execution policy."
+            "É uma estimativa, não um prazo. Considera apenas trabalho ativo e o paralelismo do plano revisado."
         ))
     } else {
         Some(format!(
-            "Duration unavailable: {}",
+            "Tempo estimado para finalização indisponível: {}",
             e["unavailable_reason"]
                 .as_str()
-                .unwrap_or("unknown measurements")
+                .unwrap_or("medições insuficientes")
         ))
     }
 }
@@ -164,5 +199,79 @@ pub fn finish_session(c: &Context, run: &mut Run, started: Instant, previous_ms:
             timeout_seconds: 0,
         });
         d.finish(overhead, "passed");
+    }
+}
+
+#[cfg(test)]
+mod display_tests {
+    use super::*;
+
+    #[test]
+    fn readable_ranges_preserve_uncertainty_and_machine_values() {
+        for (lo, hi, expected) in [
+            (9.0, 400.0, "9 segundos a 6 minutos e 40 segundos"),
+            (60.0, 120.0, "1 minuto a 2 minutos"),
+            (
+                3599.2,
+                3600.1,
+                "59 minutos e 59 segundos a 1 hora e 1 segundo",
+            ),
+            (0.0, 0.1, "0 segundos a 1 segundo"),
+            (
+                3600.0,
+                90061.0,
+                "1 hora a 1 dia, 1 hora, 1 minuto e 1 segundo",
+            ),
+        ] {
+            let value = json!({"duration_estimate": {
+                "remaining_seconds": {"lower":lo,"upper":hi},
+                "confidence":"low", "conditional":true
+            }});
+            let before = value.clone();
+            let rendered = human(&value).unwrap();
+            assert!(rendered.contains(expected), "{rendered}");
+            assert!(rendered.contains("Confiança: baixa"));
+            assert!(rendered.contains("Depende da aprovação ou retomada"));
+            assert!(rendered.contains("não um prazo"));
+            assert_eq!(value, before);
+        }
+    }
+
+    #[test]
+    fn natural_language_examples_and_singular_plural() {
+        for (seconds, expected) in [
+            (0.0, "0 segundos"),
+            (1.0, "1 segundo"),
+            (630.0, "10 minutos e 30 segundos"),
+            (86400.0, "1 dia"),
+            (90000.0, "1 dia e 1 hora"),
+            (124200.0, "1 dia, 10 horas e 30 minutos"),
+            (172801.0, "2 dias e 1 segundo"),
+        ] {
+            assert_eq!(readable_seconds(seconds), expected);
+            let value = json!({"duration_estimate": {
+                "remaining_seconds":{"lower":seconds,"upper":seconds},
+                "confidence":"high", "conditional":false
+            }});
+            let text = human(&value).unwrap();
+            assert!(
+                text.starts_with(&format!(
+                    "O tempo estimado para finalização é de: {expected}."
+                )),
+                "{text}"
+            );
+            assert!(text.contains("Confiança: alta"));
+            assert!(!text.contains("entre"));
+        }
+    }
+
+    #[test]
+    fn unavailable_and_missing_estimates_stay_explicit() {
+        assert_eq!(human(&json!({})), None);
+        assert_eq!(
+            human(&json!({"duration_estimate":{"remaining_seconds":null,
+            "unavailable_reason":"waiting for history"}})),
+            Some("Tempo estimado para finalização indisponível: waiting for history".into())
+        );
     }
 }

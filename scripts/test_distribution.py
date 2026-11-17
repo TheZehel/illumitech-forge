@@ -66,11 +66,13 @@ class DistributionContract(unittest.TestCase):
     def test_standalone_ui_allowlist_stays_narrow(self):
         files = ['Cargo.toml', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES', 'dependencies.json',
                  'build.rs', 'ui-dist/index.html', 'ui-dist/logo.webp', 'ui-dist/THIRD_PARTY_LICENSES.txt',
-                 'ui-dist/assets/index-abc123.js', 'ui-dist/assets/index-abc123.css']
+                 'ui-dist/assets/index-abc123.js', 'ui-dist/assets/index-abc123.css',
+                 'ui-dist/brand/IllumiDisplay-Regular.ttf', 'ui-dist/brand/illumitech-logo.svg']
         validate_files(files, ui=True)
         with self.assertRaises(ValueError):
             validate_files(files)
-        for bad in ['ui-dist/.env', 'ui-dist/assets/private.js.map', 'ui-dist/install.sh', 'ui-dist/assets/../private.js']:
+        for bad in ['ui-dist/.env', 'ui-dist/assets/private.js.map', 'ui-dist/install.sh', 'ui-dist/assets/../private.js', 'ui-dist/brand/private.ttf',
+                    'ui-dist/brand/../private.ttf', 'ui-dist/brand/private.svg']:
             with self.assertRaises(ValueError):
                 validate_files(files + [bad], ui=True)
         with self.assertRaises(ValueError):

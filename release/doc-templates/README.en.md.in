@@ -1,17 +1,33 @@
-<p align="center"><img src="docs/assets/logo.webp" width="108" alt="Illumitech logo"></p>
+<p align="left"><img src="docs/brand/illumitech-logo-white.svg" width="231" alt="IllumiTech" /></p>
 
 # Illumitech Forge
 
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge {{published}}.** Recoverable release publication, verified project-skill installation and evidence-backed continuity. The CLI and Workbench remain independent of the skill. See the [current release notes](docs/release-v{{published}}.md), [skill guide](docs/skill-getting-started.md) and [recovery guide](docs/release-recovery.md). Artifacts and checksums are in [releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
+**Illumitech Forge {{published}}.** Natural Portuguese completion estimates with days, hours, minutes and seconds, and the IllumiTech identity shared with Construct Companion. The CLI and Workbench remain independent of the skill. See the [current release notes](docs/release-v{{published}}.md), [skill guide](docs/skill-getting-started.md) and [recovery guide](docs/release-recovery.md). Artifacts and checksums are in [releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
 
-![An orange component passes checkpoints toward a petrol-green structure on graphite](docs/assets/cover.webp)
+![IllumiTech Forge](docs/readme/apresentacao-en.png)
 
 The **1.1** series provides the native Rust `forge` command and a terminal experience with
 ASCII identity, Markdown, command menu, visual help and searchable session history.
 See [1.2.0 release notes](docs/release-v1.2.0.md) for validation and operational limits.
+
+
+**New in {{published}}.**
+
+The visual identity follows Construct Companion: cream, graphite, orange, Illumi typefaces
+and the original logo across CLI, terminal, Workbench and site.
+
+![Execution with control](docs/readme/fluxo-en.png)
+
+![Time in seconds, minutes and hours](docs/readme/tempo-en.png)
+
+Portuguese human output says “O tempo estimado para finalização é de: 10 minutos e 30 segundos.”
+Longer durations use days, hours, minutes and seconds, with natural singular/plural
+(for example, “1 dia, 10 horas e 30 minutos”). Ranges retain both bounds. JSON retains seconds. Confidence, uncertainty and
+approval waits stay explicit. [Editable boards and maintenance](docs/readme/ATUALIZAR.md).
+
 
 ## Features
 

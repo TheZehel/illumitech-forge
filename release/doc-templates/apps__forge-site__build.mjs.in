@@ -27,8 +27,8 @@ await rm(generated, { recursive: true, force: true });
 await mkdir(join(generated, 'public'), { recursive: true });
 await copyFile(join(root, 'src/style.css'), join(generated, 'style.css'));
 await cp(join(root, 'src/assets'), join(generated, 'assets'), { recursive: true });
-await copyFile(join(root, 'src/assets/OFL.txt'), join(generated, 'public/font-license.txt'));
-const logo = `<span class="logo-light"><img src="/assets/logo-light.png" width="210" height="44" alt="IllumiTech"></span><span class="logo-dark"><img src="/assets/logo-dark.png" width="210" height="44" alt="IllumiTech"></span>`;
+await copyFile(join(root, 'src/assets/brand/LICENSE.txt'), join(generated, 'public/font-license.txt'));
+const logo = `<span class="logo-light"><img src="/assets/brand/illumitech-logo.svg" width="210" height="44" alt="IllumiTech"></span><span class="logo-dark"><img src="/assets/brand/illumitech-logo-white.svg" width="210" height="44" alt="IllumiTech"></span>`;
 for (const [folder, locale] of [['pt','pt'],['en','en'],['','pt']]) {
  const p = languages[locale], c = copy[locale], other = locale === 'pt' ? 'en' : 'pt', prefix = folder ? '../' : './';
  const docs = await Promise.all(p.docs.map(name => readFile(join(repo, 'docs/guides', name), 'utf8')));
@@ -44,7 +44,7 @@ for (const [folder, locale] of [['pt','pt'],['en','en'],['','pt']]) {
 <section id="guides" class="band section-space"><div class="container"><div class="section-heading"><span class="eyebrow">{{published}} · ${locale==='pt'?'CLI / WORKBENCH':'CLI / WORKBENCH'}</span><h2>${p.guides}</h2></div>${docs.map(doc=>{const [title,...body]=doc.split('\n');return `<details><summary>${escape(title.replace(/^# /,''))}</summary><div class="guide-content">${markdown(body.join('\n'))}</div></details>`;}).join('\n')}</div></section>
 <section class="cta"><div class="container"><h2>${c.next}</h2><a class="button" href="#start">${c.start}<span class="arrow" aria-hidden="true">→</span></a></div></section>
 <section id="support" class="container support"><div><a class="brand" href="./" aria-label="Illumitech Forge">${logo}<span class="product-label">Forge</span></a></div><div><h2>${p.support}</h2><p>${p.limits}</p><p>${p.privacy}</p><div class="links"><a href="https://crates.io/crates/illumitech-forge-cli/{{published}}">crates.io</a><a href="https://github.com/TheZehel/illumitech-forge">GitHub</a></div></div></section></main>
-<footer><div class="container footer-row"><span>© Illumitech · MIT · ${c.preview}</span><a href="${prefix}font-license.txt">Instrument Sans · ${c.font}</a></div></footer></body></html>`;
+<footer><div class="container footer-row"><span>© Illumitech · MIT · ${c.preview}</span><a href="${prefix}font-license.txt">Illumi · ${c.font}</a></div></footer></body></html>`;
  const destination=folder?join(generated,folder):generated;await mkdir(destination,{recursive:true});await writeFile(join(destination,'index.html'),html);
 }
 await build({ root: generated, base: './', logLevel: 'warn', build: { outDir: join(root, 'dist'), emptyOutDir: true, assetsInlineLimit: 0, rollupOptions: { input: { index: join(generated, 'index.html'), pt: join(generated, 'pt/index.html'), en: join(generated, 'en/index.html') } } } });

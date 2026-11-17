@@ -16,3 +16,6 @@ for (const [location, pkg] of Object.entries(lock.packages)) {
   for (const file of notices) licenses += await readFile(new URL(file, source), 'utf8') + '\n';
 }
 await writeFile(new URL('THIRD_PARTY_LICENSES.txt', destination), licenses);
+
+licenses += '\n=== Illumi typefaces / IllumiTech brand use ===\n' + await readFile(new URL('./public/brand/LICENSE.txt', import.meta.url), 'utf8');
+await writeFile(new URL('THIRD_PARTY_LICENSES.txt', destination), licenses);

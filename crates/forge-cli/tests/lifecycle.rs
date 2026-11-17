@@ -406,8 +406,8 @@ fn duration_inspect_dry_run_and_missing_status_are_read_only() {
         .output()
         .unwrap();
     let human = String::from_utf8(output.stdout).unwrap();
-    assert!(human.contains("Estimated active work remaining:"));
-    assert!(human.contains("confidence: low"));
+    assert!(human.contains("O tempo estimado para finalização é de:"));
+    assert!(human.contains("Confiança: baixa"));
     assert!(!f.state.exists());
 }
 #[test]

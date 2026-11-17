@@ -2661,7 +2661,7 @@
   ],
   "missing_notices": [],
   "frontend": {
-    "lock_sha256": "0b6d0134ce70c6c864200d29cf9f846e2745efbc0002c4a69af9e9d51ee285a4",
+    "lock_sha256": "59650a078b316ef3133da5ba14d6539d27b5a0b767ee14d6196dbc13dd040261",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",
@@ -5155,7 +5155,7 @@
     ]
   },
   "site_frontend": {
-    "lock_sha256": "b7cd1253173261b25522f7c3598de70d14e32cd10ac800f7f6ada646fc7670ce",
+    "lock_sha256": "dc2430b7e6c2d63f88a4328f2fe0a2c86af1400f146f0d7cbca5f7079238bf40",
     "dependencies": [
       {
         "name": "@esbuild/aix-ppc64",

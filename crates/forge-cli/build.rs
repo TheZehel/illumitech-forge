@@ -25,6 +25,7 @@ fn walk(path: &Path, base: &Path, out: &mut String) {
                 "css" => "text/css; charset=utf-8",
                 "webp" => "image/webp",
                 "svg" => "image/svg+xml",
+                "ttf" => "font/ttf",
                 _ => "application/octet-stream",
             };
             out.push_str(&format!(

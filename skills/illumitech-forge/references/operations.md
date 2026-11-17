@@ -36,3 +36,13 @@ checks. Consult `docs/release-recovery.md` in the product source for the full op
 Do not substitute another provider, model or executor. There is no implicit paid API fallback.
 Use the command catalogue's conservative effects and the actual operation's docs rather than
 assuming a similarly named command is read-only. Unclassified diagnostics require inspection.
+
+
+## Human duration messages
+
+The Portuguese CLI and Workbench say “O tempo estimado para finalização é de: …”,
+using days, hours, minutes and seconds with natural singular/plural. For example,
+630 seconds is “10 minutos e 30 segundos”; 124200 is “1 dia, 10 horas e 30 minutos”.
+Ranges retain both bounds; approval/resumption waits are conditional. These are active-work
+estimates, not deadlines. Use JSON `duration_estimate.remaining_seconds` for automation;
+its numeric seconds and schema are unchanged. Never parse translated human sentences.

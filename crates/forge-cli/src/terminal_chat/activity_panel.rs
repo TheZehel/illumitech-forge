@@ -234,7 +234,7 @@ impl State {
                     .fg(if selected {
                         markdown::ORANGE
                     } else {
-                        markdown::TEAL
+                        markdown::CREAM
                     })
                     .bold(),
             );
