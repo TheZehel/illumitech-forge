@@ -1,12 +1,12 @@
-# illumitech-forge-domain 1.9.0
+# illumitech-forge-domain 1.9.1
 
 Domain contracts, evidence and durable execution state for
 [Illumitech Forge](https://github.com/TheZehel/illumitech-forge): a toolkit to plan, execute,
 verify and resume development with external checks.
 
 For installation and end-user workflows, use
-[illumitech-forge-cli 1.9.0](https://crates.io/crates/illumitech-forge-cli/1.9.0).
-See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0)
+[illumitech-forge-cli 1.9.1](https://crates.io/crates/illumitech-forge-cli/1.9.1).
+See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.1)
 for notes and checksums.
 
 Release-publication intent is recorded separately from draft PRs; existing state and manifest schemas remain version 1.

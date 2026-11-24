@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "base_version": "1.8.0",
+  "base_version": "1.9.0",
   "changes": [
     {
-      "id": "F074",
-      "kind": "feature",
-      "summary": "Natural Portuguese completion estimates with days, singular/plural and preserved ranges; Construct Companion visual identity across README, Workbench, site and terminal"
+      "id": "F004-CLAUDE-PROMPT",
+      "kind": "fix",
+      "summary": "Keep manifest task prompts positional in Claude Code print mode and document native file permissions."
     }
   ]
 }

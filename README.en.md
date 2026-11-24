@@ -5,7 +5,7 @@
 **From contract to evidence.** Turn a request into specs and tasks, execute with the native
 client, and inspect verifiable results through the CLI or Illumitech Workbench.
 
-**Illumitech Forge 1.9.0.** Natural Portuguese completion estimates with days, hours, minutes and seconds, and the IllumiTech identity shared with Construct Companion. The CLI and Workbench remain independent of the skill. See the [current release notes](docs/release-v1.9.0.md), [skill guide](docs/skill-getting-started.md) and [recovery guide](docs/release-recovery.md). Artifacts and checksums are in [releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
+**Illumitech Forge 1.9.1.** Natural Portuguese completion estimates with days, hours, minutes and seconds, and the IllumiTech identity shared with Construct Companion. The CLI and Workbench remain independent of the skill. See the [current release notes](docs/release-v1.9.1.md), [skill guide](docs/skill-getting-started.md) and [recovery guide](docs/release-recovery.md). Artifacts and checksums are in [releases](https://github.com/TheZehel/illumitech-forge/releases); building this tree does not update an installed binary.
 
 ![IllumiTech Forge](docs/readme/apresentacao-en.png)
 
@@ -14,7 +14,7 @@ ASCII identity, Markdown, command menu, visual help and searchable session histo
 See [1.2.0 release notes](docs/release-v1.2.0.md) for validation and operational limits.
 
 
-**New in 1.9.0.**
+**New in 1.9.1.**
 
 The visual identity follows Construct Companion: cream, graphite, orange, Illumi typefaces
 and the original logo across CLI, terminal, Workbench and site.
@@ -39,14 +39,15 @@ independent read-only review; selected issue import and explicitly authorized dr
 installation diagnostics, verified local updates, SQLite snapshots and fresh-target restore.
 
 Codex uses the configured native account/model. Managed ChatGPT App Server protocol 0.166.0
-is the reference for Workbench. Claude is experimental/deferred. Free chat is read-only;
+is the reference for Workbench. Manifest tasks can select the experimental `claude` executor
+with Claude Code authentication and permissions ([contract](docs/contracts.md#manifest-and-operational-contracts)). Free chat is read-only;
 implementation runs under a reviewed manifest. Agent messages never satisfy acceptance gates.
 No paid API fallback or permission bypass is introduced.
 
 ## Start with the published release
 
 ```sh
-cargo install illumitech-forge-cli --version 1.9.0 --locked
+cargo install illumitech-forge-cli --version 1.9.1 --locked
 forge --version
 forge
 ```
@@ -56,7 +57,7 @@ separately for conversations; its account, model and permissions are preserved. 
 interface needs no `init`, ai-memory, Python or Node. Free chat is read-only; implementation
 execution requires a reviewed manifest.
 
-Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0)
+Cargo needs Rust 1.94.0. The [public macOS ARM64 release archive](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.1)
 needs no Rust compiler. The GitHub repository and crate source are public under MIT.
 See the [quickstart](docs/quickstart.md) for installation, version/PATH checks and Workbench.
 
@@ -127,7 +128,7 @@ Codex executes agents. The skill was discovered in Codex CLI and the Codex exten
 VS Code and Cursor. A small Feature passed in each editor with external gates and independent
 preservation checks. Directory installation and other flows need their own evidence.
 
-## Distribution and recovery in 1.9.0
+## Distribution and recovery in 1.9.1
 
 Binary archives include `scripts/install_agent_skill.py`, which verifies the standalone
 ZIP and selected CLI and previews without writes. `--apply` installs one project copy

@@ -1,12 +1,12 @@
-# illumitech-forge-catalog 1.9.0
+# illumitech-forge-catalog 1.9.1
 
 Local workflow recipe catalog for
 [Illumitech Forge](https://github.com/TheZehel/illumitech-forge): a toolkit to plan, execute,
 verify and resume development with external checks.
 
 For installation and end-user workflows, use
-[illumitech-forge-cli 1.9.0](https://crates.io/crates/illumitech-forge-cli/1.9.0).
-See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0)
+[illumitech-forge-cli 1.9.1](https://crates.io/crates/illumitech-forge-cli/1.9.1).
+See the [matching release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.1)
 for notes and checksums.
 
 Feature and reviewed QA routes use explicit scopes and coverage. Planned stack-specific QA adapters remain separate until implemented and externally verified.

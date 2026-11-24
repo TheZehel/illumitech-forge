@@ -5,7 +5,7 @@
 **Do contrato à evidência.** Organize uma demanda em specs e tarefas, execute com o cliente
 nativo e acompanhe resultados verificáveis no CLI ou no Workbench Illumitech.
 
-**Illumitech Forge 1.9.0.** Estimativas de finalização em português, com dias, horas, minutos e segundos, e identidade visual IllumiTech alinhada ao Construct Companion. O CLI e o Workbench continuam independentes da skill. Veja as [notas desta versão](docs/release-v1.9.0.md), o [guia da skill](docs/skill-getting-started.md) e o [guia de recuperação](docs/release-recovery.md). Artefatos e checksums ficam nas [releases](https://github.com/TheZehel/illumitech-forge/releases); compilar este código não atualiza um binário já instalado.
+**Illumitech Forge 1.9.1.** Estimativas de finalização em português, com dias, horas, minutos e segundos, e identidade visual IllumiTech alinhada ao Construct Companion. O CLI e o Workbench continuam independentes da skill. Veja as [notas desta versão](docs/release-v1.9.1.md), o [guia da skill](docs/skill-getting-started.md) e o [guia de recuperação](docs/release-recovery.md). Artefatos e checksums ficam nas [releases](https://github.com/TheZehel/illumitech-forge/releases); compilar este código não atualiza um binário já instalado.
 
 [English](README.en.md) · [Começar](docs/quickstart.md) · [Contratos](docs/contracts.md) · [Roadmap](docs/roadmap-v1.md)
 
@@ -16,7 +16,7 @@ com identidade ASCII, Markdown, ajuda, menu de comandos e histórico pesquisáve
 As notas e a cobertura ficam em [release 1.2.0](docs/release-v1.2.0.md).
 
 
-**Novidades da versão 1.9.0.**
+**Novidades da versão 1.9.1.**
 
 A identidade visual acompanha o Construct Companion: creme, grafite, laranja, fontes Illumi
 e logo oficial. CLI, terminal, Workbench e site compartilham a mesma direção.
@@ -43,13 +43,14 @@ espera por aprovação continuam explícitas. [Pranchas editáveis e atualizaç�
 - Issue selecionada → candidato revisável → execução → draft PR sob autorização explícita.
 - Diagnóstico de PATH, atualização local verificada, snapshots SQLite consistentes e restauração.
 
-Claude permanece experimental e fora do aceite nativo desta entrega. A conversa livre usa
+Tarefas de manifesto podem selecionar o executor experimental `claude`, com autenticação e
+permissões do Claude Code ([contrato](docs/contracts.md#manifest-and-operational-contracts)). A conversa livre usa
 somente leitura; a implementação usa um manifest revisado. A resposta do chat não aprova gates.
 
 ## Começar com a versão publicada
 
 ```sh
-cargo install illumitech-forge-cli --version 1.9.0 --locked
+cargo install illumitech-forge-cli --version 1.9.1 --locked
 forge --version
 forge
 ```
@@ -59,7 +60,7 @@ separadamente para conversar; conta, modelo e permissões continuam nativos. Nã
 rodar `init`, configurar memória, instalar Python ou Node para abrir a interface. A conversa
 livre é somente leitura; executar uma implementação exige um manifest revisado.
 
-Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0)
+Cargo requer Rust 1.94.0. O [pacote binário macOS ARM64 da release pública](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.1)
 dispensa Rust. O repositório GitHub e o código dos crates são públicos sob MIT.
 [Início rápido](docs/quickstart.md): instalação, verificação de versão, PATH e Workbench.
 
@@ -152,7 +153,7 @@ O Codex executa os agentes. A skill foi descoberta no Codex CLI e na extensão C
 editores VS Code e Cursor. Uma Feature pequena passou em cada editor, com gates externos
 e preservação conferida. Instalação por diretório e outros fluxos precisam de evidências próprias.
 
-## Distribuição e recuperação na 1.9.0
+## Distribuição e recuperação na 1.9.1
 
 O instalador `scripts/install_agent_skill.py` acompanha o pacote binário, verifica o ZIP
 standalone e o CLI selecionado e faz prévia sem escrever. `--apply` instala uma cópia por

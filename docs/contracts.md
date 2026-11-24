@@ -36,6 +36,21 @@ Task executor: `command {argv}`, `codex {permission, model?}` or `claude {permis
 Permission is `read_only` or `workspace_write`. Agent model defaults to native CLI configuration.
 The manifest is executable authority: review argv arrays before running. No implicit shell.
 
+The experimental Claude executor uses Claude Code in print mode with JSON output and
+`dontAsk`. Read-only tasks expose the native Read, Glob and Grep file tools. Write tasks
+use the operator’s existing Claude permissions. Selecting `workspace_write` does not
+grant file access. For example, to allow a task to create or edit only `hello.txt` through
+the native file-editing tools, the operator can add this rule to the task repository’s
+`.claude/settings.local.json`, preserving any existing settings:
+
+```json
+{"permissions":{"allow":["Edit(/hello.txt)"]}}
+```
+
+Claude Code 2.1.331 on macOS honored this rule for its Write tool. The rule applies to
+that repository-root file. Other effective Claude permissions still apply. A native
+permission denial blocks the task even if Claude exits zero.
+
 Acceptance is a nonempty list of `gate {id}`, `artifact {path,sha256}` or `human {id}`.
 Every entry is required. Gates have argv, pinned evaluator input files and a timeout. Input files
 must resolve outside every writable task root. `{repo}` and `{manifest_dir}` are exact argv

@@ -57,3 +57,13 @@ outside this repository. Binary inputs remain unchanged from code commit 4e4942d
 includes the bilingual first-run guide and example generators. The distribution receipt identifies
 the build and archive checksums. This ledger is the pre-publication snapshot; the GitHub release
 records the final publication without modifying the approved source revision.
+
+## Claude manifest executor pilot — 2026-11-24
+
+A local candidate based on 1.9.0 ran two manifest tasks with authenticated Claude Code
+2.1.331 on macOS ARM64. The read-only task returned a freshly generated file token.
+The write task created `hello.txt` under a project-local `Edit(/hello.txt)` rule.
+An external evaluator checked the exact file bytes and the original sentinel at final
+acceptance. A separate task targeting a sibling file returned a native Write denial,
+Forge recorded it as blocked, and the file remained absent. This pilot covers the
+manifest executor on that host. Chat and Workbench continue to use Codex.

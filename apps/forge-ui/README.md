@@ -1,4 +1,4 @@
-# Illumitech Forge Workbench 1.9.0
+# Illumitech Forge Workbench 1.9.1
 
 React/TypeScript/Vite frontend for the same-origin Rust bridge. No browser access to
 native credentials or arbitrary projects. Native configuration and managed authentication
@@ -47,7 +47,7 @@ integrity hashes are recorded in package-lock.json; upstream license files remai
 
 ## Current release and skill integration
 
-This frontend is distributed with Forge 1.9.0; see the [current release notes](../../docs/release-v1.9.0.md).
+This frontend is distributed with Forge 1.9.1; see the [current release notes](../../docs/release-v1.9.1.md).
 Forge uses the existing native Codex account/model. The optional [project skill](../../docs/skill-getting-started.md)
 guides the assistant through the CLI; Codex CLI and its extension in VS Code/Cursor
 use the same `.agents/skills` loader. Installing files does not prove model execution.

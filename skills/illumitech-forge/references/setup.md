@@ -12,14 +12,14 @@ with 1.8.0), or from reviewed source. Older 1.7.0/1.7.1 binary archives predate 
 installer. A candidate checkout may precede publication: confirm the intended release
 and artifacts exist first.
 
-Download `illumitech-forge-v1.9.0-skill.zip` and its whole-file digest from the same
-[pinned release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.0).
+Download `illumitech-forge-v1.9.1-skill.zip` and its whole-file digest from the same
+[pinned release](https://github.com/TheZehel/illumitech-forge/releases/tag/v1.9.1).
 Verify the download/source through a trusted release channel; a caller-supplied checksum
 is integrity evidence, not a publisher signature. Replace the digest placeholder below.
 
 ```sh
 python3 /reviewed/scripts/install_agent_skill.py \
-  --archive /downloads/illumitech-forge-v1.9.0-skill.zip \
+  --archive /downloads/illumitech-forge-v1.9.1-skill.zip \
   --sha256 TRUSTED_64_HEX_DIGEST --root /absolute/project \
   --host codex --forge-binary /verified/illumitech-forge
 ```

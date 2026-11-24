@@ -39,7 +39,8 @@ independent read-only review; selected issue import and explicitly authorized dr
 installation diagnostics, verified local updates, SQLite snapshots and fresh-target restore.
 
 Codex uses the configured native account/model. Managed ChatGPT App Server protocol 0.166.0
-is the reference for Workbench. Claude is experimental/deferred. Free chat is read-only;
+is the reference for Workbench. Manifest tasks can select the experimental `claude` executor
+with Claude Code authentication and permissions ([contract](docs/contracts.md#manifest-and-operational-contracts)). Free chat is read-only;
 implementation runs under a reviewed manifest. Agent messages never satisfy acceptance gates.
 No paid API fallback or permission bypass is introduced.
 

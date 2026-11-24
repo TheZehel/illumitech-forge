@@ -7,9 +7,10 @@ license: MIT
 # Illumitech Forge
 
 Operate the installed Forge CLI. Forge owns contracts, execution, external checks and durable
-state. The current assistant interprets the request and operates that CLI; native agent tasks
-use Codex CLI with its existing account, model and permissions. A Cursor skill does not add
-Cursor as a Forge executor. Keep the chosen host and the execution harness distinct.
+state. The current assistant operates that CLI. Each manifest task selects its executor.
+Use the selected Codex CLI or experimental Claude Code executor with its existing account,
+model and permissions. For a Claude write task, verify its native Edit rule covers the
+intended file. Keep the skill host distinct from the executor. Chat and Workbench use Codex.
 
 ## Discover before operating
 

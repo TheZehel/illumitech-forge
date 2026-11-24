@@ -36,6 +36,8 @@ pub fn claude(prompt: &str, write: bool, model: Option<&str>) -> Vec<String> {
     if let Some(m) = model {
         a.extend(["--model".into(), m.into()]);
     }
+    // --tools accepts multiple values. End option parsing before the literal prompt.
+    a.push("--".into());
     a.push(prompt.into());
     a
 }
@@ -148,6 +150,28 @@ mod tests {
                 "fallback-model",
             ] {
                 assert!(!s.contains(forbidden));
+            }
+        }
+    }
+    #[test]
+    fn claude_keeps_the_prompt_positional_after_tools_and_model() {
+        let prompt = "--model is part of the task\nsecond line";
+        for write in [false, true] {
+            for model in [None, Some("chosen-model")] {
+                let args = claude(prompt, write, model);
+                assert_eq!(&args[args.len() - 2..], ["--", prompt]);
+                assert_eq!(
+                    args.windows(2).any(|p| p == ["--tools", "Read,Glob,Grep"]),
+                    !write
+                );
+                assert_eq!(
+                    args.windows(2).any(|p| p == ["--model", "chosen-model"]),
+                    model.is_some()
+                );
+                assert!(
+                    args.windows(2)
+                        .any(|p| p == ["--permission-mode", "dontAsk"])
+                );
             }
         }
     }

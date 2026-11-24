@@ -43,7 +43,8 @@ espera por aprovação continuam explícitas. [Pranchas editáveis e atualizaç�
 - Issue selecionada → candidato revisável → execução → draft PR sob autorização explícita.
 - Diagnóstico de PATH, atualização local verificada, snapshots SQLite consistentes e restauração.
 
-Claude permanece experimental e fora do aceite nativo desta entrega. A conversa livre usa
+Tarefas de manifesto podem selecionar o executor experimental `claude`, com autenticação e
+permissões do Claude Code ([contrato](docs/contracts.md#manifest-and-operational-contracts)). A conversa livre usa
 somente leitura; a implementação usa um manifest revisado. A resposta do chat não aprova gates.
 
 ## Começar com a versão publicada
